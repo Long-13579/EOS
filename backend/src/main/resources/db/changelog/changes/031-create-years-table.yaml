@@ -1,0 +1,25 @@
+databaseChangeLog:
+  - changeSet:
+      id: 031-create-years-table
+      author: eos-team
+      changes:
+        - createTable:
+            tableName: years
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: year
+                  type: INTEGER
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: true

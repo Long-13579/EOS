@@ -1,0 +1,7 @@
+UpdateIssueRequestBody:
+  required: true
+  description: Request body for updating an existing issue, title is required.
+  content:
+    application/json:
+      schema:
+        $ref: ../schemas/issue/issue-update-request.yaml#/IssueUpdateRequest

@@ -1,0 +1,36 @@
+databaseChangeLog:
+  - changeSet:
+      id: 039-create-weeks-table
+      author: eos-team
+      changes:
+        - createTable:
+            tableName: weeks
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: start_date
+                  type: DATE
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: end_date
+                  type: DATE
+                  constraints:
+                    nullable: false
+                    unique: true
+        - sql:
+            sql: |
+              INSERT INTO weeks (id, start_date, end_date)
+              SELECT
+                uuid_generate_v4(),
+                CURRENT_DATE - (EXTRACT(ISODOW FROM CURRENT_DATE)::int - 1) - (week_offset * 7),
+                CURRENT_DATE + (7 - EXTRACT(ISODOW FROM CURRENT_DATE)::int) - (week_offset * 7)
+              FROM generate_series(0, 12) AS week_offset
+              ON CONFLICT DO NOTHING;
+            comment: "Initialize the current week and 12 previous weeks (13 weeks total). Uses ISO day of week (1=Monday, 7=Sunday) to correctly calculate Monday–Sunday range."

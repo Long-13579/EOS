@@ -1,0 +1,62 @@
+post:
+  tags:
+    - Headlines
+  summary: Create a new headline
+  description: Creates a new headline within the specified team.
+  operationId: createHeadline
+  security:
+    - accessCookieAuth: []
+  requestBody:
+    $ref: ../../components/request-bodies/create-headline.yaml#/CreateHeadlineRequestBody
+  responses:
+    "201":
+      description: Headline successfully created.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/headline/headline-response.yaml#/HeadlineResponse
+    "400":
+      $ref: ../../components/responses/bad-request.yaml#/BadRequestResponse
+    "401":
+      $ref: ../../components/responses/unauthorized.yaml#/UnauthorizedResponse
+    "403":
+      $ref: ../../components/responses/forbidden.yaml#/ForbiddenResponse
+    "404":
+      $ref: ../../components/responses/not-found.yaml#/NotFoundResponse
+    "409":
+      $ref: ../../components/responses/conflict.yaml#/ConflictResponse
+    "422":
+      $ref: ../../components/responses/validation-error.yaml#/ValidationErrorResponse
+    "500":
+      $ref: ../../components/responses/internal-server-error.yaml#/InternalServerErrorResponse
+
+get:
+  tags:
+    - Headlines
+  summary: Retrieve headlines for a team
+  description: Retrieves a paginated list of headlines for a specific team. Requires authentication.
+  operationId: getHeadlines
+  security:
+    - accessCookieAuth: []
+  parameters:
+    - $ref: ../../components/parameters/page.yaml#/PageParam
+    - $ref: ../../components/parameters/limit.yaml#/LimitParam
+    - $ref: ../../components/parameters/team.yaml#/TeamIdQueryParam
+    - $ref: ../../components/parameters/is-archived.yaml#/IsArchivedQueryParam
+  responses:
+    "200":
+      description: List of headlines by team.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/headline/headline-list-response.yaml#/HeadlineListResponse
+    "400":
+      $ref: ../../components/responses/bad-request.yaml#/BadRequestResponse
+    "401":
+      $ref: ../../components/responses/unauthorized.yaml#/UnauthorizedResponse
+    "403":
+      $ref: ../../components/responses/forbidden.yaml#/ForbiddenResponse
+    "404":
+      $ref: ../../components/responses/not-found.yaml#/NotFoundResponse
+    "500":
+      $ref: ../../components/responses/internal-server-error.yaml#/InternalServerErrorResponse

@@ -1,0 +1,25 @@
+get:
+  operationId: getCurrentUser
+  summary: Get current authenticated user
+  description: Retrieves information about the currently authenticated user based on the provided access token in the cookie. This endpoint allows clients to fetch the user's profile details, including their name, email, and role, without needing to specify a user ID.
+  tags:
+    - Users
+  security:
+    - accessCookieAuth: []
+  responses:
+    "200":
+      description: Successfully retrieved current user information
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/user/current-user-response.yaml#/CurrentUserResponse
+          example:
+            id: "123e4567-e89b-12d3-a456-426614174000"
+            firstName: "John"
+            lastName: "Doe"
+            email: "john.doe@gmail.com"
+            role: "USER"
+    "401":
+      $ref: ../../components/responses/unauthorized.yaml#/UnauthorizedResponse
+    "500":
+      $ref: ../../components/responses/internal-server-error.yaml#/InternalServerErrorResponse

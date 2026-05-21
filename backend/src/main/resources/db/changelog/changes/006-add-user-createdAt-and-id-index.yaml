@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - changeSet:
+      id: 006-create-index-users-created_at-id
+      author: eos-team
+      changes:
+        - createIndex:
+            tableName: users
+            indexName: idx_users_created_at_id
+            columns:
+              - column:
+                  name: created_at
+                  descending: true
+              - column:
+                  name: id
+                  descending: false

@@ -1,0 +1,15 @@
+server:
+  shutdown: graceful
+spring:
+  datasource:
+    hikari:
+      data-source-properties:
+        sslmode: require
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  liquibase:
+    contexts: prod
+cookie: # prod use HTTPS, different domain for BE,FE
+  secure: true
+  same-site: none

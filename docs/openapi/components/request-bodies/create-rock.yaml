@@ -1,0 +1,7 @@
+CreateRockRequestBody:
+  required: true
+  description: Request body for creating a new rock.
+  content:
+    application/json:
+      schema:
+        $ref: ../schemas/rock/rock-create-request.yaml#/RockCreateRequest

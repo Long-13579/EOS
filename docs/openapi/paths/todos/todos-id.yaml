@@ -1,0 +1,86 @@
+parameters:
+  - $ref: ../../components/parameters/todo.yaml#/TodoIdParam
+
+put:
+  tags:
+    - Todos
+  summary: Update a todo by ID
+  description: Updates an existing todo. Requires authentication and appropriate permissions.
+  operationId: updateTodo
+  security:
+    - accessCookieAuth: []
+  requestBody:
+    $ref: ../../components/request-bodies/update-todo.yaml#/UpdateTodoRequestBody
+  responses:
+    "200":
+      description: Todo updated successfully
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/todo/todo-response.yaml#/TodoResponse
+    "400":
+      $ref: ../../components/responses/bad-request.yaml#/BadRequestResponse
+    "401":
+      $ref: ../../components/responses/unauthorized.yaml#/UnauthorizedResponse
+    "403":
+      $ref: ../../components/responses/forbidden.yaml#/ForbiddenResponse
+    "404":
+      $ref: ../../components/responses/not-found.yaml#/NotFoundResponse
+    "422":
+      $ref: ../../components/responses/validation-error.yaml#/ValidationErrorResponse
+    "500":
+      $ref: ../../components/responses/internal-server-error.yaml#/InternalServerErrorResponse
+
+delete:
+  tags:
+    - Todos
+  summary: Delete a todo by ID
+  description: Deletes a todo by its ID. The user must be authenticated and have permission to delete the todo.
+  operationId: deleteTodo
+  security:
+    - accessCookieAuth: []
+  responses:
+    "204":
+      description: Todo deleted successfully
+    "400":
+      $ref: ../../components/responses/bad-request.yaml#/BadRequestResponse
+    "401":
+      $ref: ../../components/responses/unauthorized.yaml#/UnauthorizedResponse
+    "403":
+      $ref: ../../components/responses/forbidden.yaml#/ForbiddenResponse
+    "404":
+      $ref: ../../components/responses/not-found.yaml#/NotFoundResponse
+    "500":
+      $ref: ../../components/responses/internal-server-error.yaml#/InternalServerErrorResponse
+
+patch:
+  tags:
+    - Todos
+  summary: Archive/Unarchive a todo by ID
+  description: Archives or unarchives a todo by its ID. The user must be authenticated and have permission to modify the todo. Archiving a todo will mark it as archived without deleting it from the database.
+  operationId: updateTodoArchiveStatus
+  security:
+    - accessCookieAuth: []
+  requestBody:
+    $ref: ../../components/request-bodies/update-todo-archive.yaml#/UpdateTodoArchiveRequestBody
+  responses:
+    "200":
+      description: Todo archive status updated successfully
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/todo/todo-response.yaml#/TodoResponse
+    "400":
+      $ref: ../../components/responses/bad-request.yaml#/BadRequestResponse
+    "401":
+      $ref: ../../components/responses/unauthorized.yaml#/UnauthorizedResponse
+    "403":
+      $ref: ../../components/responses/forbidden.yaml#/ForbiddenResponse
+    "404":
+      $ref: ../../components/responses/not-found.yaml#/NotFoundResponse
+    "409":
+      $ref: ../../components/responses/conflict.yaml#/ConflictResponse
+    "422":
+      $ref: ../../components/responses/validation-error.yaml#/ValidationErrorResponse
+    "500":
+      $ref: ../../components/responses/internal-server-error.yaml#/InternalServerErrorResponse

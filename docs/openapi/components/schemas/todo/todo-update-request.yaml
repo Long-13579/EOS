@@ -1,0 +1,17 @@
+TodoUpdateRequest:
+  allOf:
+    - $ref: ./todo-base.yaml#/TodoBase
+    - type: object
+      description: Detailed schema for a todo update request
+      properties:
+        assigneeIds:
+          type: array
+          nullable: true
+          description: List of user identifiers assigned to the todo item
+          items:
+            type: string
+            format: uuid
+          uniqueItems: true
+          example:
+            - "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+            - "9c9f6c44-1b2f-4f52-b1c2-6a8a4b9c1234"

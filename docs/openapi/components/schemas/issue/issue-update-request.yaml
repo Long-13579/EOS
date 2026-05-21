@@ -1,0 +1,12 @@
+IssueUpdateRequest:
+  allOf:
+    - $ref: ./issue-base.yaml#/IssueBase
+    - type: object
+      description: Detailed schema for an issue update request
+      properties:
+        issueTypeId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Issue type identifier for the issue item
+          example: "3fa85f64-5717-4562-b3fc-2c963f66afa6"

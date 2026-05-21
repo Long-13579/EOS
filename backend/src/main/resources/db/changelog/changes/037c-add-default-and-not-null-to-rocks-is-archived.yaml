@@ -1,0 +1,29 @@
+databaseChangeLog:
+  - changeSet:
+      id: 037c-add-default-and-not-null-to-rocks-is-archived
+      author: eos-team
+      preConditions:
+        - onFail: HALT
+        - onError: HALT
+        - tableExists:
+            tableName: rocks
+        - columnExists:
+            tableName: rocks
+            columnName: is_archived
+      changes:
+        - addDefaultValue:
+            tableName: rocks
+            columnName: is_archived
+            defaultValueBoolean: false
+        - addNotNullConstraint:
+            tableName: rocks
+            columnName: is_archived
+            columnDataType: BOOLEAN
+      rollback:
+        - dropNotNullConstraint:
+            tableName: rocks
+            columnName: is_archived
+            columnDataType: BOOLEAN
+        - dropDefaultValue:
+            tableName: rocks
+            columnName: is_archived

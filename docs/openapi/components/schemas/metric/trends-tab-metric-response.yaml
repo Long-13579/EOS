@@ -1,0 +1,44 @@
+TrendsTabMetricResponse:
+  allOf:
+    - $ref: ./metric-base.yaml#/MetricBase
+    - type: object
+      description: Detailed schema for a trends tab metric response.
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the metric.
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        createdAt:
+          type: string
+          format: date-time
+          description: The timestamp when the metric was created.
+          example: "2024-01-01T12:00:00Z"
+        values:
+          type: array
+          minItems: 13
+          maxItems: 13
+          description: >-
+            List of trend data points for the last 13 weeks, including the current week, sorted by week start date in ascending order. Each item always includes a 'week' object.
+          items:
+            $ref: ./trend-data-point-response.yaml#/TrendDataPointResponse
+        team:
+          $ref: ../team/team-base.yaml#/TeamBase
+        owner:
+          $ref: ../user/user-base-response.yaml#/UserBaseResponse
+        createdBy:
+          $ref: ../user/user-base-response.yaml#/UserBaseResponse
+        updatedAt:
+          type: string
+          format: date-time
+          description: The timestamp when the metric was last updated.
+          example: "2024-01-02T12:00:00Z"
+        updatedBy:
+          $ref: ../user/user-base-response.yaml#/UserBaseResponse
+      required:
+        - id
+        - team
+        - owner
+        - values
+        - createdAt
+        - createdBy

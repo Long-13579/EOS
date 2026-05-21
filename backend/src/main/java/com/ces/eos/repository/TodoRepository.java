@@ -1,0 +1,57 @@
+package com.ces.eos.repository;
+
+import com.ces.eos.entity.Todo;
+import com.ces.eos.enums.TodoStatus;
+import java.util.List;
+import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface TodoRepository extends JpaRepository<Todo, UUID> {
+
+  @Query(
+      value =
+          "SELECT t.id FROM Todo t "
+              + "WHERE t.team.id = :teamId AND t.isArchived = :isArchived "
+              + "ORDER BY "
+              + "CASE WHEN t.status = com.ces.eos.enums.TodoStatus.COMPLETED THEN 1 "
+              + "ELSE 0 END ASC, "
+              + "t.dueDate ASC NULLS LAST, "
+              + "t.createdAt DESC")
+  Page<UUID> findTodoIdsByTeamIdAndArchiveStatus(
+      @Param("teamId") UUID teamId, @Param("isArchived") boolean isArchived, Pageable pageable);
+
+  @Query(
+      value =
+          "SELECT t.id FROM Todo t "
+              + "WHERE t.team.id = :teamId AND t.status = :status AND t.isArchived = :isArchived")
+  Page<UUID> findTodoIdsByTeamIdAndStatusAndArchiveStatus(
+      @Param("teamId") UUID teamId,
+      @Param("status") TodoStatus status,
+      @Param("isArchived") boolean isArchived,
+      Pageable pageable);
+
+  @Query(
+      value =
+          "SELECT t.id FROM Todo t JOIN t.assignees assignee JOIN t.team.users teamUser"
+              + " WHERE assignee.id = :assigneeId AND teamUser.id = :assigneeId AND t.isArchived = false"
+              + " ORDER BY CASE WHEN t.status ="
+              + " com.ces.eos.enums.TodoStatus.COMPLETED THEN 1 ELSE 0 END ASC, t.dueDate ASC"
+              + " NULLS LAST, t.createdAt DESC")
+  Page<UUID> findActiveTodoIdsByAssigneeId(@Param("assigneeId") UUID assigneeId, Pageable pageable);
+
+  @Query(
+      value =
+          "SELECT DISTINCT t FROM Todo t "
+              + "LEFT JOIN FETCH t.team "
+              + "LEFT JOIN FETCH t.assignees "
+              + "WHERE t.id IN :ids")
+  List<Todo> findAllByIdIn(@Param("ids") List<UUID> ids);
+
+  boolean existsByIdAndTeam_Users_Id(UUID todoId, UUID userId);
+}

@@ -1,0 +1,11 @@
+YearBase:
+  type: object
+  description: Base schema for year properties
+  properties:
+    year:
+      type: integer
+      description: Numerical value representing the year
+      minimum: 1900
+      example: 2026
+  required:
+    - year

@@ -1,0 +1,7 @@
+UpdateTeamRequest:
+  description: Request body for updating an existing team.
+  required: true
+  content:
+    application/json:
+      schema:
+        $ref: ../../openapi.yaml#/components/schemas/TeamUpdateRequest

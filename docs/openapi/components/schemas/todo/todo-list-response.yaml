@@ -1,0 +1,14 @@
+TodoListResponse:
+  type: object
+  description: Response schema for a list of todos with pagination
+  properties:
+    data:
+      type: array
+      description: Array of todo items
+      items:
+        $ref: ./todo-response.yaml#/TodoResponse
+    pagination:
+      $ref: ../common/pagination.yaml#/Pagination
+  required:
+    - data
+    - pagination

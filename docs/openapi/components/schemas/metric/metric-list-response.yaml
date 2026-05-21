@@ -1,0 +1,5 @@
+MetricListResponse:
+  type: array
+  description: List of metrics.
+  items:
+    $ref: ./metric-response.yaml#/MetricResponse

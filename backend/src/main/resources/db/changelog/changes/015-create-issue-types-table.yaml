@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - changeSet:
+      id: 015-create-issue-types-table
+      author: eos-team
+      changes:
+        - createTable:
+            tableName: issue_types
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+                    unique: true

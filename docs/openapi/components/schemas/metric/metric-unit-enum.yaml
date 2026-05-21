@@ -1,0 +1,16 @@
+MetricUnitEnum:
+  type: string
+  description: |
+    Indicates the unit or format used for a metric value.
+    - NUMBER: A plain numeric value with no associated unit.
+    - PERCENTAGE: A value expressed as a percentage.
+    - CURRENCY: A value representing a monetary amount.
+    - YES_NO: A boolean-style value represented as Yes or No.
+    - RYG_STATUS: A status value represented as Red, Yellow, or Green.
+  enum:
+    - NUMBER
+    - PERCENTAGE
+    - CURRENCY
+    - YES_NO
+    - RYG_STATUS
+  example: PERCENTAGE

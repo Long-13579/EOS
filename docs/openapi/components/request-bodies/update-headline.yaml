@@ -1,0 +1,7 @@
+UpdateHeadlineRequestBody:
+  required: true
+  description: Request body for updating an existing headline.
+  content:
+    application/json:
+      schema:
+        $ref: ../schemas/headline/headline-update-request.yaml#/HeadlineUpdateRequest

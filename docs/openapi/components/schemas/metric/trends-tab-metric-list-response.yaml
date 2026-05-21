@@ -1,0 +1,10 @@
+TrendsTabMetricListResponse:
+  type: object
+  properties:
+    items:
+      type: array
+      description: Array of trends tab metric items.
+      items:
+        $ref: ./trends-tab-metric-response.yaml#/TrendsTabMetricResponse
+  required:
+    - items

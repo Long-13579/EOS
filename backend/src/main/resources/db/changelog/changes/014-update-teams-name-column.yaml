@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: 014-update-teams-name-column
+      author: eos-team
+      changes:
+        - modifyDataType:
+            tableName: teams
+            columnName: name
+            newDataType: VARCHAR(100)
+        - addUniqueConstraint:
+            tableName: teams
+            columnNames: name
+            constraintName: uk_teams_name

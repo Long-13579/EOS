@@ -1,0 +1,83 @@
+databaseChangeLog:
+  - changeSet:
+      id: 047-migrate-todo-assignees-from-assignee-column
+      author: eos-team
+      preConditions:
+        - onFail: HALT
+        - onError: HALT
+        - tableExists:
+            tableName: todos
+        - tableExists:
+            tableName: users
+        - columnExists:
+            tableName: todos
+            columnName: assignee_id
+        - not:
+            - tableExists:
+                tableName: todo_assignees
+      changes:
+        - createTable:
+            tableName: todo_assignees
+            columns:
+              - column:
+                  name: todo_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_todo_assignees
+              - column:
+                  name: assignee_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_todo_assignees
+        - addForeignKeyConstraint:
+            baseTableName: todo_assignees
+            baseColumnNames: todo_id
+            referencedTableName: todos
+            referencedColumnNames: id
+            constraintName: fk_todo_assignees_todo_id
+            onDelete: CASCADE
+            onUpdate: CASCADE
+        - addForeignKeyConstraint:
+            baseTableName: todo_assignees
+            baseColumnNames: assignee_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_todo_assignees_assignee_id
+            onDelete: CASCADE
+            onUpdate: CASCADE
+        - sql:
+            sql: |
+              INSERT INTO todo_assignees (todo_id, assignee_id)
+              SELECT t.id, t.assignee_id
+              FROM todos t
+              WHERE t.assignee_id IS NOT NULL
+              ON CONFLICT (todo_id, assignee_id) DO NOTHING;
+        - dropForeignKeyConstraint:
+            baseTableName: todos
+            constraintName: fk_todos_assignee_id
+        - dropColumn:
+            tableName: todos
+            columnName: assignee_id
+      rollback:
+        - addColumn:
+            tableName: todos
+            columns:
+              - column:
+                  name: assignee_id
+                  type: UUID
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: todos
+            baseColumnNames: assignee_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_todos_assignee_id
+            onDelete: SET NULL
+            onUpdate: CASCADE
+        - dropTable:
+            tableName: todo_assignees

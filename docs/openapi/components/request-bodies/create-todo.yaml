@@ -1,0 +1,7 @@
+CreateTodoRequestBody:
+  required: true
+  description: Request body for creating a new todo.
+  content:
+    application/json:
+      schema:
+        $ref: ../schemas/todo/todo-create-request.yaml#/TodoCreateRequest

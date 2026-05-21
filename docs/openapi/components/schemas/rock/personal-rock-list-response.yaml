@@ -1,0 +1,11 @@
+PersonalRockListResponse:
+  type: object
+  description: Flat list of personal rocks across all categories.
+  properties:
+    data:
+      type: array
+      description: Personal rocks (COMPANY, DEPARTMENT, INDIVIDUAL) for the current user. Each item's `category` field distinguishes the type.
+      items:
+        $ref: ./rock-response.yaml#/RockResponse
+  required:
+    - data

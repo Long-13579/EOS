@@ -1,0 +1,18 @@
+IssueBase:
+  type: object
+  description: Base schema for an issue
+  properties:
+    title:
+      type: string
+      description: Short title of the issue item
+      minLength: 1
+      maxLength: 255
+      example: Scorecard export bug
+    description:
+      type: string
+      nullable: true
+      description: Detailed description of the issue item
+      maxLength: 2000
+      example: The CSV export returns a 500 error when a week has no data.
+  required:
+    - title

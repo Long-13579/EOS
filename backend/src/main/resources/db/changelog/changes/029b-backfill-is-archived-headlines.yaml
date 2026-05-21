@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - changeSet:
+      id: 029b-backfill-is-archived-headlines
+      author: eos-team
+      preConditions:
+        - onFail: HALT
+        - onError: HALT
+        - tableExists:
+            tableName: headlines
+        - columnExists:
+            tableName: headlines
+            columnName: is_archived
+      changes:
+        - update:
+            tableName: headlines
+            columns:
+              - column:
+                  name: is_archived
+                  valueBoolean: false
+            where: is_archived IS NULL

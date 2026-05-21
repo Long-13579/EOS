@@ -1,0 +1,39 @@
+databaseChangeLog:
+  - changeSet:
+      id: 019-add-is-archived-column
+      author: eos-team
+      preConditions:
+        - onFail: HALT
+        - onError: HALT
+        - tableExists:
+            tableName: todos
+        - not:
+            - columnExists:
+                tableName: todos
+                columnName: is_archived
+      changes:
+        - addColumn:
+            tableName: todos
+            columns:
+              - column:
+                  name: is_archived
+                  type: BOOLEAN
+        - update:
+            tableName: todos
+            columns:
+              - column:
+                  name: is_archived
+                  valueBoolean: false
+            where: is_archived IS NULL
+        - addDefaultValue:
+            tableName: todos
+            columnName: is_archived
+            defaultValueBoolean: false
+        - addNotNullConstraint:
+            tableName: todos
+            columnName: is_archived
+            columnDataType: BOOLEAN
+      rollback:
+        - dropColumn:
+            tableName: todos
+            columnName: is_archived

@@ -1,0 +1,24 @@
+databaseChangeLog:
+  - changeSet:
+      id: 037a-add-is-archived-column-to-rocks
+      author: eos-team
+      preConditions:
+        - onFail: HALT
+        - onError: HALT
+        - tableExists:
+            tableName: rocks
+        - not:
+            - columnExists:
+                tableName: rocks
+                columnName: is_archived
+      changes:
+        - addColumn:
+            tableName: rocks
+            columns:
+              - column:
+                  name: is_archived
+                  type: BOOLEAN
+      rollback:
+        - dropColumn:
+            tableName: rocks
+            columnName: is_archived

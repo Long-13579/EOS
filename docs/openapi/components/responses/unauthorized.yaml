@@ -1,0 +1,12 @@
+UnauthorizedResponse:
+  description: Unauthorized
+  content:
+    application/json:
+      schema:
+        $ref: ../../openapi.yaml#/components/schemas/ErrorResponse
+      example:
+        code: UNAUTHORIZED
+        message: Authentication is required and has failed or has not yet been provided.
+        details:
+          auth:
+            - Missing Authorization header in request.

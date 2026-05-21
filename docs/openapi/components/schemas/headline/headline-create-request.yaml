@@ -1,0 +1,13 @@
+HeadlineCreateRequest:
+  allOf:
+    - $ref: ./headline-base.yaml#/HeadlineBase
+    - type: object
+      description: Payload used to create a new headline
+      required:
+        - teamId
+      properties:
+        teamId:
+          type: string
+          format: uuid
+          description: Team identifier that owns this headline
+          example: "3fa85f64-5717-4562-b3fc-2c963f66afa6"

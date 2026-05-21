@@ -1,0 +1,15 @@
+YearResponse:
+  allOf:
+    - $ref: ./year-base-response.yaml#/YearBaseResponse
+    - type: object
+      description: Detailed schema for a year response
+      properties:
+        isCurrent:
+          type: boolean
+          description: Indicates whether the year is the current year
+          example: false
+        createdAt:
+          type: string
+          format: date-time
+          description: Date and time when the year was created
+          example: "2026-02-24T10:00:00Z"

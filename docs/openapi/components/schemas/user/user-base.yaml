@@ -1,0 +1,28 @@
+UserBase:
+  type: object
+  description: Base schema for a user
+  properties:
+    firstName:
+      type: string
+      description: User's legal first name. Allows letters with accents, spaces, hyphens, and apostrophes
+      minLength: 1
+      maxLength: 100
+      pattern: "^[a-zA-ZÀ-ỹ]+(?:[ \\-\\'][a-zA-ZÀ-ỹ]+)*$"
+      example: John
+    lastName:
+      type: string
+      description: User's legal last name or family name. Allows letters with accents, spaces, hyphens, and apostrophes
+      minLength: 1
+      maxLength: 100
+      pattern: "^[a-zA-ZÀ-ỹ]+(?:[ \\-\\'][a-zA-ZÀ-ỹ]+)*$"
+      example: Doe
+    email:
+      type: string
+      description: Email address of the user
+      format: email
+      maxLength: 255
+      example: john.doe@gmail.com
+  required:
+    - firstName
+    - lastName
+    - email

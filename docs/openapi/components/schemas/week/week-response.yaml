@@ -1,0 +1,13 @@
+WeekResponse:
+  allOf:
+    - $ref: ./week-base.yaml#/WeekBase
+    - type: object
+      description: Response schema for a week, extending WeekBase with an ID field
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the week
+          example: "123e4567-e89b-12d3-a456-426614174000"
+      required:
+        - id

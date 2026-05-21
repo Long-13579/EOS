@@ -1,0 +1,16 @@
+ValidationErrorResponse:
+  description: Input validation failed. The request body contains invalid data according to validation rules.
+  content:
+    application/json:
+      schema:
+        $ref: ../../openapi.yaml#/components/schemas/ErrorResponse
+      example:
+        code: VALIDATION_ERROR
+        message: Input validation failed.
+        details:
+          email:
+            - must be a valid email format
+          firstName:
+            - must not be blank.
+          lastName:
+            - must not be blank.

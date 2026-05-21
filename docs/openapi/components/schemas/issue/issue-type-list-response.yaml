@@ -1,0 +1,5 @@
+IssueTypeListResponse:
+  type: array
+  description: Response schema for a list of issue types
+  items:
+    $ref: ./issue-type-base-response.yaml#/IssueTypeBaseResponse # currently, we are using issue type base response as the list response, but we can change it to issue type response if needed in the future when we have more fields in the issue type response (created_at, updated_at,...).

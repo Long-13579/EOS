@@ -1,0 +1,13 @@
+YearBaseResponse:
+  allOf:
+    - $ref: ./year-base.yaml#/YearBase
+    - type: object
+      description: Basic information of year including id and base details
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the year
+          example: "123e4567-e89b-12d3-a456-426614174000"
+      required:
+        - id

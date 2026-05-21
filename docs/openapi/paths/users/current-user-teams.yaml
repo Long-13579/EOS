@@ -1,0 +1,39 @@
+get:
+  tags:
+    - Users
+  summary: List teams for the current user
+  description: Retrieves a list of teams the current user belongs to. If the user is an admin, all teams are returned. Requires authentication.
+  operationId: listTeamsByCurrentUser
+  security:
+    - accessCookieAuth: []
+  responses:
+    "200":
+      description: Successfully retrieved teams for the current user
+      content:
+        application/json:
+          schema:
+            type: array
+            description: Array of teams belonging to the current user
+            items:
+              $ref: ../../components/schemas/team/team-response.yaml#/TeamResponse
+          example:
+            - id: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+              name: Engineering Team
+              isLeadership: false
+              createdAt: "2024-01-01T12:00:00Z"
+              updatedAt: "2024-01-01T12:00:00Z"
+            - id: 4fb96f75-6828-5673-c4ad-3d074a77bfb7
+              name: Design Team
+              isLeadership: false
+              createdAt: "2024-01-02T08:30:00Z"
+              updatedAt: "2024-01-02T08:30:00Z"
+    "400":
+      $ref: ../../components/responses/bad-request.yaml#/BadRequestResponse
+    "401":
+      $ref: ../../components/responses/unauthorized.yaml#/UnauthorizedResponse
+    "403":
+      $ref: ../../components/responses/forbidden.yaml#/ForbiddenResponse
+    "404":
+      $ref: ../../components/responses/not-found.yaml#/NotFoundResponse
+    "500":
+      $ref: ../../components/responses/internal-server-error.yaml#/InternalServerErrorResponse

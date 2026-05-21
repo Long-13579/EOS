@@ -1,0 +1,7 @@
+UpdateMetricValueRequestBody:
+  description: Request body for updating the current value of a metric.
+  required: true
+  content:
+    application/json:
+      schema:
+        $ref: ../schemas/metric-value/metric-value-update-request.yaml#/MetricValueUpdateRequest

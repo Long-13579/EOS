@@ -1,0 +1,17 @@
+MetricValueBaseResponse:
+  description: Compact metric value payload used in trends data points.
+  allOf:
+    - $ref: ./metric-value-base.yaml#/MetricValueBase
+    - type: object
+      properties:
+        isGoalMet:
+          type: boolean
+          description: Indicates whether the recorded value meets the metric's goal, evaluated server-side using the metric's configured operator. Absent when the metric has no goal or operator configured; false means computed but not met.
+          example: true
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the metric value.
+          example: "123e4567-e89b-12d3-a456-426614174000"
+      required:
+        - id

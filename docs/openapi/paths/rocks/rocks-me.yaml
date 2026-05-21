@@ -1,0 +1,29 @@
+get:
+  tags:
+    - Rocks
+  summary: Get Personal Rocks
+  description:
+    Retrieves a flattened array of all Rocks associated with the current user.
+    If either 'year' or 'quarter' is omitted, the parameter defaults to the
+    current year or current quarter, respectively.
+  operationId: getPersonalRocks
+  security:
+    - accessCookieAuth: []
+  parameters:
+    - $ref: ../../components/parameters/year.yaml#/YearIdQueryParam
+    - $ref: ../../components/parameters/quarter.yaml#/QuarterIdQueryParam
+  responses:
+    "200":
+      description: Successfully retrieved personal rocks object.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/rock/personal-rock-list-response.yaml#/PersonalRockListResponse
+    "400":
+      $ref: ../../components/responses/bad-request.yaml#/BadRequestResponse
+    "401":
+      $ref: ../../components/responses/unauthorized.yaml#/UnauthorizedResponse
+    "403":
+      $ref: ../../components/responses/forbidden.yaml#/ForbiddenResponse
+    "500":
+      $ref: ../../components/responses/internal-server-error.yaml#/InternalServerErrorResponse

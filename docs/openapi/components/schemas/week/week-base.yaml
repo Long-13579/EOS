@@ -1,0 +1,17 @@
+WeekBase:
+  type: object
+  description: Base schema for week properties.
+  properties:
+    startDate:
+      type: string
+      format: date-time
+      description: Week start timestamp
+      example: "2026-03-30T00:00:00Z"
+    endDate:
+      type: string
+      format: date-time
+      description: Week end timestamp
+      example: "2026-04-05T23:59:59Z"
+  required:
+    - startDate
+    - endDate

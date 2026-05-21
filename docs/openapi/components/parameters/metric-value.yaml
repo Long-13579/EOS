@@ -1,0 +1,9 @@
+MetricValueIdParam:
+  name: metric-value-id
+  in: path
+  required: true
+  description: Unique identifier of the metric value
+  schema:
+    type: string
+    format: uuid
+    example: "123e4567-e89b-12d3-a456-426614174000"

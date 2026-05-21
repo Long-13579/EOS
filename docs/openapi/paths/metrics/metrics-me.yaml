@@ -1,0 +1,25 @@
+get:
+  tags:
+    - Metrics
+  summary: List metrics assigned to current user
+  description: Retrieves metrics assigned to the currently authenticated user across all teams for the specified week. Requires authentication.
+  operationId: listMyAssignedMetrics
+  security:
+    - accessCookieAuth: []
+  parameters:
+    - $ref: ../../components/parameters/week.yaml#/WeekIdQueryParam
+  responses:
+    "200":
+      description: Successfully retrieved metrics assigned to current user for the specified week.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/metric/metric-list-response.yaml#/MetricListResponse
+    "400":
+      $ref: ../../components/responses/bad-request.yaml#/BadRequestResponse
+    "401":
+      $ref: ../../components/responses/unauthorized.yaml#/UnauthorizedResponse
+    "403":
+      $ref: ../../components/responses/forbidden.yaml#/ForbiddenResponse
+    "500":
+      $ref: ../../components/responses/internal-server-error.yaml#/InternalServerErrorResponse

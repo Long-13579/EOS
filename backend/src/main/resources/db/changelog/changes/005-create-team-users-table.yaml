@@ -1,0 +1,38 @@
+databaseChangeLog:
+  - changeSet:
+      id: 005-create-team-users-table
+      author: eos-team
+      changes:
+        - createTable:
+            tableName: team_users
+            columns:
+              - column:
+                  name: user_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: team_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            tableName: team_users
+            columnNames: user_id, team_id
+            constraintName: pk_team_users
+        - addForeignKeyConstraint:
+            baseTableName: team_users
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_team_users_user_id
+            onDelete: CASCADE
+            onUpdate: CASCADE
+        - addForeignKeyConstraint:
+            baseTableName: team_users
+            baseColumnNames: team_id
+            referencedTableName: teams
+            referencedColumnNames: id
+            constraintName: fk_team_users_team_id
+            onDelete: CASCADE
+            onUpdate: CASCADE

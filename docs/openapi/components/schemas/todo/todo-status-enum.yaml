@@ -1,0 +1,8 @@
+TodoStatusEnum:
+  type: string
+  description: Status of the todo item
+  enum:
+    - NOT_STARTED
+    - IN_PROGRESS
+    - COMPLETED
+  example: IN_PROGRESS

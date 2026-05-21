@@ -1,0 +1,25 @@
+get:
+  tags:
+    - Quarters
+  summary: Retrieve quarters
+  description: Retrieves all quarters. Requires authentication.
+  operationId: getQuarters
+  security:
+    - accessCookieAuth: []
+  responses:
+    "200":
+      description: List of quarters.
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ../../components/schemas/quarter/quarter-response.yaml#/QuarterResponse
+    "400":
+      $ref: ../../components/responses/bad-request.yaml#/BadRequestResponse
+    "401":
+      $ref: ../../components/responses/unauthorized.yaml#/UnauthorizedResponse
+    "403":
+      $ref: ../../components/responses/forbidden.yaml#/ForbiddenResponse
+    "500":
+      $ref: ../../components/responses/internal-server-error.yaml#/InternalServerErrorResponse

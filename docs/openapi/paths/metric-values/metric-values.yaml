@@ -1,0 +1,31 @@
+put:
+  tags:
+    - Metric Values
+  summary: Update a metric value
+  description: Updates the current value of a metric and returns the updated metric with its latest value. Requires authentication.
+  operationId: updateMetricValue
+  security:
+    - accessCookieAuth: []
+  requestBody:
+    $ref: ../../components/request-bodies/update-metric-value.yaml#/UpdateMetricValueRequestBody
+  responses:
+    "200":
+      description: Metric retrieved successfully after updating its current value
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/metric/metric-response.yaml#/MetricResponse
+    "400":
+      $ref: ../../components/responses/bad-request.yaml#/BadRequestResponse
+    "401":
+      $ref: ../../components/responses/unauthorized.yaml#/UnauthorizedResponse
+    "403":
+      $ref: ../../components/responses/forbidden.yaml#/ForbiddenResponse
+    "404":
+      $ref: ../../components/responses/not-found.yaml#/NotFoundResponse
+    "409":
+      $ref: ../../components/responses/conflict.yaml#/ConflictResponse
+    "422":
+      $ref: ../../components/responses/validation-error.yaml#/ValidationErrorResponse
+    "500":
+      $ref: ../../components/responses/internal-server-error.yaml#/InternalServerErrorResponse

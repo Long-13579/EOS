@@ -1,0 +1,46 @@
+databaseChangeLog:
+  - changeSet:
+      id: 030-replace-index-headlines-team-is-archived-created-at-id
+      author: eos-team
+      preConditions:
+        - onFail: HALT
+        - indexExists:
+            indexName: idx_headlines_team_created_at_id
+            tableName: headlines
+      changes:
+        - dropIndex:
+            indexName: idx_headlines_team_created_at_id
+            tableName: headlines
+
+        - createIndex:
+            tableName: headlines
+            indexName: idx_headlines_team_is_archived_created_at_id
+            columns:
+              - column:
+                  name: team_id
+                  descending: false
+              - column:
+                  name: is_archived
+              - column:
+                  name: created_at
+                  descending: true
+              - column:
+                  name: id
+                  descending: false
+      rollback:
+        - dropIndex:
+            indexName: idx_headlines_team_is_archived_created_at_id
+            tableName: headlines
+        - createIndex:
+            tableName: headlines
+            indexName: idx_headlines_team_created_at_id
+            columns:
+              - column:
+                  name: team_id
+                  descending: false
+              - column:
+                  name: created_at
+                  descending: true
+              - column:
+                  name: id
+                  descending: false

@@ -1,0 +1,27 @@
+get:
+  tags:
+    - Users
+  summary: Get users of a team
+  description: Returns a list of users that belong to the specified team.
+  operationId: listTeamUsers
+  security:
+    - accessCookieAuth: []
+  parameters:
+    - $ref: ../../components/parameters/team.yaml#/TeamIdParam
+  responses:
+    "200":
+      description: List of users belonging to the specified team retrieved successfully
+      content:
+        application/json:
+          schema:
+            type: array
+            items: 
+              $ref: ../../components/schemas/user/user-base-response.yaml#/UserBaseResponse
+    "401":
+      $ref: ../../components/responses/unauthorized.yaml#/UnauthorizedResponse
+    "403":
+      $ref: ../../components/responses/forbidden.yaml#/ForbiddenResponse
+    "404":
+      $ref: ../../components/responses/not-found.yaml#/NotFoundResponse
+    "500":
+      $ref: ../../components/responses/internal-server-error.yaml#/InternalServerErrorResponse

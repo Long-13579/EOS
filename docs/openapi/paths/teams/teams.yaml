@@ -1,0 +1,56 @@
+get:
+  tags:
+    - Teams
+  summary: List teams
+  description: Retrieves a paginated list of teams. If page and limit are omitted, it returns 1 page with all teams. Providing only one of the pagination parameters will result in a 400 Bad Request. Requires admin privileges.
+  operationId: listTeams
+  security:
+    - accessCookieAuth: []
+  parameters:
+    - $ref: ../../components/parameters/page.yaml#/PageParam
+    - $ref: ../../components/parameters/limit.yaml#/LimitParam
+  responses:
+    "200":
+      description: List of teams
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/team/list-team-response.yaml#/ListTeamResponse
+    "400":
+      $ref: ../../components/responses/bad-request.yaml#/BadRequestResponse
+    "401":
+      $ref: ../../components/responses/unauthorized.yaml#/UnauthorizedResponse
+    "403":
+      $ref: ../../components/responses/forbidden.yaml#/ForbiddenResponse
+    "500":
+      $ref: ../../components/responses/internal-server-error.yaml#/InternalServerErrorResponse
+
+post:
+  operationId: createTeam
+  summary: Create a new team (Admin only)
+  description: Creates a new team. Requires admin privileges. The team name must be unique and follow the specified format constraints.
+  tags:
+    - Teams
+  security:
+    - accessCookieAuth: []
+  requestBody:
+    $ref: ../../components/request-bodies/create-team.yaml#/CreateTeamRequest
+  responses:
+    "201":
+      description: Team Created
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/team/team-response.yaml#/TeamResponse
+    "400":
+      $ref: ../../components/responses/bad-request.yaml#/BadRequestResponse
+    "401":
+      $ref: ../../components/responses/unauthorized.yaml#/UnauthorizedResponse
+    "403":
+      $ref: ../../components/responses/forbidden.yaml#/ForbiddenResponse
+    "409":
+      $ref: ../../components/responses/conflict.yaml#/ConflictResponse
+    "422":
+      $ref: ../../components/responses/validation-error.yaml#/ValidationErrorResponse
+    "500":
+      $ref: ../../components/responses/internal-server-error.yaml#/InternalServerErrorResponse

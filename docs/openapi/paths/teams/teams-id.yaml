@@ -1,0 +1,59 @@
+get:
+  tags:
+    - Teams
+  summary: Get team detail
+  description: Get detailed information of a team
+  operationId: getTeamById
+  security:
+    - accessCookieAuth: []
+  parameters:
+    - $ref: ../../components/parameters/team.yaml#/TeamIdParam
+  responses:
+    "200":
+      description: Team details retrieved successfully
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/team/team-response.yaml#/TeamResponse
+    "401":
+      $ref: ../../components/responses/unauthorized.yaml#/UnauthorizedResponse
+    "403":
+      $ref: ../../components/responses/forbidden.yaml#/ForbiddenResponse
+    "404":
+      $ref: ../../components/responses/not-found.yaml#/NotFoundResponse
+    "500":
+      $ref: ../../components/responses/internal-server-error.yaml#/InternalServerErrorResponse
+
+put:
+  tags:
+    - Teams
+  summary: Update team information (Admin only)
+  description: Updates the name of an existing team. Only users with the ADMIN role can update team information. All fields in the request body will replace existing values.
+  operationId: updateTeam
+  security:
+    - accessCookieAuth: []
+  parameters:
+    - $ref: ../../components/parameters/team.yaml#/TeamIdParam
+  requestBody:
+    $ref: ../../components/request-bodies/update-team.yaml#/UpdateTeamRequest
+  responses:
+    "200":
+      description: Team updated successfully
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/team/team-response.yaml#/TeamResponse
+    "400":
+      $ref: ../../components/responses/bad-request.yaml#/BadRequestResponse
+    "401":
+      $ref: ../../components/responses/unauthorized.yaml#/UnauthorizedResponse
+    "403":
+      $ref: ../../components/responses/forbidden.yaml#/ForbiddenResponse
+    "404":
+      $ref: ../../components/responses/not-found.yaml#/NotFoundResponse
+    "409":
+      $ref: ../../components/responses/conflict.yaml#/ConflictResponse
+    "422":
+      $ref: ../../components/responses/validation-error.yaml#/ValidationErrorResponse
+    "500":
+      $ref: ../../components/responses/internal-server-error.yaml#/InternalServerErrorResponse

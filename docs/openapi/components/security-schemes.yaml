@@ -1,0 +1,17 @@
+jwt-bearer:
+  type: http
+  scheme: bearer
+  bearerFormat: JWT
+  description: JWT Bearer token for authentication. Include token in Authorization header
+
+accessCookieAuth:
+  type: apiKey
+  in: cookie
+  name: access_token
+  description: Authentication using access token stored in an HTTP-only cookie.
+
+refreshCookieAuth:
+  type: apiKey
+  in: cookie
+  name: refresh_token
+  description: Authentication using refresh token stored in an HTTP-only cookie.

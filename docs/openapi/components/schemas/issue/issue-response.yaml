@@ -1,0 +1,51 @@
+IssueResponse:
+  allOf:
+    - $ref: ./issue-base.yaml#/IssueBase
+    - type: object
+      description: Detailed schema for an issue response
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the issue
+          readOnly: true
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        issueType:
+          $ref: ./issue-type-base-response.yaml#/IssueTypeBaseResponse
+          nullable: true
+        isArchived:
+          type: boolean
+          description: Indicates whether the issue is archived
+          readOnly: true
+          example: false
+        createdAt:
+          type: string
+          format: date-time
+          description: Date and time when the issue was created
+          readOnly: true
+          example: "2026-02-24T10:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: Date and time when the issue was last updated
+          readOnly: true
+          example: "2026-02-24T12:30:00Z"
+        createdBy:
+          type: string
+          format: uuid
+          description: User identifier who created the issue
+          readOnly: true
+          example: "9c9f6c44-1b2f-4f52-b1c2-6a8a4b9c1234"
+        updatedBy:
+          type: string
+          format: uuid
+          description: User identifier who last updated the issue
+          readOnly: true
+          example: "9c9f6c44-1b2f-4f52-b1c2-6a8a4b9c1234"
+        creator:
+          $ref: ../user/user-base-response.yaml#/UserBaseResponse
+        team:
+          $ref: ../team/team-base.yaml#/TeamBase
+      required:
+        - id
+        - isArchived

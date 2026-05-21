@@ -1,0 +1,13 @@
+UserListResponse:
+  type: object
+  description: Response schema for a list of users with pagination
+  required:
+    - data
+    - pagination
+  properties:
+    data:
+      type: array
+      items:
+        $ref: ../../../openapi.yaml#/components/schemas/UserResponse
+    pagination:
+      $ref: ../../../openapi.yaml#/components/schemas/Pagination

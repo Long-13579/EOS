@@ -1,0 +1,12 @@
+RockCategoryEnum:
+  type: string
+  description: |
+    Category of the rock.
+    - COMPANY: Company-level goal
+    - DEPARTMENT: Department-level goal
+    - INDIVIDUAL: Individual-level goal
+  enum:
+    - COMPANY
+    - DEPARTMENT
+    - INDIVIDUAL
+  example: COMPANY

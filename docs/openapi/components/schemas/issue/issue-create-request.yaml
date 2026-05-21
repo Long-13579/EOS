@@ -1,0 +1,19 @@
+IssueCreateRequest:
+  allOf:
+    - $ref: ./issue-base.yaml#/IssueBase
+    - type: object
+      description: Payload used to create a new issue
+      required:
+        - teamId
+      properties:
+        issueTypeId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Issue type identifier for the issue item
+          example: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+        teamId:
+          type: string
+          format: uuid
+          description: Team identifier that owns this issue
+          example: "3fa85f64-5717-4562-b3fc-2c963f66afa6"

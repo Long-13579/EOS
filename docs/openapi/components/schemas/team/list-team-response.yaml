@@ -1,0 +1,47 @@
+ListTeamResponse:
+  type: object
+  description: |
+    Represents the paginated response returned by the Get Teams API.
+    Contains a list of team resources along with pagination metadata
+    to support client-side navigation.
+  properties:
+    data:
+      type: array
+      items:
+        $ref: ./team-response.yaml#/TeamResponse
+      description: Array of teams
+    pagination:
+      $ref: ../common/pagination.yaml#/Pagination
+  example:
+    data:
+      - id: 2c9f6c44-1b2f-4f52-b1c2-6a8a4b9c1234
+        name: Leadership Team
+        isLeadership: true
+        createdAt: 2026-01-25T10:00:00Z
+        updatedAt: 2026-01-30T12:30:00Z
+        createdBy: 7e8d5a22-0b3e-4f52-a0b1-5b7b3a8b0123
+        updatedBy: 7e8d5a22-0b3e-4f52-a0b1-5b7b3a8b0123
+      - id: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+        name: Engineering Team
+        isLeadership: false
+        createdAt: 2026-01-30T08:15:30Z
+        updatedAt: 2026-02-01T10:45:00Z
+        createdBy: 9c9f6c44-1b2f-4f52-b1c2-6a8a4b9c1234
+        updatedBy: 9c9f6c44-1b2f-4f52-b1c2-6a8a4b9c1234
+      - id: 4fb96f75-6828-5673-c4ad-3d074a77bfb7
+        name: Design Team
+        isLeadership: false
+        createdAt: 2026-01-28T14:20:15Z
+        updatedAt: 2026-01-31T09:30:45Z
+        createdBy: 8d8e5b33-0a1e-3e41-a0b1-5b7b3a8b0123
+        updatedBy: 9c9f6c44-1b2f-4f52-b1c2-6a8a4b9c1234
+    pagination:
+      page: 1
+      limit: 10
+      totalItems: 3
+      totalPages: 1
+      hasNext: false
+      hasPrev: false
+  required:
+    - data
+    - pagination

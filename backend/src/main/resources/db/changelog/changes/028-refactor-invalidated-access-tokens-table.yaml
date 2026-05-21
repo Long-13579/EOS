@@ -1,0 +1,66 @@
+databaseChangeLog:
+  - changeSet:
+      id: 028-refactor-invalidated-access-tokens-table
+      author: eos-team
+      comment: "Drops the surrogate UUID 'id' key, promotes natural 'jti' key to PK"
+      preConditions:
+        - onFail: HALT
+        - onError: HALT
+        - and:
+            - primaryKeyExists:
+                tableName: invalidated_access_tokens
+                primaryKeyName: invalidated_access_tokens_pkey
+            - columnExists:
+                tableName: invalidated_access_tokens
+                columnName: id
+            - uniqueConstraintExists:
+                tableName: invalidated_access_tokens
+                constraintName: invalidated_access_tokens_jti_key
+      changes:
+        - dropPrimaryKey:
+            tableName: invalidated_access_tokens
+            constraintName: invalidated_access_tokens_pkey
+
+        - dropColumn:
+            tableName: invalidated_access_tokens
+            columnName: id
+
+        - dropUniqueConstraint:
+            tableName: invalidated_access_tokens
+            constraintName: invalidated_access_tokens_jti_key
+
+        - addPrimaryKey:
+            tableName: invalidated_access_tokens
+            columnNames: jti
+            constraintName: pk_invalidated_access_tokens
+
+      rollback:
+        - dropPrimaryKey:
+            tableName: invalidated_access_tokens
+            constraintName: pk_invalidated_access_tokens
+
+        - addColumn:
+            tableName: invalidated_access_tokens
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+
+        - sql:
+            sql: UPDATE invalidated_access_tokens SET id = gen_random_uuid();
+            dbms: postgresql
+
+        - addNotNullConstraint:
+            tableName: invalidated_access_tokens
+            columnName: id
+            columnDataType: UUID
+
+        - addPrimaryKey:
+            tableName: invalidated_access_tokens
+            columnNames: id
+            constraintName: invalidated_access_tokens_pkey
+
+        - addUniqueConstraint:
+            tableName: invalidated_access_tokens
+            columnNames: jti
+            constraintName: invalidated_access_tokens_jti_key

@@ -1,0 +1,80 @@
+@startuml
+scale 1
+skinparam defaultFontSize 14
+skinparam sequenceMessageAlign center
+skinparam ParticipantPadding 80
+skinparam BoxPadding 40
+
+actor "User" as U
+participant "Web\nApplication" as W
+participant "Google\nOAuth 2.0" as G
+participant "Backend\nAPI" as B
+database "PostgreSQL" as DB
+
+== Login Flow ==
+
+U -> W: Click "Sign in with Google"
+W -> G: Open consent popup\n(auth-code flow)
+G -> U: Show consent screen
+U -> G: Grant permission
+G -> W: Authorization code
+
+W -> B: POST /auth/google\n{code, redirectUri}
+B -> G: Exchange code for ID token
+G -> B: ID token (email, name)
+
+B -> B: Verify ID token signature
+
+B -> DB: Find user by email
+alt User exists
+    DB -> B: Existing user
+else New user
+    B -> DB: Create user (USER role)
+    DB -> B: New user
+end
+
+B -> B: Generate JWT access token (15 min)
+B -> B: Generate refresh token (7 days)
+B -> DB: Store refresh token with JTI
+
+B -> W: HTTP-only cookies\n(access_token, refresh_token)
+
+W -> B: GET /users/me
+B -> DB: Fetch user profile
+DB -> B: User data
+B -> W: CurrentUserResponse
+
+W -> W: Store in Zustand\nRedirect to dashboard
+W -> U: Display dashboard
+
+== Token Refresh (on 401) ==
+
+W -> B: API request (expired token)
+B -> W: 401 Unauthorized
+
+W -> B: POST /auth/refresh\n(refresh_token cookie)
+B -> DB: Validate refresh token JTI
+
+alt Valid refresh token
+    B -> B: Generate new tokens\n(token rotation)
+    B -> DB: Store new, delete old
+    B -> W: New HTTP-only cookies
+    W -> B: Retry original request
+    B -> W: Success response
+else Invalid / expired
+    B -> W: 401 Unauthorized
+    W -> W: Clear stores
+    W -> U: Redirect to login
+end
+
+== Logout ==
+
+U -> W: Click logout
+W -> B: POST /auth/logout
+B -> DB: Blacklist access token JTI
+B -> DB: Delete refresh token
+B -> W: Clear cookies
+W -> W: Clear Zustand stores
+W -> U: Redirect to login
+
+@enduml

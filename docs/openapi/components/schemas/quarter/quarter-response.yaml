@@ -1,0 +1,24 @@
+QuarterResponse:
+  allOf:
+    - $ref: ./quarter-base-response.yaml#/QuarterBaseResponse
+    - type: object
+      description: Detailed schema for a quarter response
+      properties:
+        isCurrent:
+          type: boolean
+          description: Indicates whether the quarter is the current quarter of the current year
+          example: false
+        createdAt:
+          type: string
+          format: date-time
+          description: Date and time when the quarter was created
+          example: "2026-02-24T10:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: Date and time when the quarter was last updated
+          example: "2026-02-24T10:00:00Z"
+        createdBy:
+          $ref: ../user/user-base-response.yaml#/UserBaseResponse
+        updatedBy:
+          $ref: ../user/user-base-response.yaml#/UserBaseResponse

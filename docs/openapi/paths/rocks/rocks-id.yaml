@@ -1,0 +1,64 @@
+parameters:
+  - $ref: ../../components/parameters/rock.yaml#/RockIdParam
+
+put:
+  tags:
+    - Rocks
+  summary: Update a rock by ID
+  description: Updates an existing rock. Allows editing title, description, owner, year, quarter, category, due date, and status. Requires authentication and appropriate permissions.
+  operationId: updateRock
+  security:
+    - accessCookieAuth: []
+  requestBody:
+    $ref: ../../components/request-bodies/update-rock.yaml#/UpdateRockRequestBody
+  responses:
+    "200":
+      description: Rock updated successfully
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/rock/rock-response.yaml#/RockResponse
+    "400":
+      $ref: ../../components/responses/bad-request.yaml#/BadRequestResponse
+    "401":
+      $ref: ../../components/responses/unauthorized.yaml#/UnauthorizedResponse
+    "403":
+      $ref: ../../components/responses/forbidden.yaml#/ForbiddenResponse
+    "404":
+      $ref: ../../components/responses/not-found.yaml#/NotFoundResponse
+    "409":
+      $ref: ../../components/responses/conflict.yaml#/ConflictResponse
+    "422":
+      $ref: ../../components/responses/validation-error.yaml#/ValidationErrorResponse
+    "500":
+      $ref: ../../components/responses/internal-server-error.yaml#/InternalServerErrorResponse
+
+patch:
+  tags:
+    - Rocks
+  summary: Archive or unarchive a rock by ID
+  description: Updates the archived status of a rock. The user must be authenticated and have permission to modify the rock. Archiving a rock marks it as archived without deleting it from the database, while unarchiving restores the rock to the active state.
+  operationId: updateRockArchiveStatus
+  security:
+    - accessCookieAuth: []
+  requestBody:
+    $ref: ../../components/request-bodies/update-rock-archive.yaml#/UpdateRockArchiveRequestBody
+  responses:
+    "200":
+      description: Rock archive status updated successfully
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/rock/rock-response.yaml#/RockResponse
+    "400":
+      $ref: ../../components/responses/bad-request.yaml#/BadRequestResponse
+    "401":
+      $ref: ../../components/responses/unauthorized.yaml#/UnauthorizedResponse
+    "403":
+      $ref: ../../components/responses/forbidden.yaml#/ForbiddenResponse
+    "404":
+      $ref: ../../components/responses/not-found.yaml#/NotFoundResponse
+    "422":
+      $ref: ../../components/responses/validation-error.yaml#/ValidationErrorResponse
+    "500":
+      $ref: ../../components/responses/internal-server-error.yaml#/InternalServerErrorResponse

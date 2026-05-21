@@ -1,0 +1,13 @@
+InternalServerErrorResponse:
+  description: The server encountered an unexpected condition.
+  content:
+    application/json:
+      schema:
+        $ref: ../../openapi.yaml#/components/schemas/ErrorResponse
+      example:
+        code: INTERNAL_SERVER_ERROR
+        message: The server encountered an unexpected condition.
+        details:
+          error:
+            - An unexpected error occurred while processing the request.
+            - Please try again later.

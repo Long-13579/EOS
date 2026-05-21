@@ -1,0 +1,9 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: none
+  liquibase:
+    contexts: dev
+cookie: # dev use localhost for both BE,FE or use LAN IP
+  secure: false
+  same-site: lax

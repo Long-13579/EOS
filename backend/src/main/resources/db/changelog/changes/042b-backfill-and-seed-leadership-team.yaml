@@ -1,0 +1,32 @@
+databaseChangeLog:
+  - changeSet:
+      id: 042b-backfill-and-seed-leadership-team
+      author: eos-team
+      preConditions:
+        - onFail: HALT
+        - onError: HALT
+        - tableExists:
+            tableName: teams
+        - columnExists:
+            tableName: teams
+            columnName: is_leadership
+      changes:
+        - sql:
+            sql: |
+              UPDATE teams
+              SET is_leadership = FALSE
+              WHERE is_leadership IS NULL;
+        - sql:
+            sql: |
+              UPDATE teams
+              SET is_leadership = TRUE
+              WHERE LOWER(name) = LOWER('Leadership team');
+        - sql:
+            sql: |
+              INSERT INTO teams (id, name, is_leadership)
+              SELECT uuid_generate_v4(), 'Leadership team', TRUE
+              WHERE NOT EXISTS (
+                SELECT 1
+                FROM teams
+                WHERE LOWER(name) = LOWER('Leadership team')
+              );

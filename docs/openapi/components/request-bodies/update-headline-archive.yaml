@@ -1,0 +1,14 @@
+UpdateHeadlineArchiveRequestBody:
+  description: Request body for updating the archived status of an existing headline.
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          isArchived:
+            type: boolean
+            description: Whether to archive (true) or unarchive (false) the headline.
+            example: true
+        required:
+          - isArchived

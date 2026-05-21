@@ -1,0 +1,12 @@
+IssueTypeBase:
+  type: object
+  description: Base schema for an issue type
+  properties:
+    name:
+      type: string
+      description: Name of the issue type item
+      minLength: 1
+      maxLength: 255
+      example: Decision needed
+  required:
+    - name

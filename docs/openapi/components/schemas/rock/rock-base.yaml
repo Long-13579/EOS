@@ -1,0 +1,33 @@
+RockBase:
+  type: object
+  description: Base schema for rock properties. 
+  properties:
+    title:
+      type: string
+      description: Title of the rock. Must contain at least one non-whitespace character.
+      minLength: 1
+      maxLength: 255
+      pattern: '^(?!\s*$).+'
+      example: "Improve system performance by 30%"
+    description:
+      type: string
+      description: Detailed description of the rock. Must contain at least one non-whitespace character.
+      minLength: 1
+      maxLength: 2000
+      pattern: '^(?!\s*$).+'
+      example: "Optimize database queries and reduce API latency."
+    status:
+      $ref: ./rock-status-enum.yaml#/RockStatusEnum
+    category:
+      $ref: ./rock-category-enum.yaml#/RockCategoryEnum
+    dueDate:
+      type: string
+      format: date-time
+      description: Due date of the rock. The value must fall within the selected year and quarter. The timestamp must be in UTC (ISO 8601 format, e.g., 2026-03-25T00:00:00Z).
+      example: "2026-03-31T23:59:59Z"
+  required:
+    - title
+    - description
+    - status
+    - category
+    - dueDate

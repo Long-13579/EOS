@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - changeSet:
+      id: 000-enable-uuid-ossp-extension
+      author: eos-team
+      changes:
+        - sql:
+            sql: CREATE EXTENSION IF NOT EXISTS "uuid-ossp"

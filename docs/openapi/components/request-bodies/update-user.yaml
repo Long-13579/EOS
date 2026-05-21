@@ -1,0 +1,7 @@
+UpdateUserRequest:
+  required: true
+  description: Request body for updating an existing user.
+  content:
+    application/json:
+      schema:
+        $ref: ../../openapi.yaml#/components/schemas/UserUpdateRequest

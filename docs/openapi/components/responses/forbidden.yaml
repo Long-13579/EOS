@@ -1,0 +1,13 @@
+ForbiddenResponse:
+  description: The client does not have access rights to the content.
+  content:
+    application/json:
+      schema:
+        $ref: ../../openapi.yaml#/components/schemas/ErrorResponse
+      example:
+        code: FORBIDDEN
+        message: You do not have permission to access this resource.
+        details:
+          accessDenied:
+            - Your role 'user' does not have permission to access this endpoint.
+            - Required permission `admin:read` or `manager:read`.

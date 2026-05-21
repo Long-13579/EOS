@@ -1,0 +1,31 @@
+post: 
+  tags:
+    - Authentication
+  summary: Refresh access token
+  description: |
+    Refreshes the access token using the refresh token stored in an HTTP-only cookie.
+
+    If the refresh token is valid, a new access token is issued and returned as a secure cookie without requiring the user to re-authenticate.
+  operationId: authRefresh
+  security: 
+    - refreshCookieAuth: []
+  responses:
+    "200":
+      description: Token refresh successful
+      headers:
+        Set-Cookie:
+          description: |
+            HTTP-only authentication containing the new access token.
+            Sets or updates the `access_token` cookie and the refresh token cookie.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/common/message-response.yaml#/MessageResponse
+          example:
+            message: Refresh token successfully.
+    "401":
+      $ref: ../../components/responses/unauthorized.yaml#/UnauthorizedResponse
+    "500":
+      $ref: ../../components/responses/internal-server-error.yaml#/InternalServerErrorResponse

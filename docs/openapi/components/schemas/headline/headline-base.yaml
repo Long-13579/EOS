@@ -1,0 +1,13 @@
+HeadlineBase:
+  type: object
+  description: Base schema for headline properties. The title must contain at least one non-whitespace character to prevent titles that consist only of spaces.
+  properties:
+    title:
+      type: string
+      description: Title of the headline. Must contain at least one non-whitespace character.
+      minLength: 1
+      maxLength: 2000
+      pattern: '^(?!\s*$).+'
+      example: "Q1 2026 Product Launch"
+  required:
+    - title

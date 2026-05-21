@@ -1,0 +1,17 @@
+extends: [spectral:oas]
+
+rules:
+  operation-operationId: error
+
+  operation-description: warn
+
+  info-description: error
+
+  path-params-kebab-case:
+    description: Path parameters should be kebab-case
+    severity: warn
+    given: $.paths[*].parameters[?(@.in == 'path')].name
+    then:
+      function: pattern
+      functionOptions:
+        match: ^[a-z][a-z0-9-]*$

@@ -1,0 +1,30 @@
+databaseChangeLog:
+  - changeSet:
+      id: 045-add-metrics-owner-created-at-id-index
+      author: eos-team
+      preConditions:
+        - onFail: HALT
+        - tableExists:
+            tableName: metrics
+        - not:
+            - indexExists:
+                tableName: metrics
+                indexName: idx_metrics_owner_created_at_id
+      changes:
+        - createIndex:
+            tableName: metrics
+            indexName: idx_metrics_owner_created_at_id
+            columns:
+              - column:
+                  name: owner_id
+                  descending: false
+              - column:
+                  name: created_at
+                  descending: false
+              - column:
+                  name: id
+                  descending: false
+      rollback:
+        - dropIndex:
+            tableName: metrics
+            indexName: idx_metrics_owner_created_at_id

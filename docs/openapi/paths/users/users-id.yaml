@@ -1,0 +1,32 @@
+parameters:
+  - $ref: ../../components/parameters/user.yaml#/UserIdParam
+
+put:
+  operationId: updateUser
+  summary: Update an existing user (Admin only)
+  description: Update an existing user by ID. Only admins can perform this operation.
+  tags:
+    - Users
+  security:
+    - accessCookieAuth: []
+  requestBody:
+    $ref: ../../components/request-bodies/update-user.yaml#/UpdateUserRequest
+  responses:
+    "200":
+      description: User Updated
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/user/user-response.yaml#/UserResponse
+    "400":
+      $ref: ../../components/responses/bad-request.yaml#/BadRequestResponse
+    "401":
+      $ref: ../../components/responses/unauthorized.yaml#/UnauthorizedResponse
+    "403":
+      $ref: ../../components/responses/forbidden.yaml#/ForbiddenResponse
+    "404":
+      $ref: ../../components/responses/not-found.yaml#/NotFoundResponse
+    "422":
+      $ref: ../../components/responses/validation-error.yaml#/ValidationErrorResponse
+    "500":
+      $ref: ../../components/responses/internal-server-error.yaml#/InternalServerErrorResponse

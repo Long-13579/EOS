@@ -1,0 +1,7 @@
+CreateUserRequest:
+  required: true
+  description: Request body for creating a new user.
+  content:
+    application/json:
+      schema:
+        $ref: ../../openapi.yaml#/components/schemas/UserCreateRequest

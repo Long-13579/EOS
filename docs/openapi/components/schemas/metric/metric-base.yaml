@@ -1,0 +1,22 @@
+MetricBase:
+  type: object
+  description: The base schema for a metric.
+  properties:
+    name:
+      type: string
+      description: The name of the metric.
+      minLength: 1
+      maxLength: 255
+      example: Revenue
+    goal:
+      type: string
+      description: The goal or target value for the metric.
+      example: "1000"
+    unit:
+      $ref: ./metric-unit-enum.yaml#/MetricUnitEnum
+    operator:
+      $ref: ./metric-operator-enum.yaml#/MetricOperatorEnum
+  required:
+    - name
+    - unit
+    - goal

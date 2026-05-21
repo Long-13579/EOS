@@ -1,0 +1,24 @@
+databaseChangeLog:
+  - changeSet:
+      id: 029a-add-is-archived-column-to-headlines
+      author: eos-team
+      preConditions:
+        - onFail: HALT
+        - onError: HALT
+        - tableExists:
+            tableName: headlines
+        - not:
+            - columnExists:
+                tableName: headlines
+                columnName: is_archived
+      changes:
+        - addColumn:
+            tableName: headlines
+            columns:
+              - column:
+                  name: is_archived
+                  type: BOOLEAN
+      rollback:
+        - dropColumn:
+            tableName: headlines
+            columnName: is_archived

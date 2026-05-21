@@ -1,0 +1,34 @@
+databaseChangeLog:
+  - changeSet:
+      id: 038-update-index-rocks-team-year-quarter-due-date-is-archived-created-at-id
+      author: eos-team
+      changes:
+        - dropIndex:
+            indexName: idx_rocks_team_year_quarter_due_date_created_at_id
+            tableName: rocks
+
+        - createIndex:
+            tableName: rocks
+            indexName: idx_rocks_team_year_quarter_due_date_is_archived_created_at_id
+            columns:
+              - column:
+                  name: team_id
+                  descending: false
+              - column:
+                  name: year_id
+                  descending: false
+              - column:
+                  name: quarter_id
+                  descending: false
+              - column:
+                  name: is_archived
+                  descending: false
+              - column:
+                  name: due_date
+                  descending: false
+              - column:
+                  name: created_at
+                  descending: true
+              - column:
+                  name: id
+                  descending: false

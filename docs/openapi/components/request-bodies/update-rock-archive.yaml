@@ -1,0 +1,14 @@
+UpdateRockArchiveRequestBody:
+  description: Request body for updating the archived status of an existing rock.
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          isArchived:
+            type: boolean
+            description: Whether to archive (true) or unarchive (false) the rock.
+            example: true
+        required:
+          - isArchived

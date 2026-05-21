@@ -1,0 +1,13 @@
+TeamCreateRequest:
+  type: object
+  description: Payload used to create a new team.
+  properties:
+    name:
+      type: string
+      description: Name of the team. Must not be empty or contain leading/trailing whitespace.
+      minLength: 1
+      maxLength: 100
+      pattern: "^[a-zA-ZÀ-ỹ0-9]+(?:[ \\-\\'][a-zA-ZÀ-ỹ0-9]+)*$" 
+      example: Development Team
+  required:
+    - name

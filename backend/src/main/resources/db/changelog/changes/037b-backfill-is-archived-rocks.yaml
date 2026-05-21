@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - changeSet:
+      id: 037b-backfill-is-archived-rocks
+      author: eos-team
+      preConditions:
+        - onFail: HALT
+        - onError: HALT
+        - tableExists:
+            tableName: rocks
+        - columnExists:
+            tableName: rocks
+            columnName: is_archived
+      changes:
+        - update:
+            tableName: rocks
+            columns:
+              - column:
+                  name: is_archived
+                  valueBoolean: false
+            where: is_archived IS NULL

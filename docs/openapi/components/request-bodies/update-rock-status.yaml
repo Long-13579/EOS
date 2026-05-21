@@ -1,0 +1,12 @@
+UpdateRockStatusRequestBody:
+  description: Request body for updating the status of an existing rock.
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          status:
+            $ref: ../schemas/rock/rock-status-enum.yaml#/RockStatusEnum
+        required:
+          - status

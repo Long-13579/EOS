@@ -1,0 +1,9 @@
+QuarterIdQueryParam:
+  name: quarterId
+  in: query
+  required: false
+  description: Filter rocks by quarter identifier
+  schema:
+    type: string
+    format: uuid
+    example: 223e4567-e89b-12d3-a456-426614174000

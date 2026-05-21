@@ -1,0 +1,23 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-insert-default-user-roles
+      author: eos-team
+      changes:
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: id
+                  valueComputed: uuid_generate_v4()
+              - column:
+                  name: name
+                  value: USER
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: id
+                  valueComputed: uuid_generate_v4()
+              - column:
+                  name: name
+                  value: ADMIN

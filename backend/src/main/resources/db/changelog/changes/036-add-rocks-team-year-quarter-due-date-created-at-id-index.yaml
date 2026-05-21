@@ -1,0 +1,39 @@
+databaseChangeLog:
+  - changeSet:
+      id: 036-add-rocks-team-year-quarter-due-date-created-at-id-index
+      author: eos-team
+      preConditions:
+        - onFail: HALT
+        - tableExists:
+            tableName: rocks
+        - not:
+            - indexExists:
+                tableName: rocks
+                indexName: idx_rocks_team_year_quarter_due_date_created_at_id
+      changes:
+        - createIndex:
+            tableName: rocks
+            indexName: idx_rocks_team_year_quarter_due_date_created_at_id
+            columns:
+              - column:
+                  name: team_id
+                  descending: false
+              - column:
+                  name: year_id
+                  descending: false
+              - column:
+                  name: quarter_id
+                  descending: false
+              - column:
+                  name: due_date
+                  descending: false
+              - column:
+                  name: created_at
+                  descending: true
+              - column:
+                  name: id
+                  descending: false
+      rollback:
+        - dropIndex:
+            tableName: rocks
+            indexName: idx_rocks_team_year_quarter_due_date_created_at_id

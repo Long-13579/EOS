@@ -1,0 +1,7 @@
+LoginGoogleRequest:
+  description: Request body for Google OAuth login containing the authorization code and redirect URI.
+  required: true
+  content:
+    application/json:
+      schema: 
+        $ref: ../schemas/auth/login-google.yaml#/LoginGoogle

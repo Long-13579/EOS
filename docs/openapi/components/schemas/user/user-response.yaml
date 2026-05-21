@@ -1,0 +1,63 @@
+UserResponse:
+  allOf:
+    - $ref: ./user-base.yaml#/UserBase
+    - type: object
+      description: Detailed schema for a user response
+      required:
+        - id
+        - isActive
+        - role
+        - teams
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the user
+          readOnly: true
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        isActive:
+          type: boolean
+          description: Indicates if the user is active
+          example: true
+        role:
+          $ref: ./user-role-enum.yaml#/UserRoleEnum
+        teams:
+          description: The teams the user belongs to, returns unique teams only
+          type: array
+          minItems: 0
+          uniqueItems: true
+          items:
+            type: object
+            required:
+              - id
+              - name
+            properties:
+              id:
+                type: string
+                format: uuid
+                description: Unique identifier for the team
+                example: "223e4567-e89b-12d3-a456-426614174001"
+              name:
+                type: string
+                description: Name of the team
+                example: Leadership Team
+        createdAt:
+          type: string
+          description: The date and time when the user was created
+          format: date-time
+          example: "2023-01-15T10:00:00Z"
+        updatedAt:
+          type: string
+          description: The date and time when the user was last updated
+          format: date-time
+          example: "2023-06-20T15:30:00Z"
+        createdBy:
+          type: string
+          description: The ID of the user who created this user
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        updatedBy:
+          type: string
+          format: uuid
+          description: Identifier of the user who updated the user
+          example: 9c9f6c44-1b2f-4f52-b1c2-6a8a4b9c1234

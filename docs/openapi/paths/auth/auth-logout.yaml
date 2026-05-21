@@ -1,0 +1,33 @@
+post:
+  tags:
+    - Authentication
+  summary: Logout user
+  description: |
+    Logs out the user by invalidating both access and refresh tokens.
+
+    This endpoint clears the authentication cookies, effectively ending the user's session.
+    The user will need to re-authenticate to access protected resources.
+  operationId: authLogout
+  security: 
+    - accessCookieAuth: []
+    - refreshCookieAuth: []
+  responses:
+    "200":
+      description: Logout successful
+      headers:
+        Set-Cookie:
+          description: |
+            HTTP-only authentication cookies set to expire immediately.
+            Clears both access_token and refresh_token cookies.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/common/message-response.yaml#/MessageResponse
+          example:
+            message: Logout successfully.
+    "401":
+      $ref: ../../components/responses/unauthorized.yaml#/UnauthorizedResponse
+    "500":
+      $ref: ../../components/responses/internal-server-error.yaml#/InternalServerErrorResponse

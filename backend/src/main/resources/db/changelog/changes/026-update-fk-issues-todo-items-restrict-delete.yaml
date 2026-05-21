@@ -1,0 +1,52 @@
+databaseChangeLog:
+  - changeSet:
+      id: 026-update-fk-issues-todo-items-restrict-delete
+      author: eos-team
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: issues
+            constraintName: fk_issues_team_id
+
+        - addForeignKeyConstraint:
+            baseTableName: issues
+            baseColumnNames: team_id
+            referencedTableName: teams
+            referencedColumnNames: id
+            constraintName: fk_issues_team_id
+            onDelete: RESTRICT
+            onUpdate: CASCADE
+
+        - dropForeignKeyConstraint:
+            baseTableName: issues
+            constraintName: fk_issues_created_by
+          
+        - addForeignKeyConstraint:
+            baseTableName: issues
+            baseColumnNames: created_by
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_issues_created_by
+            onDelete: RESTRICT
+            onUpdate: CASCADE
+
+        - dropForeignKeyConstraint:
+            baseTableName: todos
+            constraintName: fk_todos_team_id
+          
+        - addForeignKeyConstraint:
+            baseTableName: todos
+            baseColumnNames: team_id
+            referencedTableName: teams
+            referencedColumnNames: id
+            constraintName: fk_todos_team_id
+            onDelete: RESTRICT
+            onUpdate: CASCADE
+
+        - addForeignKeyConstraint:
+            baseTableName: todos
+            baseColumnNames: created_by
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_todos_created_by
+            onDelete: RESTRICT
+            onUpdate: CASCADE

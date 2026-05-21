@@ -1,0 +1,13 @@
+IssueTypeIdQueryParam:
+  name: issueTypeId
+  in: query
+  required: false
+  description: |
+    Filter issues by their type.
+
+    - Omit entirely to get all issues.
+    - Provide a UUID to filter by a specific type.
+    - Provide the literal string "none" to get unassigned issues.
+  schema:
+    type: string
+    example: "none" # or a valid UUID

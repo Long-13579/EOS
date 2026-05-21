@@ -1,0 +1,24 @@
+get:
+  tags:
+    - Todos
+  summary: List todos assigned to current user
+  description: Retrieves a paginated list of todos assigned to the currently authenticated user. Archived todos are excluded from the response.
+  operationId: listMyAssignedTodos
+  security:
+    - accessCookieAuth: []
+  parameters:
+    - $ref: ../../components/parameters/page.yaml#/PageParam
+    - $ref: ../../components/parameters/limit.yaml#/LimitParam
+  responses:
+    "200":
+      description: List of non-archived todos assigned to current user
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/todo/todo-list-response.yaml#/TodoListResponse
+    "400":
+      $ref: ../../components/responses/bad-request.yaml#/BadRequestResponse
+    "401":
+      $ref: ../../components/responses/unauthorized.yaml#/UnauthorizedResponse
+    "500":
+      $ref: ../../components/responses/internal-server-error.yaml#/InternalServerErrorResponse

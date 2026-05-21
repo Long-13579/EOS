@@ -1,0 +1,13 @@
+QuarterBaseResponse:
+  allOf:
+    - $ref: ./quarter-base.yaml#/QuarterBase
+    - type: object
+      description: Basic information of quarter including id and base details
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the quarter
+          example: "123e4567-e89b-12d3-a456-426614174000"
+      required:
+        - id

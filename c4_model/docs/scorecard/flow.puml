@@ -1,0 +1,77 @@
+@startuml
+scale 1
+skinparam defaultFontSize 14
+skinparam sequenceMessageAlign center
+skinparam ParticipantPadding 80
+skinparam BoxPadding 40
+
+actor "User" as U
+participant "Web\nApplication" as W
+participant "Backend\nAPI" as B
+database "PostgreSQL" as DB
+
+== Metrics Tab - Page Load ==
+
+U -> W: Navigate to /scorecards
+W -> W: Read active team\nfrom Zustand
+
+W -> B: GET /weeks
+B -> DB: Query last 13 weeks
+DB -> B: Week list
+B -> W: WeekResponse[]
+
+W -> W: Determine current week
+
+W -> B: GET /metrics\n?teamId=X&weekId=W
+B -> B: @PreAuthorize\nteam membership check
+B -> DB: Query metrics for team
+DB -> B: Metric entities
+B -> DB: Query metric values\n(current + previous week)
+DB -> B: MetricValue entities
+B -> B: Map metrics with values\nand goal status
+B -> W: MetricResponse[]
+W -> W: Calculate goal-met\nindicators
+W -> U: Display scorecard table
+
+== Update Weekly Value ==
+
+U -> W: Enter value in cell
+W -> B: PUT /metric-values\n{metricId, weekId, value}
+B -> B: Validate team membership
+B -> DB: UPSERT metric_value\n(insert or update)
+DB -> B: Updated value
+B -> W: MetricValueResponse
+W -> W: Invalidate query cache
+W -> U: Show value with\ngoal indicator
+
+== Create Metric ==
+
+U -> W: Fill metric form + submit
+W -> B: POST /metrics\n{teamId, name, goal,\nunit, operator, ownerId}
+B -> B: Validate team membership
+B -> B: Validate owner in team
+B -> DB: INSERT metric
+DB -> B: Saved metric
+B -> W: MetricResponse
+W -> U: New metric in scorecard
+
+== Trends Tab ==
+
+U -> W: Switch to "Trends" tab
+W -> B: GET /metrics/trends\n?teamId=X
+B -> B: Validate team membership
+B -> DB: Query all team metrics
+B -> DB: Query metric values\nacross 13 weeks
+DB -> B: Values grouped by\nmetric and week
+B -> B: Build trend data points
+B -> W: TrendsTabMetricListResponse\n{metrics: [{id, name,\ndata: [{week, value}]}]}
+W -> W: Render with Recharts
+W -> U: Display trend table/chart
+
+== Background: Week Creation ==
+
+note over B,DB: WeekCreationScheduler\n(Monday 00:01)
+B -> DB: INSERT week IF NOT EXISTS\n(startDate=Mon, endDate=Sun)
+DB -> B: New or existing week
+
+@enduml

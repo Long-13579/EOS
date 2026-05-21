@@ -1,0 +1,27 @@
+get:
+  tags:
+    - Metrics
+  summary: List trends tab metrics by team
+  description: Retrieves trends tab metrics for a specific team. Requires authentication.
+  operationId: listTrendsTabMetricsByTeam
+  security:
+    - accessCookieAuth: []
+  parameters:
+    - $ref: ../../components/parameters/team.yaml#/TeamIdQueryParam
+  responses:
+    "200":
+      description: Successfully retrieved trends tab metrics for the specified team.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/metric/trends-tab-metric-list-response.yaml#/TrendsTabMetricListResponse
+    "400":
+      $ref: ../../components/responses/bad-request.yaml#/BadRequestResponse
+    "401":
+      $ref: ../../components/responses/unauthorized.yaml#/UnauthorizedResponse
+    "403":
+      $ref: ../../components/responses/forbidden.yaml#/ForbiddenResponse
+    "404":
+      $ref: ../../components/responses/not-found.yaml#/NotFoundResponse
+    "500":
+      $ref: ../../components/responses/internal-server-error.yaml#/InternalServerErrorResponse

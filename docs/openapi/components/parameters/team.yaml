@@ -1,0 +1,17 @@
+TeamIdParam:
+  name: team-id
+  in: path
+  required: true
+  description: ID of the team
+  schema:
+    type: string
+    format: uuid
+
+TeamIdQueryParam:
+  name: teamId
+  in: query
+  required: true
+  description: ID of the team
+  schema:
+    type: string
+    format: uuid

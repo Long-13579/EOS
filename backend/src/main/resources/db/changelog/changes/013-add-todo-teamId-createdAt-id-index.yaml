@@ -1,0 +1,18 @@
+databaseChangeLog:
+  - changeSet:
+      id: 013-create-index-todos-team-created_at-id
+      author: eos-team
+      changes:
+        - createIndex:
+            tableName: todos
+            indexName: idx_todos_team_created_at_id
+            columns:
+              - column:
+                  name: team_id
+                  descending: false
+              - column:
+                  name: created_at
+                  descending: true
+              - column:
+                  name: id
+                  descending: false

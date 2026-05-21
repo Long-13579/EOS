@@ -1,0 +1,24 @@
+TodoCreateRequest:
+  allOf:
+    - $ref: ./todo-base.yaml#/TodoBase
+    - type: object
+      description: Payload used to create a new todo
+      required:
+        - teamId
+      properties:
+        teamId:
+          type: string
+          format: uuid
+          description: Team identifier that owns this todo
+          example: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+        assigneeIds:
+          type: array
+          nullable: true
+          description: List of user identifiers assigned to this todo (input only)
+          items:
+            type: string
+            format: uuid
+          uniqueItems: true
+          example:
+            - "9c9f6c44-1b2f-4f52-b1c2-6a8a4b9c1234"
+            - "6b2e0b2e-f8f2-4a22-9abf-12d4ef98c111"

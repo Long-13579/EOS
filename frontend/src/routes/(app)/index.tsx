@@ -1,0 +1,9 @@
+import { createFileRoute } from '@tanstack/react-router';
+import { Dashboard } from '@/pages/Dashboard';
+
+export const Route = createFileRoute('/(app)/')({
+    component: Dashboard,
+    staticData: {
+        breadcrumb: 'Dashboard',
+    },
+});

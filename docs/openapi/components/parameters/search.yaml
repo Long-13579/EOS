@@ -1,0 +1,8 @@
+SearchParam:
+  name: search
+  in: query
+  description: Searches across relevant text fields of the resource.
+  schema:
+    type: string
+    minLength: 1
+    maxLength: 100

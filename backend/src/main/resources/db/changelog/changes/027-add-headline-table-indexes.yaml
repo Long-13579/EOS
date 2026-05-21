@@ -1,0 +1,18 @@
+databaseChangeLog:
+  - changeSet:
+      id: 027-add-headline-table-indexes
+      author: eos-team
+      changes:
+        - createIndex:
+            indexName: idx_headlines_team_created_at_id
+            tableName: headlines
+            columns:
+              - column:
+                  name: team_id
+                  descending: false
+              - column:
+                  name: created_at
+                  descending: true
+              - column:
+                  name: id
+                  descending: false

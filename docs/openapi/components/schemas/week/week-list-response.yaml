@@ -1,0 +1,5 @@
+WeekListResponse:
+  type: array
+  description: A collection of week objects.
+  items:
+    $ref: ./week-response.yaml#/WeekResponse

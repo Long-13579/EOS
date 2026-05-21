@@ -1,0 +1,25 @@
+RockUpdateRequest:
+  allOf:
+    - $ref: ./rock-base.yaml#/RockBase
+    - type: object
+      description: Payload used to update an existing rock
+      required:
+        - ownerId
+        - year
+        - quarterId
+      properties:
+        ownerId:
+          type: string
+          format: uuid
+          description: User identifier who owns this rock
+          example: "323e4567-e89b-12d3-a456-426614174000"
+        year:
+          type: integer
+          description: Year that this rock belongs to
+          minimum: 1900
+          example: 2026
+        quarterId:
+          type: string
+          format: uuid
+          description: Identifier of the quarter this rock belongs to
+          example: "223e4567-e89b-12d3-a456-426614174000"

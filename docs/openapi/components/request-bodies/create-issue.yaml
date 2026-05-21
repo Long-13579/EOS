@@ -1,0 +1,7 @@
+CreateIssueRequestBody:
+  required: true
+  description: Request body for creating a new issue.
+  content:
+    application/json:
+      schema:
+        $ref: ../schemas/issue/issue-create-request.yaml#/IssueCreateRequest

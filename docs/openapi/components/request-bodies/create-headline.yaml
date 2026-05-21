@@ -1,0 +1,7 @@
+CreateHeadlineRequestBody:
+  required: true
+  description: Request body for creating a new headline.
+  content:
+    application/json:
+      schema:
+        $ref: ../schemas/headline/headline-create-request.yaml#/HeadlineCreateRequest

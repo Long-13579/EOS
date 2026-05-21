@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: 020-add-index-todos-team-id-is-archived
+      author: eos-team
+      changes:
+        - createIndex:
+            tableName: todos
+            indexName: idx_todos_team_id_is_archived
+            columns:
+              - column:
+                  name: team_id
+              - column:
+                  name: is_archived

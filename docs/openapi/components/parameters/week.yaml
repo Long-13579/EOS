@@ -1,0 +1,9 @@
+WeekIdQueryParam:
+  name: weekId
+  in: query
+  required: true
+  description: Filter metrics by week identifier
+  schema:
+    type: string
+    format: uuid
+    example: "223e4567-e89b-12d3-a456-426614174001"

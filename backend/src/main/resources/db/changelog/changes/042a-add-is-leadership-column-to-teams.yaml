@@ -1,0 +1,24 @@
+databaseChangeLog:
+  - changeSet:
+      id: 042a-add-is-leadership-column-to-teams
+      author: eos-team
+      preConditions:
+        - onFail: HALT
+        - onError: HALT
+        - tableExists:
+            tableName: teams
+        - not:
+            - columnExists:
+                tableName: teams
+                columnName: is_leadership
+      changes:
+        - addColumn:
+            tableName: teams
+            columns:
+              - column:
+                  name: is_leadership
+                  type: BOOLEAN
+      rollback:
+        - dropColumn:
+            tableName: teams
+            columnName: is_leadership

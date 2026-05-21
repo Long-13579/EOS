@@ -1,0 +1,7 @@
+UpdateRockRequestBody:
+  required: true
+  description: Request body for updating an existing rock.
+  content:
+    application/json:
+      schema:
+        $ref: ../schemas/rock/rock-update-request.yaml#/RockUpdateRequest

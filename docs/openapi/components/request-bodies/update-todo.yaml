@@ -1,0 +1,7 @@
+UpdateTodoRequestBody:
+  required: true
+  description: Request body for updating an existing todo.
+  content:
+    application/json:
+      schema:
+        $ref: ../schemas/todo/todo-update-request.yaml#/TodoUpdateRequest

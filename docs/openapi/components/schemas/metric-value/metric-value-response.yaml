@@ -1,0 +1,32 @@
+MetricValueResponse:
+  allOf:
+    - $ref: ./metric-value-base.yaml#/MetricValueBase
+    - type: object
+      description: Detailed schema for a metric value base response
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the metric value
+          example: "323e4567-e89b-12d3-a456-426614174002"
+        isGoalMet:
+          type: boolean
+          description: Indicates whether the recorded value meets the metric's goal, evaluated server-side using the metric's configured operator. Absent when the metric has no goal or operator configured; false means computed but not met.
+          example: true
+        week:
+          $ref: ../week/week-response.yaml#/WeekResponse
+        createdAt:
+          type: string
+          format: date-time
+          description: Date and time when the metric value was created
+          example: "2026-04-01T09:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: Date and time when the metric value was last updated
+          example: "2026-04-01T10:30:00Z"
+        updatedBy:
+          $ref: ../user/user-base-response.yaml#/UserBaseResponse
+      required:
+        - id
+        - week

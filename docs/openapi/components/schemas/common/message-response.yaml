@@ -1,0 +1,10 @@
+MessageResponse:
+  type: object
+  description: Standard response object containing a human-readable message.
+  properties:
+    message: 
+      type: string
+      description: A descriptive message explaining the result of the request.
+      example: Operation completed successfully.
+  required:
+    - message

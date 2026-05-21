@@ -1,0 +1,80 @@
+@startuml
+scale 1
+skinparam defaultFontSize 14
+skinparam sequenceMessageAlign center
+skinparam ParticipantPadding 80
+skinparam BoxPadding 40
+
+actor "User" as U
+participant "Web\nApplication" as W
+participant "Backend\nAPI" as B
+database "PostgreSQL" as DB
+
+== Page Load ==
+
+U -> W: Navigate to /issues
+W -> W: Read active team\nfrom Zustand
+
+W -> B: GET /issue-types
+B -> DB: Query issue types
+DB -> B: IssueType list
+B -> W: IssueTypeBaseResponse[]
+
+W -> B: GET /issues\n?teamId=X&view=issues\n&page=1&pageSize=10
+B -> B: @PreAuthorize\nteam membership check
+B -> DB: Query issue IDs\n(filtered, paginated)
+DB -> B: Matching IDs
+B -> DB: Fetch full issues by IDs\n(with joins: type, creator, team)
+DB -> B: Issue entities
+B -> W: PagedEntityResponse
+W -> U: Display issues table
+
+== View Filtering ==
+
+U -> W: Switch to "Long Term" tab
+W -> B: GET /issues\n?teamId=X&view=long_term
+B -> DB: Query where type\n= "Long Term Issue"
+DB -> B: Filtered issues
+B -> W: Paginated list
+W -> U: Display long-term issues
+
+== Create Issue ==
+
+U -> W: Fill issue dialog + submit
+W -> B: POST /issues\n{teamId, title,\ndescription, issueTypeId}
+B -> B: Validate team membership
+B -> B: Validate issue type
+B -> DB: INSERT issue
+DB -> B: Saved issue
+B -> W: IssueResponse
+W -> W: Invalidate query cache
+W -> U: Updated issues list
+
+== Update Issue ==
+
+U -> W: Edit issue + submit
+W -> B: PUT /issues/{id}\n{title, description, issueTypeId}
+B -> B: Validate team membership
+B -> DB: UPDATE issue
+DB -> B: Updated issue
+B -> W: IssueResponse
+W -> U: Show updated issue
+
+== Archive / Delete ==
+
+alt Archive
+    U -> W: Click archive
+    W -> B: PATCH /issues/{id}\n{isArchived: true}
+    B -> DB: UPDATE isArchived
+    B -> W: IssueResponse
+else Delete
+    U -> W: Click delete + confirm
+    W -> B: DELETE /issues/{id}
+    B -> DB: DELETE issue
+    B -> W: 204 No Content
+end
+
+W -> W: Invalidate query cache
+W -> U: Updated view
+
+@enduml

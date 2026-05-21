@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: 021-add-is-archived-to-issues
+      author: eos-team
+      changes:
+        - addColumn:
+            tableName: issues
+            columns:
+              - column:
+                  name: is_archived
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false

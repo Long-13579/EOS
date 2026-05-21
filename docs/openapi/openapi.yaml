@@ -1,0 +1,277 @@
+openapi: 3.1.0
+info:
+  title: EOS Platform API
+  description: |
+    API for the EOS Platform, managing Users, Teams, To-Dos, Issues, Headlines, Rocks, and Scorecards.
+
+    ## System Guardrails
+    - **Team-Based Visibility**: Users can only access data for teams they belong to.
+    - **Role Restrictions**: Only 'User' and 'Admin' roles exist.
+  version: 1.0.0
+
+servers:
+  - url: https://oas271d2d1bbe04.free.beeceptor.com
+    description: Mock Server
+
+paths:
+  /users:
+    $ref: ./paths/users/users.yaml
+  /users/me:
+    $ref: ./paths/users/users-me.yaml
+  /users/{user-id}:
+    $ref: ./paths/users/users-id.yaml
+  /users/me/teams:
+    $ref: ./paths/users/current-user-teams.yaml
+  /auth/google:
+    $ref: ./paths/auth/auth-google.yaml
+  /auth/refresh:
+    $ref: ./paths/auth/auth-refresh.yaml
+  /auth/logout:
+    $ref: ./paths/auth/auth-logout.yaml
+  /teams:
+    $ref: ./paths/teams/teams.yaml
+  /teams/{team-id}:
+    $ref: ./paths/teams/teams-id.yaml
+  /teams/{team-id}/users:
+    $ref: ./paths/teams/teams-id-users.yaml
+  /todos:
+    $ref: ./paths/todos/todos.yaml
+  /todos/me:
+    $ref: ./paths/todos/todos-me.yaml
+  /todos/{todo-id}:
+    $ref: ./paths/todos/todos-id.yaml
+  /issues:
+    $ref: ./paths/issues/issues.yaml
+  /issues/{issue-id}:
+    $ref: ./paths/issues/issues-id.yaml
+  /issue-types:
+    $ref: ./paths/issues/issue-types.yaml
+  /headlines:
+    $ref: ./paths/headlines/headlines.yaml
+  /headlines/{headline-id}:
+    $ref: ./paths/headlines/headlines-id.yaml
+  /quarters:
+    $ref: ./paths/quarters/quarters.yaml
+  /years:
+    $ref: ./paths/years/years.yaml
+  /weeks:
+    $ref: ./paths/weeks/weeks.yaml
+  /rocks:
+    $ref: ./paths/rocks/rocks.yaml
+  /rocks/me:
+    $ref: ./paths/rocks/rocks-me.yaml
+  /rocks/{rock-id}:
+    $ref: ./paths/rocks/rocks-id.yaml
+  /rocks/{rock-id}/status:
+    $ref: ./paths/rocks/rocks-id-status.yaml
+  /metrics:
+    $ref: ./paths/metrics/metrics.yaml
+  /metrics/me:
+    $ref: ./paths/metrics/metrics-me.yaml
+  /metrics/trends:
+    $ref: ./paths/metrics/metrics-trends.yaml
+  /metrics/{metric-id}:
+    $ref: ./paths/metrics/metrics-id.yaml
+  /metric-values:
+    $ref: ./paths/metric-values/metric-values.yaml
+
+components:
+  securitySchemes:
+    jwtBearer:
+      $ref: ./components/security-schemes.yaml#/jwt-bearer
+    accessCookieAuth:
+      $ref: ./components/security-schemes.yaml#/accessCookieAuth
+    refreshCookieAuth:
+      $ref: ./components/security-schemes.yaml#/refreshCookieAuth
+
+  parameters:
+    PageNumber:
+      $ref: ./components/parameters/page.yaml#/PageParam
+    PageSize:
+      $ref: ./components/parameters/limit.yaml#/LimitParam
+    Search:
+      $ref: ./components/parameters/search.yaml#/SearchParam
+    Headline:
+      $ref: ./components/parameters/headline.yaml#/HeadlineIdParam
+    RockIdParam:
+      $ref: ./components/parameters/rock.yaml#/RockIdParam
+
+  schemas:
+    ErrorResponse:
+      $ref: ./components/schemas/common/error-response.yaml#/ErrorResponse
+    Pagination:
+      $ref: ./components/schemas/common/pagination.yaml#/Pagination
+    UserCreateRequest:
+      $ref: ./components/schemas/user/user-create-request.yaml#/UserCreateRequest
+    UserUpdateRequest:
+      $ref: ./components/schemas/user/user-update-request.yaml#/UserUpdateRequest
+    UserListResponse:
+      $ref: ./components/schemas/user/user-list-response.yaml#/UserListResponse
+    UserResponse:
+      $ref: ./components/schemas/user/user-response.yaml#/UserResponse
+    CurrentUserResponse:
+      $ref: ./components/schemas/user/current-user-response.yaml#/CurrentUserResponse
+    MessageResponse:
+      $ref: ./components/schemas/common/message-response.yaml#/MessageResponse
+    LoginGoogle:
+      $ref: ./components/schemas/auth/login-google.yaml#/LoginGoogle
+    LoginResponse:
+      $ref: ./components/schemas/auth/login-response.yaml#/LoginResponse
+    TeamBase:
+      $ref: ./components/schemas/team/team-base.yaml#/TeamBase
+    TeamResponse:
+      $ref: ./components/schemas/team/team-response.yaml#/TeamResponse
+    ListTeamResponse:
+      $ref: ./components/schemas/team/list-team-response.yaml#/ListTeamResponse
+    TeamCreateRequest:
+      $ref: ./components/schemas/team/team-create-request.yaml#/TeamCreateRequest
+    TeamUpdateRequest:
+      $ref: ./components/schemas/team/team-update-request.yaml#/TeamUpdateRequest
+    TodoResponse:
+      $ref: ./components/schemas/todo/todo-response.yaml#/TodoResponse
+    TodoListResponse:
+      $ref: ./components/schemas/todo/todo-list-response.yaml#/TodoListResponse
+    TodoCreateRequest:
+      $ref: ./components/schemas/todo/todo-create-request.yaml#/TodoCreateRequest
+    TodoUpdateRequest:
+      $ref: ./components/schemas/todo/todo-update-request.yaml#/TodoUpdateRequest
+    TodoStatusEnum:
+      $ref: ./components/schemas/todo/todo-status-enum.yaml#/TodoStatusEnum
+    IssueResponse:
+      $ref: ./components/schemas/issue/issue-response.yaml#/IssueResponse
+    IssueListResponse:
+      $ref: ./components/schemas/issue/issue-list-response.yaml#/IssueListResponse
+    IssueCreateRequest:
+      $ref: ./components/schemas/issue/issue-create-request.yaml#/IssueCreateRequest
+    IssueUpdateRequest:
+      $ref: ./components/schemas/issue/issue-update-request.yaml#/IssueUpdateRequest
+    IssueTypeResponse:
+      $ref: ./components/schemas/issue/issue-type-base-response.yaml#/IssueTypeBaseResponse
+    IssueTypeListResponse:
+      $ref: ./components/schemas/issue/issue-type-list-response.yaml#/IssueTypeListResponse
+    HeadlineBase:
+      $ref: ./components/schemas/headline/headline-base.yaml#/HeadlineBase
+    HeadlineResponse:
+      $ref: ./components/schemas/headline/headline-response.yaml#/HeadlineResponse
+    HeadlineCreateRequest:
+      $ref: ./components/schemas/headline/headline-create-request.yaml#/HeadlineCreateRequest
+    HeadlineListResponse:
+      $ref: ./components/schemas/headline/headline-list-response.yaml#/HeadlineListResponse
+    HeadlineUpdateRequest:
+      $ref: ./components/schemas/headline/headline-update-request.yaml#/HeadlineUpdateRequest
+    QuarterBaseResponse:
+      $ref: ./components/schemas/quarter/quarter-base-response.yaml#/QuarterBaseResponse
+    YearBaseResponse:
+      $ref: ./components/schemas/year/year-base-response.yaml#/YearBaseResponse
+    QuarterResponse:
+      $ref: ./components/schemas/quarter/quarter-response.yaml#/QuarterResponse
+    YearResponse:
+      $ref: ./components/schemas/year/year-response.yaml#/YearResponse
+    WeekBase:
+      $ref: ./components/schemas/week/week-base.yaml#/WeekBase
+    WeekResponse:
+      $ref: ./components/schemas/week/week-response.yaml#/WeekResponse
+    WeekListResponse:
+      $ref: ./components/schemas/week/week-list-response.yaml#/WeekListResponse
+    RockBase:
+      $ref: ./components/schemas/rock/rock-base.yaml#/RockBase
+    RockStatusEnum:
+      $ref: ./components/schemas/rock/rock-status-enum.yaml#/RockStatusEnum
+    RockCategoryEnum:
+      $ref: ./components/schemas/rock/rock-category-enum.yaml#/RockCategoryEnum
+    RockResponse:
+      $ref: ./components/schemas/rock/rock-response.yaml#/RockResponse
+    RockCreateRequest:
+      $ref: ./components/schemas/rock/rock-create-request.yaml#/RockCreateRequest
+    RockListResponse:
+      $ref: ./components/schemas/rock/rock-list-response.yaml#/RockListResponse
+    PersonalRockListResponse:
+      $ref: ./components/schemas/rock/personal-rock-list-response.yaml#/PersonalRockListResponse
+    RockUpdateRequest:
+      $ref: ./components/schemas/rock/rock-update-request.yaml#/RockUpdateRequest
+    MetricBase:
+      $ref: ./components/schemas/metric/metric-base.yaml#/MetricBase
+    MetricOperatorEnum:
+      $ref: ./components/schemas/metric/metric-operator-enum.yaml#/MetricOperatorEnum
+    MetricUnitEnum:
+      $ref: ./components/schemas/metric/metric-unit-enum.yaml#/MetricUnitEnum
+    MetricResponse:
+      $ref: ./components/schemas/metric/metric-response.yaml#/MetricResponse
+    MetricCreateRequest:
+      $ref: ./components/schemas/metric/metric-create-request.yaml#/MetricCreateRequest
+    TrendDataPointResponse:
+      $ref: ./components/schemas/metric/trend-data-point-response.yaml#/TrendDataPointResponse
+    TrendsTabMetricResponse:
+      $ref: ./components/schemas/metric/trends-tab-metric-response.yaml#/TrendsTabMetricResponse
+    TrendsTabMetricListResponse:
+      $ref: ./components/schemas/metric/trends-tab-metric-list-response.yaml#/TrendsTabMetricListResponse
+    MetricValueBase:
+      $ref: ./components/schemas/metric-value/metric-value-base.yaml#/MetricValueBase
+    MetricValueBaseResponse:
+      $ref: ./components/schemas/metric-value/metric-value-base-response.yaml#/MetricValueBaseResponse
+    MetricValueResponse:
+      $ref: ./components/schemas/metric-value/metric-value-response.yaml#/MetricValueResponse
+    MetricListResponse:
+      $ref: ./components/schemas/metric/metric-list-response.yaml#/MetricListResponse
+    MetricUpdateRequest:
+      $ref: ./components/schemas/metric/metric-update-request.yaml#/MetricUpdateRequest
+    MetricValueUpdateRequest:
+      $ref: ./components/schemas/metric-value/metric-value-update-request.yaml#/MetricValueUpdateRequest
+
+  requestBodies:
+    CreateUserRequest:
+      $ref: ./components/request-bodies/create-user.yaml#/CreateUserRequest
+    UpdateUserRequest:
+      $ref: ./components/request-bodies/update-user.yaml#/UpdateUserRequest
+    CreateTeamRequest:
+      $ref: ./components/request-bodies/create-team.yaml#/CreateTeamRequest
+    UpdateTeamRequest:
+      $ref: ./components/request-bodies/update-team.yaml#/UpdateTeamRequest
+    CreateTodoRequestBody:
+      $ref: ./components/request-bodies/create-todo.yaml#/CreateTodoRequestBody
+    UpdateTodoRequestBody:
+      $ref: ./components/request-bodies/update-todo.yaml#/UpdateTodoRequestBody
+    UpdateTodoArchiveRequestBody:
+      $ref: ./components/request-bodies/update-todo-archive.yaml#/UpdateTodoArchiveRequestBody
+    CreateIssueRequestBody:
+      $ref: ./components/request-bodies/create-issue.yaml#/CreateIssueRequestBody
+    UpdateIssueRequestBody:
+      $ref: ./components/request-bodies/update-issue.yaml#/UpdateIssueRequestBody
+    UpdateIssueArchiveRequestBody:
+      $ref: ./components/request-bodies/update-issue-archive.yaml#/UpdateIssueArchiveRequestBody
+    CreateHeadlineRequestBody:
+      $ref: ./components/request-bodies/create-headline.yaml#/CreateHeadlineRequestBody
+    UpdateHeadlineRequestBody:
+      $ref: ./components/request-bodies/update-headline.yaml#/UpdateHeadlineRequestBody
+    UpdateHeadlineArchiveRequestBody:
+      $ref: ./components/request-bodies/update-headline-archive.yaml#/UpdateHeadlineArchiveRequestBody
+    CreateRockRequestBody:
+      $ref: ./components/request-bodies/create-rock.yaml#/CreateRockRequestBody
+    UpdateRockRequestBody:
+      $ref: ./components/request-bodies/update-rock.yaml#/UpdateRockRequestBody
+    UpdateRockStatusRequestBody:
+      $ref: ./components/request-bodies/update-rock-status.yaml#/UpdateRockStatusRequestBody
+    UpdateRockArchiveRequestBody:
+      $ref: ./components/request-bodies/update-rock-archive.yaml#/UpdateRockArchiveRequestBody
+    CreateMetricRequestBody:
+      $ref: ./components/request-bodies/create-metric.yaml#/CreateMetricRequestBody
+    UpdateMetricValueRequestBody:
+      $ref: ./components/request-bodies/update-metric-value.yaml#/UpdateMetricValueRequestBody
+    UpdateMetricRequestBody:
+      $ref: ./components/request-bodies/update-metric.yaml#/UpdateMetricRequestBody
+
+  responses:
+    BadRequestResponse:
+      $ref: ./components/responses/bad-request.yaml#/BadRequestResponse
+    UnauthorizedResponse:
+      $ref: ./components/responses/unauthorized.yaml#/UnauthorizedResponse
+    ForbiddenResponse:
+      $ref: ./components/responses/forbidden.yaml#/ForbiddenResponse
+    ConflictResponse:
+      $ref: ./components/responses/conflict.yaml#/ConflictResponse
+    NotFoundResponse:
+      $ref: ./components/responses/not-found.yaml#/NotFoundResponse
+    ValidationErrorResponse:
+      $ref: ./components/responses/validation-error.yaml#/ValidationErrorResponse
+    InternalServerErrorResponse:
+      $ref: ./components/responses/internal-server-error.yaml#/InternalServerErrorResponse

@@ -1,0 +1,13 @@
+TeamUpdateRequest:
+  type: object
+  description: Payload used to update an existing team.
+  required:
+    - name
+  properties:
+    name:
+      type: string
+      minLength: 1
+      maxLength: 100
+      pattern: "^[a-zA-ZÀ-ỹ0-9]+(?:[ \\-\\'][a-zA-ZÀ-ỹ0-9]+)*$"
+      description: Name of the team. Must not be empty or contain leading/trailing whitespace.
+      example: Engineering Team

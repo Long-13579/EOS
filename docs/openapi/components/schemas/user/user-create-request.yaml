@@ -1,0 +1,19 @@
+UserCreateRequest:
+  allOf:
+    - $ref: ./user-base.yaml#/UserBase
+    - type: object
+      description: Payload used to create a new user.
+      properties:
+        role:
+          $ref: ./user-role-enum.yaml#/UserRoleEnum
+        teamIds:
+          type: array
+          description: List of team IDs the user belongs to.
+          items:
+            type: string
+            format: uuid
+          example:
+            - 550e8400-e29b-41d4-a716-446655440000
+            - 550e8400-e29b-41d4-a716-446655440001
+      required:
+        - role

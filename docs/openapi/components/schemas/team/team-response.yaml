@@ -1,0 +1,37 @@
+TeamResponse:
+  description: Detailed information about a team, including metadata (metadata fields are optional)
+  type: object
+  allOf:
+    - $ref: ./team-base.yaml#/TeamBase
+    - type: object
+      properties:
+        isLeadership:
+          type: boolean
+          description: Indicates if the team is a leadership team
+          example: true
+
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the team was created
+          example: 2026-01-30T08:15:30Z
+
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the team was last updated
+          example: 2026-02-01T10:45:00Z
+
+        createdBy:
+          type: string
+          format: uuid
+          description: Identifier of the user who created the team
+          example: 9c9f6c44-1b2f-4f52-b1c2-6a8a4b9c1234
+
+        updatedBy:
+          type: string
+          format: uuid
+          description: Identifier of the user who updated the team
+          example: 9c9f6c44-1b2f-4f52-b1c2-6a8a4b9c1234
+      required:
+        - isLeadership

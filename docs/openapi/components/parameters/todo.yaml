@@ -1,0 +1,26 @@
+TodoIdParam:
+  name: todo-id
+  in: path
+  required: true
+  description: Unique identifier of the todo
+  schema:
+    type: string
+    format: uuid
+    example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+
+TodoStatusQueryParam:
+  name: status
+  in: query
+  required: false
+  description: Filter todos by their status
+  schema:
+    $ref: ../schemas/todo/todo-status-enum.yaml#/TodoStatusEnum
+
+TodoArchiveQueryParam:
+  name: isArchived
+  in: query
+  required: false
+  description: Filter todos by their archived status
+  schema:
+    type: boolean
+    example: true

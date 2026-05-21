@@ -1,0 +1,14 @@
+IssueListResponse:
+  type: object
+  description: Response schema for a list of issues with pagination
+  properties:
+    data:
+      type: array
+      description: Array of issue items
+      items:
+        $ref: ./issue-response.yaml#/IssueResponse
+    pagination:
+      $ref: ../common/pagination.yaml#/Pagination
+  required:
+    - data
+    - pagination

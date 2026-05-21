@@ -1,0 +1,22 @@
+RockListResponse:
+  type: object
+  description: Response containing rocks grouped by category. `companyRocks` is only included for Leadership teams; it is omitted for non-Leadership teams. `departmentRocks` and `individualRocks` are always returned and will be empty if no rocks exist in that category.
+  properties:
+    companyRocks:
+      type: array
+      description: List of company-level rocks.
+      items:
+        $ref: ./rock-response.yaml#/RockResponse
+    departmentRocks:
+      type: array
+      description: List of department-level rocks.
+      items:
+        $ref: ./rock-response.yaml#/RockResponse
+    individualRocks:
+      type: array
+      description: List of individual-level rocks.
+      items:
+        $ref: ./rock-response.yaml#/RockResponse
+  required:
+    - departmentRocks
+    - individualRocks

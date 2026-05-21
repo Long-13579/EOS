@@ -1,0 +1,41 @@
+Pagination:
+  type: object
+  description: Pagination details for paginated responses
+  additionalProperties: false
+  properties:
+    page:
+      type: integer
+      minimum: 1
+      description: Current page number
+      example: 1
+    limit:
+      type: integer
+      minimum: 1
+      maximum: 20
+      description: Number of items per page
+      example: 20
+    totalItems:
+      type: integer
+      minimum: 0
+      description: Total number of items
+      example: 100
+    totalPages:
+      type: integer
+      minimum: 0
+      description: Total number of pages (0 when totalItems is 0)
+      example: 5
+    hasNext:
+      type: boolean
+      description: Whether there are more pages (derived from page and totalPages)
+      example: true
+    hasPrev:
+      type: boolean
+      description: Whether there are previous pages (derived from page)
+      example: false
+  required:
+    - page
+    - limit
+    - totalItems
+    - totalPages
+    - hasNext
+    - hasPrev

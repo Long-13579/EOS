@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: 043-remove-one-thing-issue-type
+      author: eos-team
+      preConditions:
+        - onFail: HALT
+        - onError: HALT
+        - tableExists:
+            tableName: issue_types
+      changes:
+        - sql:
+            sql: |
+              DELETE FROM issue_types
+              WHERE name = 'One Thing';

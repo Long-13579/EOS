@@ -1,0 +1,17 @@
+databaseChangeLog:
+  - changeSet:
+      id: 046-add-index-rock-owner-year-quarter-archived
+      author: eos-team
+      changes:
+        - createIndex:
+            indexName: idx_rock_owner_year_quarter_archived
+            tableName: rocks
+            columns:
+              - column:
+                  name: owner_id
+              - column:
+                  name: year_id
+              - column:
+                  name: quarter_id
+              - column:
+                  name: is_archived

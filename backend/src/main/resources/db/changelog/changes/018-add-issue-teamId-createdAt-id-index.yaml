@@ -1,0 +1,18 @@
+databaseChangeLog:
+  - changeSet:
+      id: 018-create-index-issues-team-created_at-id
+      author: eos-team
+      changes:
+        - createIndex:
+            tableName: issues
+            indexName: idx_issues_team_created_at_id
+            columns:
+              - column:
+                  name: team_id
+                  descending: false
+              - column:
+                  name: created_at
+                  descending: true
+              - column:
+                  name: id
+                  descending: false

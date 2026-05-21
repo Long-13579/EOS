@@ -1,0 +1,22 @@
+ErrorResponse:
+  type: object
+  description: Standard error response returned by all API endpoints when an error occurs.
+  properties:
+    code:
+      type: string
+      description: Machine-readable error code in UPPER_SNAKE_CASE.
+      example: ERROR_RESPONSE_CODE
+    message:
+      type: string
+      description: Human-readable error message.
+      example: Invalid request data.
+    details:
+      type: object
+      description: Map of field names to their specific validation error messages.
+      additionalProperties:
+        type: array
+        items:
+          type: string
+  required:
+    - code
+    - message

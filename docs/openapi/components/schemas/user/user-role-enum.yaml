@@ -1,0 +1,7 @@
+UserRoleEnum:
+  type: string
+  description: Role assigned to the user.
+  enum:
+    - USER
+    - ADMIN
+  example: USER

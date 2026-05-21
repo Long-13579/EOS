@@ -1,0 +1,4 @@
+HeadlineUpdateRequest:
+  description: Payload used to update an existing headline.
+  allOf:
+    - $ref: ./headline-base.yaml#/HeadlineBase

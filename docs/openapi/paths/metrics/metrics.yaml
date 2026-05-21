@@ -1,0 +1,54 @@
+post:
+  tags:
+    - Metrics
+  summary: Create a new metric
+  description: Creates a new metric. Requires authentication.
+  operationId: createMetric
+  security:
+    - accessCookieAuth: []
+  requestBody:
+    $ref: ../../components/request-bodies/create-metric.yaml#/CreateMetricRequestBody
+  responses:
+    "201":
+      description: Metric created successfully.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/metric/metric-response.yaml#/MetricResponse
+    "400":
+      $ref: ../../components/responses/bad-request.yaml#/BadRequestResponse
+    "401":
+      $ref: ../../components/responses/unauthorized.yaml#/UnauthorizedResponse
+    "403":
+      $ref: ../../components/responses/forbidden.yaml#/ForbiddenResponse
+    "500":
+      $ref: ../../components/responses/internal-server-error.yaml#/InternalServerErrorResponse
+
+get:
+  tags:
+    - Metrics
+  summary: List metrics by team and week
+  description: Retrieves metrics for a specific team and week. Each metric may include current and last week values when available. Requires authentication.
+  operationId: listMetricsByTeamAndWeek
+  security:
+    - accessCookieAuth: []
+  parameters:
+    - $ref: ../../components/parameters/team.yaml#/TeamIdQueryParam
+    - $ref: ../../components/parameters/week.yaml#/WeekIdQueryParam
+  responses:
+    "200":
+      description: Successfully retrieved list of metrics for the specified team and week.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/metric/metric-list-response.yaml#/MetricListResponse
+    "400":
+      $ref: ../../components/responses/bad-request.yaml#/BadRequestResponse
+    "401":
+      $ref: ../../components/responses/unauthorized.yaml#/UnauthorizedResponse
+    "403":
+      $ref: ../../components/responses/forbidden.yaml#/ForbiddenResponse
+    "404":
+      $ref: ../../components/responses/not-found.yaml#/NotFoundResponse
+    "500":
+      $ref: ../../components/responses/internal-server-error.yaml#/InternalServerErrorResponse

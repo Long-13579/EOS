@@ -1,0 +1,33 @@
+UserUpdateRequest:
+    type: object
+    description: Payload used to update an existing user.
+    properties:
+      firstName:
+        type: string
+        description: User's legal first name. Allows letters with accents, spaces, hyphens, and apostrophes
+        minLength: 1
+        maxLength: 100
+        pattern: "^[a-zA-ZÀ-ỹ]+(?:[ \\-\\'][a-zA-ZÀ-ỹ]+)*$"
+        example: John
+      lastName:
+        type: string
+        description: User's legal last name or family name. Allows letters with accents, spaces, hyphens, and apostrophes
+        minLength: 1
+        maxLength: 100
+        pattern: "^[a-zA-ZÀ-ỹ]+(?:[ \\-\\'][a-zA-ZÀ-ỹ]+)*$"
+        example: Doe
+      role:
+        $ref: ./user-role-enum.yaml#/UserRoleEnum
+      teamIds:
+        type: array
+        description: List of team IDs the user belongs to.
+        items:
+          type: string
+          format: uuid
+        example:
+          - 550e8400-e29b-41d4-a716-446655440000
+          - 550e8400-e29b-41d4-a716-446655440001
+    required:
+      - firstName
+      - lastName
+      - role

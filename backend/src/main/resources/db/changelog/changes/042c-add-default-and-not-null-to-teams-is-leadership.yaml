@@ -1,0 +1,29 @@
+databaseChangeLog:
+  - changeSet:
+      id: 042c-add-default-and-not-null-to-teams-is-leadership
+      author: eos-team
+      preConditions:
+        - onFail: HALT
+        - onError: HALT
+        - tableExists:
+            tableName: teams
+        - columnExists:
+            tableName: teams
+            columnName: is_leadership
+      changes:
+        - addDefaultValue:
+            tableName: teams
+            columnName: is_leadership
+            defaultValueBoolean: false
+        - addNotNullConstraint:
+            tableName: teams
+            columnName: is_leadership
+            columnDataType: BOOLEAN
+      rollback:
+        - dropNotNullConstraint:
+            tableName: teams
+            columnName: is_leadership
+            columnDataType: BOOLEAN
+        - dropDefaultValue:
+            tableName: teams
+            columnName: is_leadership

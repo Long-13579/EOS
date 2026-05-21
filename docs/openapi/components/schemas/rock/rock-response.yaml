@@ -1,0 +1,46 @@
+RockResponse:
+  allOf:
+    - $ref: ./rock-base.yaml#/RockBase
+    - type: object
+      description: Detailed schema for a rock response
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the rock
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        team:
+          $ref: ../team/team-base.yaml#/TeamBase
+        year:
+          $ref: ../year/year-base-response.yaml#/YearBaseResponse
+        quarter:
+          $ref: ../quarter/quarter-base-response.yaml#/QuarterBaseResponse
+        owner:
+          $ref: ../user/user-base-response.yaml#/UserBaseResponse
+        isArchived:
+          type: boolean
+          description: Indicates whether the rock is archived
+          example: false
+        createdAt:
+          type: string
+          format: date-time
+          description: Date and time when the rock was created
+          example: "2026-02-24T10:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: Date and time when the rock was last updated
+          example: "2026-02-24T12:30:00Z"
+        createdBy:
+          $ref: ../user/user-base-response.yaml#/UserBaseResponse
+        updatedBy:
+          $ref: ../user/user-base-response.yaml#/UserBaseResponse
+      required:
+        - id
+        - team
+        - quarter
+        - year
+        - owner
+        - isArchived
+        - createdAt
+        - createdBy

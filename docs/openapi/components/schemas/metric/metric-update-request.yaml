@@ -1,0 +1,25 @@
+MetricUpdateRequest:
+  type: object
+  description: Schema for updating a metric's mutable fields. All required fields must be provided on every request.
+  properties:
+    name:
+      type: string
+      description: The name of the metric.
+      minLength: 1
+      maxLength: 255
+      example: Revenue
+    goal:
+      type: string
+      description: The expected value the metric should reach, interpreted according to the metric's unit (e.g., a numeric threshold, YES/NO, or RYG status).
+      example: "1000"
+    operator:
+      $ref: ./metric-operator-enum.yaml#/MetricOperatorEnum
+    ownerId:
+      type: string
+      format: uuid
+      description: User identifier who is responsible for this metric
+      example: "123e4567-e89b-12d3-a456-426614174001"
+  required:
+    - name
+    - goal
+    - ownerId

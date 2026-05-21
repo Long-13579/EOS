@@ -1,0 +1,14 @@
+RockStatusEnum:
+  type: string
+  description: |
+    Current status of the rock.
+    - ON_TRACK: The rock is progressing as planned and is on schedule.
+    - OFF_TRACK: The rock is at risk or behind schedule and may not meet its target.
+    - COMPLETED: The rock has been successfully completed.
+    - DEFERRED: The rock has been intentionally postponed to a later time or future quarter.
+  enum:
+    - ON_TRACK
+    - OFF_TRACK
+    - COMPLETED
+    - DEFERRED
+  example: ON_TRACK

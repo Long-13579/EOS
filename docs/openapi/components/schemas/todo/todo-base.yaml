@@ -1,0 +1,27 @@
+TodoBase:
+  type: object
+  description: Base schema for a todo item
+  properties:
+    title:
+      type: string
+      description: Short title of the todo item
+      minLength: 1
+      maxLength: 255
+      example: Prepare weekly report
+    description:
+      type: string
+      nullable: true
+      description: Detailed description of the todo item
+      maxLength: 2000
+      example: Gather team updates and prepare summary slides.
+    status:
+      $ref: ./todo-status-enum.yaml#/TodoStatusEnum
+    dueDate:
+      type: string
+      format: date-time
+      nullable: true
+      description: Due date of the todo item
+      example: "2026-03-01T09:00:00Z"
+  required:
+    - title
+    - status

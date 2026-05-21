@@ -1,0 +1,22 @@
+QuarterBase:
+  type: object
+  description: Base schema for quarter properties
+  properties:
+    name:
+      type: string
+      description: Quarter name
+      example: "Q1"
+    startDate:
+      type: string
+      pattern:  "^(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])$"
+      description: Start date of the quarter (month and day)
+      example: "02-24"
+    endDate:
+      type: string
+      pattern:  "^(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])$"
+      description: End date of the quarter (month and day)
+      example: "05-31"
+  required:
+    - name
+    - startDate
+    - endDate

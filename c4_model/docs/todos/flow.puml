@@ -1,0 +1,83 @@
+@startuml
+scale 1
+skinparam defaultFontSize 14
+skinparam sequenceMessageAlign center
+skinparam ParticipantPadding 80
+skinparam BoxPadding 40
+
+actor "User" as U
+participant "Web\nApplication" as W
+participant "Backend\nAPI" as B
+database "PostgreSQL" as DB
+
+== Page Load ==
+
+U -> W: Navigate to /todos
+W -> W: Read active team\nfrom Zustand
+
+W -> B: GET /teams/{teamId}/users
+B -> DB: Query team members
+DB -> B: User list
+B -> W: UserBaseResponse[]
+
+W -> B: GET /todos\n?teamId=X&isArchived=false\n&page=1&pageSize=10
+B -> B: @PreAuthorize\nteam membership check
+B -> DB: Query todo IDs\n(filtered, paginated)
+DB -> B: Matching IDs
+B -> DB: Fetch full todos by IDs\n(with joins: assignees, team)
+DB -> B: Todo entities
+B -> W: PagedEntityResponse
+W -> U: Display todos table
+
+== Filter by Status ==
+
+U -> W: Select "In Progress" filter
+W -> B: GET /todos\n?teamId=X&status=IN_PROGRESS
+B -> DB: Query by status
+DB -> B: Filtered todos
+B -> W: Paginated list
+W -> U: Display filtered todos
+
+== Create Todo ==
+
+U -> W: Fill todo dialog + submit
+W -> B: POST /todos\n{teamId, title, description,\nstatus, dueDate, assigneeIds}
+B -> B: Validate team membership
+B -> B: Validate assignees in team
+B -> DB: INSERT todo
+B -> DB: INSERT todo_assignees\n(join records)
+DB -> B: Saved todo
+B -> W: TodoResponse
+W -> W: Invalidate query cache
+W -> U: Updated todos list
+
+== Update Todo ==
+
+U -> W: Change status or edit fields
+W -> B: PUT /todos/{id}\n{title, status,\nassigneeIds, ...}
+B -> B: Validate team membership
+B -> B: Validate assignees
+B -> DB: UPDATE todo
+B -> DB: Sync todo_assignees\n(delete old, insert new)
+DB -> B: Updated todo
+B -> W: TodoResponse
+W -> U: Show updated todo
+
+== Archive / Delete ==
+
+alt Archive
+    U -> W: Click archive
+    W -> B: PATCH /todos/{id}\n{isArchived: true}
+    B -> DB: UPDATE isArchived
+    B -> W: TodoResponse
+else Delete
+    U -> W: Click delete + confirm
+    W -> B: DELETE /todos/{id}
+    B -> DB: DELETE todo + assignees
+    B -> W: 204 No Content
+end
+
+W -> W: Invalidate query cache
+W -> U: Updated view
+
+@enduml

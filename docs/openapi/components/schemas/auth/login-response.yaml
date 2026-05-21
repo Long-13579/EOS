@@ -1,0 +1,29 @@
+LoginResponse:
+  type: object
+  description: User's information combine first name, last name and role.
+  properties:
+    firstName:
+      type: string
+      description: User's first name. Must not be empty or contain leading/trailing whitespace.
+      minLength: 1
+      maxLength: 100
+      pattern: "^[a-zA-ZÀ-ỹ]+(?:[ \\-\\'][a-zA-ZÀ-ỹ]+)*$"
+      example: John
+    lastName:
+      type: string
+      description: User's last name. Must not be empty or contain leading/trailing whitespace.
+      minLength: 1
+      maxLength: 100
+      pattern: "^[a-zA-ZÀ-ỹ]+(?:[ \\-\\'][a-zA-ZÀ-ỹ]+)*$"
+      example: Doe
+    role:
+      type: string
+      description: User's role in the system. Determines access permissions and capabilities.
+      enum:
+        - USER
+        - ADMIN
+      default: USER
+  required:
+    - firstName
+    - lastName
+    - role

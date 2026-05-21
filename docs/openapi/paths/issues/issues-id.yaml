@@ -1,0 +1,84 @@
+parameters:
+  - $ref: ../../components/parameters/issue.yaml#/IssueIdParam
+
+put:
+  tags:
+    - Issues
+  summary: Update an issue by ID
+  description: Updates an existing issue. Requires authentication and appropriate permissions.
+  operationId: updateIssue
+  security:
+    - accessCookieAuth: []
+  requestBody:
+    $ref: ../../components/request-bodies/update-issue.yaml#/UpdateIssueRequestBody
+  responses:
+    "200":
+      description: Issue updated successfully
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/issue/issue-response.yaml#/IssueResponse
+    "400":
+      $ref: ../../components/responses/bad-request.yaml#/BadRequestResponse
+    "401":
+      $ref: ../../components/responses/unauthorized.yaml#/UnauthorizedResponse
+    "403":
+      $ref: ../../components/responses/forbidden.yaml#/ForbiddenResponse
+    "404":
+      $ref: ../../components/responses/not-found.yaml#/NotFoundResponse
+    "422":
+      $ref: ../../components/responses/validation-error.yaml#/ValidationErrorResponse
+    "500":
+      $ref: ../../components/responses/internal-server-error.yaml#/InternalServerErrorResponse
+
+delete:
+  tags:
+    - Issues
+  summary: Delete an issue by ID
+  description: Deletes an issue by its ID. The user must be authenticated and have permission to delete the issue.
+  operationId: deleteIssue
+  security:
+    - accessCookieAuth: []
+  responses:
+    "204":
+      description: Issue deleted successfully
+    "400":
+      $ref: ../../components/responses/bad-request.yaml#/BadRequestResponse
+    "401":
+      $ref: ../../components/responses/unauthorized.yaml#/UnauthorizedResponse
+    "403":
+      $ref: ../../components/responses/forbidden.yaml#/ForbiddenResponse
+    "404":
+      $ref: ../../components/responses/not-found.yaml#/NotFoundResponse
+    "500":
+      $ref: ../../components/responses/internal-server-error.yaml#/InternalServerErrorResponse
+
+patch:
+  tags:
+    - Issues
+  summary: Archive or Unarchive an issue by ID
+  description: Updates the archived status of an issue. The user must be authenticated and have permission to modify the issue. Archiving an issue marks it as archived without deleting it from the database, while unarchiving restores the issue to the active state.
+  operationId: updateIssueArchiveStatus
+  security:
+    - accessCookieAuth: []
+  requestBody:
+    $ref: ../../components/request-bodies/update-issue-archive.yaml#/UpdateIssueArchiveRequestBody
+  responses:
+    "200":
+      description: Issue archive status updated successfully
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/issue/issue-response.yaml#/IssueResponse
+    "400":
+      $ref: ../../components/responses/bad-request.yaml#/BadRequestResponse
+    "401":
+      $ref: ../../components/responses/unauthorized.yaml#/UnauthorizedResponse
+    "403":
+      $ref: ../../components/responses/forbidden.yaml#/ForbiddenResponse
+    "404":
+      $ref: ../../components/responses/not-found.yaml#/NotFoundResponse
+    "422":
+      $ref: ../../components/responses/validation-error.yaml#/ValidationErrorResponse
+    "500":
+      $ref: ../../components/responses/internal-server-error.yaml#/InternalServerErrorResponse

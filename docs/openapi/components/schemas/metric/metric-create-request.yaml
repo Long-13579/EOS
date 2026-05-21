@@ -1,0 +1,19 @@
+MetricCreateRequest:
+  allOf:
+    - $ref: ./metric-base.yaml#/MetricBase
+    - type: object
+      description: Payload used to create a new metric
+      required:
+        - teamId
+        - ownerId
+      properties:
+        teamId:
+          type: string
+          format: uuid
+          description: Team identifier that owns this metric
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        ownerId:
+          type: string
+          format: uuid
+          description: User identifier who is responsible for this metric
+          example: "123e4567-e89b-12d3-a456-426614174001"

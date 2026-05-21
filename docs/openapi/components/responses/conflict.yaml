@@ -1,0 +1,12 @@
+ConflictResponse:
+  description: Request could not be completed due to a conflict with the current state of the resource.
+  content:
+    application/json:
+      schema:
+        $ref: ../../openapi.yaml#/components/schemas/ErrorResponse
+      example:
+        code: CONFLICT
+        message: Request could not be completed due to a conflict with the current state of the resource.
+        details:
+          resourceId:
+            - Resource with the given info already exists.

@@ -1,0 +1,23 @@
+get:
+  tags:
+    - Issue Types
+  summary: List issue types
+  description: Retrieves a list of all issue types available in the system.
+  operationId: listIssueTypes
+  security:
+    - accessCookieAuth: []
+  responses:
+    "200":
+      description: List of issue types
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/issue/issue-type-list-response.yaml#/IssueTypeListResponse
+    "400":
+      $ref: ../../components/responses/bad-request.yaml#/BadRequestResponse
+    "401":
+      $ref: ../../components/responses/unauthorized.yaml#/UnauthorizedResponse
+    "403":
+      $ref: ../../components/responses/forbidden.yaml#/ForbiddenResponse
+    "500":
+      $ref: ../../components/responses/internal-server-error.yaml#/InternalServerErrorResponse

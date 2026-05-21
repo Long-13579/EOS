@@ -1,0 +1,86 @@
+parameters:
+  - $ref: ../../components/parameters/headline.yaml#/HeadlineIdParam
+
+put:
+  tags:
+    - Headlines
+  summary: Update a headline by ID
+  description: Updates an existing headline. Requires authentication and appropriate permissions.
+  operationId: updateHeadline
+  security:
+    - accessCookieAuth: []
+  requestBody:
+    $ref: ../../components/request-bodies/update-headline.yaml#/UpdateHeadlineRequestBody
+  responses:
+    "200":
+      description: Headline updated successfully
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/headline/headline-response.yaml#/HeadlineResponse
+    "400":
+      $ref: ../../components/responses/bad-request.yaml#/BadRequestResponse
+    "401":
+      $ref: ../../components/responses/unauthorized.yaml#/UnauthorizedResponse
+    "403":
+      $ref: ../../components/responses/forbidden.yaml#/ForbiddenResponse
+    "404":
+      $ref: ../../components/responses/not-found.yaml#/NotFoundResponse
+    "409":
+      $ref: ../../components/responses/conflict.yaml#/ConflictResponse
+    "422":
+      $ref: ../../components/responses/validation-error.yaml#/ValidationErrorResponse
+    "500":
+      $ref: ../../components/responses/internal-server-error.yaml#/InternalServerErrorResponse
+
+delete:
+  tags:
+    - Headlines
+  summary: Delete a headline by ID
+  description: Deletes a headline by its ID. The user must be authenticated and have permission to delete the headline.
+  operationId: deleteHeadline
+  security:
+    - accessCookieAuth: []
+  responses:
+    "204":
+      description: Headline deleted successfully
+    "400":
+      $ref: ../../components/responses/bad-request.yaml#/BadRequestResponse
+    "401":
+      $ref: ../../components/responses/unauthorized.yaml#/UnauthorizedResponse
+    "403":
+      $ref: ../../components/responses/forbidden.yaml#/ForbiddenResponse
+    "404":
+      $ref: ../../components/responses/not-found.yaml#/NotFoundResponse
+    "500":
+      $ref: ../../components/responses/internal-server-error.yaml#/InternalServerErrorResponse
+
+patch:
+  tags:
+    - Headlines
+  summary: Archive or unarchive a headline by ID
+  description: Updates the archived status of a headline. The user must be authenticated and have permission to modify the headline. Archiving a headline marks it as archived without deleting it from the database, while unarchiving restores the headline to the active state.
+  operationId: updateHeadlineArchiveStatus
+  security:
+    - accessCookieAuth: []
+  requestBody:
+    $ref: ../../components/request-bodies/update-headline-archive.yaml#/UpdateHeadlineArchiveRequestBody
+  responses:
+    "200":
+      description: Headline archive status updated successfully
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/headline/headline-response.yaml#/HeadlineResponse
+    "400":
+      $ref: ../../components/responses/bad-request.yaml#/BadRequestResponse
+    "401":
+      $ref: ../../components/responses/unauthorized.yaml#/UnauthorizedResponse
+    "403":
+      $ref: ../../components/responses/forbidden.yaml#/ForbiddenResponse
+    "404":
+      $ref: ../../components/responses/not-found.yaml#/NotFoundResponse
+    "422":
+      $ref: ../../components/responses/validation-error.yaml#/ValidationErrorResponse
+    "500":
+      $ref: ../../components/responses/internal-server-error.yaml#/InternalServerErrorResponse

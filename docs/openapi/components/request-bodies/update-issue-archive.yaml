@@ -1,0 +1,15 @@
+UpdateIssueArchiveRequestBody:
+  description: Request body for updating the archived status of an existing issue.
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        description: Request payload to update the archived status of an issue.
+        properties:
+          isArchived:
+            type: boolean
+            description: Whether the issue is archived.
+            example: true
+        required:
+          - isArchived

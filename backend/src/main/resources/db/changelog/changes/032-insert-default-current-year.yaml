@@ -1,0 +1,17 @@
+databaseChangeLog:
+  - changeSet:
+      id: 032-insert-default-current-year
+      author: eos-team
+      changes:
+        - insert:
+            tableName: years
+            columns:
+              - column:
+                  name: id
+                  valueComputed: uuid_generate_v4()
+              - column:
+                  name: year
+                  valueComputed: EXTRACT(YEAR FROM CURRENT_DATE)
+              - column:
+                  name: created_at
+                  valueComputed: NOW()

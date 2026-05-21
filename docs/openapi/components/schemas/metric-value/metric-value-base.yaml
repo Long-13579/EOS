@@ -1,0 +1,8 @@
+MetricValueBase:
+  type: object
+  description: Base schema for a metric value
+  properties:
+    value:
+      type: string
+      description: Captured metric value for the given week
+      example: "1000"

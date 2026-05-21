@@ -1,0 +1,10 @@
+TrendDataPointResponse:
+  type: object
+  description: One week slot in a trends metric response. The 'metricValue' object is omitted if no data is recorded for this specific week.
+  properties:
+    week:
+      $ref: ../week/week-response.yaml#/WeekResponse
+    metricValue:
+      $ref: ../metric-value/metric-value-base-response.yaml#/MetricValueBaseResponse
+  required:
+    - week

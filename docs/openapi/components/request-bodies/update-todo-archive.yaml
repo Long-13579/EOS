@@ -1,0 +1,14 @@
+UpdateTodoArchiveRequestBody:
+  description: Request body for updating the archived status of an existing todo.
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          isArchived:
+            type: boolean
+            description: Indicates whether the todo is archived (true) or unarchived (false).
+            example: true
+        required:
+          - isArchived

@@ -1,0 +1,7 @@
+UpdateMetricRequestBody:
+  required: true
+  description: Request body for updating an existing metric.
+  content:
+    application/json:
+      schema:
+        $ref: ../schemas/metric/metric-update-request.yaml#/MetricUpdateRequest

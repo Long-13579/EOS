@@ -1,0 +1,57 @@
+get:
+  operationId: listUsers
+  summary: List all users (Admin only)
+  description: Retrieve a paginated list of all users in the system. This operation is restricted to administrators only. Supports pagination through query parameters for page number and page size. Additionally, a search parameter is available to filter users based on relevant text fields.
+  tags:
+    - Users
+  security:
+    - accessCookieAuth: []
+  parameters:
+    - $ref: ../../openapi.yaml#/components/parameters/PageNumber
+    - $ref: ../../openapi.yaml#/components/parameters/PageSize
+    - $ref: ../../openapi.yaml#/components/parameters/Search
+  responses:
+    "200":
+      description: Return a list of users with pagination
+      content:
+        application/json:
+          schema:
+            $ref: ../../openapi.yaml#/components/schemas/UserListResponse
+    "400":
+      $ref: ../../openapi.yaml#/components/responses/BadRequestResponse
+    "401":
+      $ref: ../../openapi.yaml#/components/responses/UnauthorizedResponse
+    "403":
+      $ref: ../../openapi.yaml#/components/responses/ForbiddenResponse
+    "500":
+      $ref: ../../openapi.yaml#/components/responses/InternalServerErrorResponse
+
+post:
+  operationId: createUser
+  summary: Create a new user (Admin only)
+  description: Creates a new user account in the system. This operation is restricted to administrators only. The request body must contain required user information such as email, first name, last name, and role.
+  tags:
+    - Users
+  security:
+    - accessCookieAuth: []
+  requestBody:
+    $ref: ../../openapi.yaml#/components/requestBodies/CreateUserRequest
+  responses:
+    "201":
+      description: User Created
+      content:
+        application/json:
+          schema:
+            $ref: ../../openapi.yaml#/components/schemas/UserResponse
+    "400":
+      $ref: ../../openapi.yaml#/components/responses/BadRequestResponse
+    "401":
+      $ref: ../../openapi.yaml#/components/responses/UnauthorizedResponse
+    "403":
+      $ref: ../../openapi.yaml#/components/responses/ForbiddenResponse
+    "409":
+      $ref: ../../openapi.yaml#/components/responses/ConflictResponse
+    "422":
+      $ref: ../../openapi.yaml#/components/responses/ValidationErrorResponse
+    "500":
+      $ref: ../../openapi.yaml#/components/responses/InternalServerErrorResponse

@@ -1,0 +1,14 @@
+MetricValueUpdateRequest:
+  allOf:
+    - $ref: ./metric-value-base.yaml#/MetricValueBase
+    - type: object
+      description: Payload used to update current value of a metric
+      required:
+        - value
+        - metricId
+      properties:
+        metricId:
+          type: string
+          format: uuid
+          description: The unique identifier of the metric.
+          example: "123e4567-e89b-12d3-a456-426614174000"

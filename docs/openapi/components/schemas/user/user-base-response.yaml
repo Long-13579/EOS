@@ -1,0 +1,14 @@
+UserBaseResponse:
+  allOf:
+    - $ref: ./user-base.yaml#/UserBase
+    - type: object
+      description: Basic information of user including id and base details
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the user
+          readOnly: true
+          example: "123e4567-e89b-12d3-a456-426614174000"
+      required:
+        - id

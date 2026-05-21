@@ -1,0 +1,41 @@
+MetricResponse:
+  allOf:
+    - $ref: ./metric-base.yaml#/MetricBase
+    - type: object
+      description: Detailed schema for a metric response
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the metric.
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        lastValue:
+          type: string
+          description: Captured metric value for the given week
+          example: "1000"
+        createdAt:
+          type: string
+          format: date-time
+          description: The timestamp when the metric was created.
+          example: "2024-01-01T12:00:00Z"
+        currentValue:
+          $ref: ../metric-value/metric-value-response.yaml#/MetricValueResponse
+        team:
+          $ref: ../team/team-base.yaml#/TeamBase
+        owner:
+          $ref: ../user/user-base-response.yaml#/UserBaseResponse
+        createdBy:
+          $ref: ../user/user-base-response.yaml#/UserBaseResponse
+        updatedAt:
+          type: string
+          format: date-time
+          description: The timestamp when the metric was last updated.
+          example: "2024-01-02T12:00:00Z"
+        updatedBy:
+          $ref: ../user/user-base-response.yaml#/UserBaseResponse
+      required:
+        - id
+        - team
+        - owner
+        - createdAt
+        - createdBy

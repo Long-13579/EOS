@@ -1,0 +1,72 @@
+databaseChangeLog:
+  - changeSet:
+      id: 041-create-metric-values-table
+      author: eos-team
+      changes:
+        - createTable:
+            tableName: metric_values
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: metric_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: week_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: value
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: true
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: true
+              - column:
+                  name: updated_by
+                  type: UUID
+                  constraints:
+                    nullable: true
+        - addUniqueConstraint:
+            tableName: metric_values
+            columnNames: metric_id, week_id
+            constraintName: uk_metric_values_metric_id_week_id
+        - addForeignKeyConstraint:
+            baseTableName: metric_values
+            baseColumnNames: metric_id
+            referencedTableName: metrics
+            referencedColumnNames: id
+            constraintName: fk_metric_values_metric_id
+            onDelete: RESTRICT
+            onUpdate: CASCADE
+        - addForeignKeyConstraint:
+            baseTableName: metric_values
+            baseColumnNames: week_id
+            referencedTableName: weeks
+            referencedColumnNames: id
+            constraintName: fk_metric_values_week_id
+            onDelete: RESTRICT
+            onUpdate: CASCADE
+        - addForeignKeyConstraint:
+            baseTableName: metric_values
+            baseColumnNames: updated_by
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_metric_values_updated_by
+            onDelete: SET NULL
+            onUpdate: CASCADE

@@ -1,0 +1,23 @@
+get:
+  tags:
+    - Weeks
+  summary: Get week list
+  description: Returns a list of up to 13 weeks, ordered chronologically from the current week to past weeks (descending). Always includes at least the current week. Historical weeks may be omitted if data is unavailable. Requires authentication.
+  operationId: getWeeks
+  security:
+    - accessCookieAuth: []
+  responses:
+    "200":
+      description: Successfully retrieved the list of weeks.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/week/week-list-response.yaml#/WeekListResponse
+    "400":
+      $ref: ../../components/responses/bad-request.yaml#/BadRequestResponse
+    "401":
+      $ref: ../../components/responses/unauthorized.yaml#/UnauthorizedResponse
+    "403":
+      $ref: ../../components/responses/forbidden.yaml#/ForbiddenResponse
+    "500":
+      $ref: ../../components/responses/internal-server-error.yaml#/InternalServerErrorResponse

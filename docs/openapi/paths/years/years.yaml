@@ -1,0 +1,25 @@
+get:
+  tags:
+    - Years
+  summary: Retrieve years
+  description: Retrieves all years. Requires authentication.
+  operationId: getYears
+  security:
+    - accessCookieAuth: []
+  responses:
+    "200":
+      description: List of years.
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ../../components/schemas/year/year-response.yaml#/YearResponse
+    "400":
+      $ref: ../../components/responses/bad-request.yaml#/BadRequestResponse
+    "401":
+      $ref: ../../components/responses/unauthorized.yaml#/UnauthorizedResponse
+    "403":
+      $ref: ../../components/responses/forbidden.yaml#/ForbiddenResponse
+    "500":
+      $ref: ../../components/responses/internal-server-error.yaml#/InternalServerErrorResponse

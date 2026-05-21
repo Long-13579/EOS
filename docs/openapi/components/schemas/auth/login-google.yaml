@@ -1,0 +1,15 @@
+LoginGoogle:
+  type: object
+  description: Request payload for Google OAuth login using authorization code flow.
+  required:
+    - code
+    - redirectUri
+  properties:
+    code:
+      type: string
+      description: Authorization code returned by Google after the user successfully authenticates and grants consent.
+      example: 4/0AX4XfWh...
+    redirectUri: 
+      type: string
+      description: The redirect URI that was used during the initial Google OAuth authorization request. This value must exactly match the redirect URI registered in the Google Cloud Console and the one used to obtain the authorization code, otherwise Google will reject the token exchange.
+      example: https://example.com/callback

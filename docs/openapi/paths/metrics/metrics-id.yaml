@@ -1,0 +1,34 @@
+parameters:
+  - $ref: ../../components/parameters/metric.yaml#/MetricIdParam
+
+put:
+  tags:
+    - Metrics
+  summary: Update a metric by ID
+  description: Updates an existing metric. Requires authentication and appropriate permissions.
+  operationId: updateMetric
+  security:
+    - accessCookieAuth: []
+  requestBody:
+    $ref: ../../components/request-bodies/update-metric.yaml#/UpdateMetricRequestBody
+  responses:
+    "200":
+      description: Metric updated successfully
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/metric/metric-response.yaml#/MetricResponse
+    "400":
+      $ref: ../../components/responses/bad-request.yaml#/BadRequestResponse
+    "401":
+      $ref: ../../components/responses/unauthorized.yaml#/UnauthorizedResponse
+    "403":
+      $ref: ../../components/responses/forbidden.yaml#/ForbiddenResponse
+    "404":
+      $ref: ../../components/responses/not-found.yaml#/NotFoundResponse
+    "409":
+      $ref: ../../components/responses/conflict.yaml#/ConflictResponse
+    "422":
+      $ref: ../../components/responses/validation-error.yaml#/ValidationErrorResponse
+    "500":
+      $ref: ../../components/responses/internal-server-error.yaml#/InternalServerErrorResponse

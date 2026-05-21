@@ -1,0 +1,68 @@
+databaseChangeLog:
+  - changeSet:
+      id: 016-insert-default-issue-types
+      author: eos-team
+      changes:
+        - insert:
+            tableName: issue_types
+            columns:
+              - column:
+                  name: id
+                  valueComputed: uuid_generate_v4()
+              - column:
+                  name: name
+                  value: Debrief
+        - insert:
+            tableName: issue_types
+            columns:
+              - column:
+                  name: id
+                  valueComputed: uuid_generate_v4()
+              - column:
+                  name: name
+                  value: Decision Needed
+        - insert:
+            tableName: issue_types
+            columns:
+              - column:
+                  name: id
+                  valueComputed: uuid_generate_v4()
+              - column:
+                  name: name
+                  value: Problem
+        - insert:
+            tableName: issue_types
+            columns:
+              - column:
+                  name: id
+                  valueComputed: uuid_generate_v4()
+              - column:
+                  name: name
+                  value: Info Needed
+        - insert:
+            tableName: issue_types
+            columns:
+              - column:
+                  name: id
+                  valueComputed: uuid_generate_v4()
+              - column:
+                  name: name
+                  value: Long Term Issue
+        - insert:
+            tableName: issue_types
+            columns:
+              - column:
+                  name: id
+                  valueComputed: uuid_generate_v4()
+              - column:
+                  name: name
+                  value: Recurring
+        - insert:
+            tableName: issue_types
+            columns:
+              - column:
+                  name: id
+                  valueComputed: uuid_generate_v4()
+              - column:
+                  name: name
+                  value: One Thing

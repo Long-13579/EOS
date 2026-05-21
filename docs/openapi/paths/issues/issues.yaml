@@ -1,0 +1,61 @@
+get:
+  tags:
+    - Issues
+  summary: List issues by team
+  description: Retrieves a paginated list of issues for a specific team. Requires authentication.
+  operationId: listIssuesByTeam
+  security:
+    - accessCookieAuth: []
+  parameters:
+    - $ref: ../../components/parameters/page.yaml#/PageParam
+    - $ref: ../../components/parameters/limit.yaml#/LimitParam
+    - $ref: ../../components/parameters/team.yaml#/TeamIdQueryParam
+    - $ref: ../../components/parameters/is-archived.yaml#/IsArchivedQueryParam
+    - $ref: ../../components/parameters/issue-type.yaml#/IssueTypeIdQueryParam
+  responses:
+    "200":
+      description: List of issues by team.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/issue/issue-list-response.yaml#/IssueListResponse
+    "400":
+      $ref: ../../components/responses/bad-request.yaml#/BadRequestResponse
+    "401":
+      $ref: ../../components/responses/unauthorized.yaml#/UnauthorizedResponse
+    "403":
+      $ref: ../../components/responses/forbidden.yaml#/ForbiddenResponse
+    "404":
+      $ref: ../../components/responses/not-found.yaml#/NotFoundResponse
+    "500":
+      $ref: ../../components/responses/internal-server-error.yaml#/InternalServerErrorResponse
+
+post:
+  operationId: createIssue
+  summary: Create a new issue
+  description: Creates a new issue within the currently selected team.
+  tags:
+    - Issues
+  security:
+    - accessCookieAuth: []
+  requestBody:
+    $ref: ../../components/request-bodies/create-issue.yaml#/CreateIssueRequestBody
+  responses:
+    "201":
+      description: Issue created successfully.
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/issue/issue-response.yaml#/IssueResponse
+    "400":
+      $ref: ../../components/responses/bad-request.yaml#/BadRequestResponse
+    "401":
+      $ref: ../../components/responses/unauthorized.yaml#/UnauthorizedResponse
+    "403":
+      $ref: ../../components/responses/forbidden.yaml#/ForbiddenResponse
+    "409":
+      $ref: ../../components/responses/conflict.yaml#/ConflictResponse
+    "422":
+      $ref: ../../components/responses/validation-error.yaml#/ValidationErrorResponse
+    "500":
+      $ref: ../../components/responses/internal-server-error.yaml#/InternalServerErrorResponse

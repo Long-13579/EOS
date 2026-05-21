@@ -1,0 +1,14 @@
+HeadlineListResponse:
+  type: object
+  description: Paginated list of headlines
+  properties:
+    data:
+      type: array
+      description: Array of headline items
+      items:
+        $ref: ./headline-response.yaml#/HeadlineResponse
+    pagination:
+      $ref: ../common/pagination.yaml#/Pagination
+  required:
+    - data
+    - pagination

@@ -1,0 +1,8 @@
+IsArchivedQueryParam:
+  name: isArchived
+  in: query
+  required: false
+  description: Filter entities by their archived status
+  schema:
+    type: boolean
+    example: false

@@ -1,0 +1,29 @@
+databaseChangeLog:
+  - changeSet:
+      id: 029c-add-default-and-not-null-to-headlines-is-archived
+      author: eos-team
+      preConditions:
+        - onFail: HALT
+        - onError: HALT
+        - tableExists:
+            tableName: headlines
+        - columnExists:
+            tableName: headlines
+            columnName: is_archived
+      changes:
+        - addDefaultValue:
+            tableName: headlines
+            columnName: is_archived
+            defaultValueBoolean: false
+        - addNotNullConstraint:
+            tableName: headlines
+            columnName: is_archived
+            columnDataType: BOOLEAN
+      rollback:
+        - dropNotNullConstraint:
+            tableName: headlines
+            columnName: is_archived
+            columnDataType: BOOLEAN
+        - dropDefaultValue:
+            tableName: headlines
+            columnName: is_archived

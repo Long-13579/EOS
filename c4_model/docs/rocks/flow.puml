@@ -1,0 +1,70 @@
+@startuml
+scale 1
+skinparam defaultFontSize 14
+skinparam sequenceMessageAlign center
+skinparam ParticipantPadding 80
+skinparam BoxPadding 40
+
+actor "User" as U
+participant "Web\nApplication" as W
+participant "Backend\nAPI" as B
+database "PostgreSQL" as DB
+
+== Page Load ==
+
+U -> W: Navigate to /rocks
+W -> W: Read active team\nfrom Zustand
+
+W -> B: GET /years
+B -> DB: Query years
+DB -> B: Year list
+B -> W: YearResponse[]
+
+W -> B: GET /quarters
+B -> DB: Query quarters
+DB -> B: Quarter list
+B -> W: QuarterResponse[]
+
+W -> W: Determine current\nyear/quarter defaults
+
+W -> B: GET /rocks\n?teamId=X&yearId=Y&quarterId=Z
+B -> B: @PreAuthorize\nteam membership check
+B -> DB: Query rocks\n(with joins: team, owner, year, quarter)
+DB -> B: Rock entities
+B -> W: RockListResponse\n(company, dept, individual)
+W -> U: Display rocks\ngrouped by category
+
+== Create Rock ==
+
+U -> W: Fill rock form + submit
+W -> B: POST /rocks\n{teamId, yearId, quarterId,\ntitle, status, category,\nownerId, dueDate}
+B -> B: Validate team membership
+B -> B: Validate owner in team
+B -> B: Validate year/quarter exist
+B -> DB: INSERT rock
+DB -> B: Saved rock
+B -> W: RockResponse
+W -> W: Invalidate query cache
+W -> U: Updated rocks list
+
+== Update Status ==
+
+U -> W: Change status dropdown
+W -> B: PATCH /rocks/{id}/status\n{status: ON_TRACK}
+B -> B: Validate team membership
+B -> DB: UPDATE rock status
+DB -> B: Updated rock
+B -> W: RockResponse
+W -> U: Show new status
+
+== Archive Rock ==
+
+U -> W: Click archive
+W -> B: PATCH /rocks/{id}\n{isArchived: true}
+B -> B: Validate team membership
+B -> DB: UPDATE isArchived
+DB -> B: Updated rock
+B -> W: RockResponse
+W -> U: Rock hidden from view
+
+@enduml
