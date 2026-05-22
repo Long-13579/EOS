@@ -20,6 +20,8 @@ public interface TeamService {
 
   List<UserBaseResponse> getUsersByTeamId(UUID teamId);
 
+  List<User> getActiveUsersByTeamId(UUID teamId);
+
   void validateTeamExists(UUID teamId);
 
   List<TeamResponse> getTeamsByUserId(UUID userId, UserRole userRole);

@@ -135,6 +135,19 @@ public class TeamServiceImpl implements TeamService {
     return responses;
   }
 
+  @Override
+  public List<User> getActiveUsersByTeamId(UUID teamId) {
+    log.debug("action=getActiveUsersByTeamId.start teamId={}", teamId);
+    validateTeamExists(teamId);
+
+    log.debug("action=getActiveUsersByTeamId.repo.findActiveUsersByTeamId teamId={}", teamId);
+    List<User> users =
+        userRepository.findActiveUsersByTeamId(teamId, SortingConstants.DEFAULT_ENTITIES_SORT);
+
+    log.debug("action=getActiveUsersByTeamId.success count={}", users.size());
+    return users;
+  }
+
   private void validateTeamName(String name) {
     log.debug("action=validateTeamName.repo.existsByNameIgnoreCase");
     if (teamRepository.existsByNameIgnoreCase(name)) {

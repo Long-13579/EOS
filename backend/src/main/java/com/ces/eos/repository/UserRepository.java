@@ -46,6 +46,9 @@ public interface UserRepository extends JpaRepository<User, UUID> {
   @Query("SELECT u FROM User u JOIN u.teams t WHERE u.id = :userId AND t.id = :teamId")
   Optional<User> findByIdAndTeamId(@Param("userId") UUID userId, @Param("teamId") UUID teamId);
 
+  @Query("SELECT u FROM User u JOIN u.teams t WHERE t.id = :teamId AND u.isActive = true")
+  List<User> findActiveUsersByTeamId(@Param("teamId") UUID teamId, Sort sort);
+
   @Query(
       "SELECT u FROM User u JOIN u.teams t WHERE u.id IN :userIds AND t.id = :teamId AND u.isActive"
           + " = true")

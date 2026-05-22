@@ -2,6 +2,7 @@ package com.ces.eos.security;
 
 import com.ces.eos.repository.HeadlineRepository;
 import com.ces.eos.repository.IssueRepository;
+import com.ces.eos.repository.L10MeetingRepository;
 import com.ces.eos.repository.MetricRepository;
 import com.ces.eos.repository.RockRepository;
 import com.ces.eos.repository.TodoRepository;
@@ -24,6 +25,7 @@ public class TeamSecurityService {
   private final HeadlineRepository headlineRepository;
   private final RockRepository rockRepository;
   private final MetricRepository metricRepository;
+  private final L10MeetingRepository l10MeetingRepository;
 
   public boolean isCurrentUserMemberOfTeam(UUID teamId) {
     return isUserMemberOfTeam(getCurrentUserId(), teamId);
@@ -80,6 +82,15 @@ public class TeamSecurityService {
     }
 
     return metricRepository.existsByIdAndTeam_Users_Id(metricId, userId);
+  }
+
+  public boolean isCurrentUserMemberOfL10Meeting(UUID meetingId) {
+    UUID userId = getCurrentUserId();
+    if (userId == null || meetingId == null) {
+      return false;
+    }
+
+    return l10MeetingRepository.existsByIdAndTeam_Users_Id(meetingId, userId);
   }
 
   private UUID getCurrentUserId() {
