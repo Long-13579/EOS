@@ -1,0 +1,133 @@
+databaseChangeLog:
+  - changeSet:
+      id: 048-create-l10-meetings-table
+      author: eos-team
+      changes:
+        - createTable:
+            tableName: l10_meetings
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: team_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: meeting_date
+                  type: DATE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: meeting_time
+                  type: TIME
+                  constraints:
+                    nullable: false
+              - column:
+                  name: week_start_date
+                  type: DATE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: facilitator_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: scribe_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: conclude_key_decisions
+                  type: TEXT
+                  constraints:
+                    nullable: true
+              - column:
+                  name: conclude_cascading_message
+                  type: TEXT
+                  constraints:
+                    nullable: true
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: true
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: true
+              - column:
+                  name: created_by
+                  type: UUID
+                  constraints:
+                    nullable: true
+              - column:
+                  name: updated_by
+                  type: UUID
+                  constraints:
+                    nullable: true
+
+        - addForeignKeyConstraint:
+            baseTableName: l10_meetings
+            baseColumnNames: team_id
+            referencedTableName: teams
+            referencedColumnNames: id
+            constraintName: fk_l10_meetings_team_id
+            onDelete: CASCADE
+            onUpdate: CASCADE
+
+        - addForeignKeyConstraint:
+            baseTableName: l10_meetings
+            baseColumnNames: facilitator_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_l10_meetings_facilitator_id
+            onDelete: RESTRICT
+            onUpdate: CASCADE
+
+        - addForeignKeyConstraint:
+            baseTableName: l10_meetings
+            baseColumnNames: scribe_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_l10_meetings_scribe_id
+            onDelete: RESTRICT
+            onUpdate: CASCADE
+
+        - addForeignKeyConstraint:
+            baseTableName: l10_meetings
+            baseColumnNames: created_by
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_l10_meetings_created_by
+            onDelete: SET NULL
+            onUpdate: CASCADE
+
+        - addForeignKeyConstraint:
+            baseTableName: l10_meetings
+            baseColumnNames: updated_by
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_l10_meetings_updated_by
+            onDelete: SET NULL
+            onUpdate: CASCADE
+
+        - addUniqueConstraint:
+            tableName: l10_meetings
+            columnNames: team_id, week_start_date
+            constraintName: uq_l10_meetings_team_week_start
+
+      rollback:
+        - dropTable:
+            tableName: l10_meetings

@@ -1,0 +1,18 @@
+databaseChangeLog:
+  - changeSet:
+      id: 050-add-team-timezone
+      author: eos-team
+      changes:
+        - addColumn:
+            tableName: teams
+            columns:
+              - column:
+                  name: timezone
+                  type: VARCHAR(100)
+                  defaultValue: UTC
+                  constraints:
+                    nullable: false
+      rollback:
+        - dropColumn:
+            tableName: teams
+            columnName: timezone

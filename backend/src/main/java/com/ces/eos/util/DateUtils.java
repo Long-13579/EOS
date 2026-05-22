@@ -6,7 +6,12 @@ import com.ces.eos.exception.ServerInternalException;
 import java.time.Instant;
 import java.time.MonthDay;
 import java.time.Year;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.temporal.TemporalAdjusters;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import lombok.experimental.UtilityClass;
@@ -16,6 +21,7 @@ public class DateUtils {
 
   private static final DateTimeFormatter MONTH_DAY_FORMATTER = DateTimeFormatter.ofPattern("MM-dd");
   private static final ZoneOffset DEFAULT_ZONE_OFFSET = ZoneOffset.UTC;
+  private static final ZoneId DEFAULT_ZONE_ID = ZoneOffset.UTC;
 
   public static boolean isCurrentYear(CustomYear year) {
     Objects.requireNonNull(year, "Year must not be null");
@@ -44,6 +50,22 @@ public class DateUtils {
 
   public static String fromMonthDayToString(MonthDay monthDay) {
     return monthDay == null ? null : monthDay.format(MONTH_DAY_FORMATTER);
+  }
+
+  public static ZoneId resolveZoneId(String timezone) {
+    if (timezone == null || timezone.isBlank()) {
+      return DEFAULT_ZONE_ID;
+    }
+    return ZoneId.of(timezone);
+  }
+
+  public static LocalDate getWeekStartDate(
+      LocalDate meetingDate, LocalTime meetingTime, String timezone) {
+    Objects.requireNonNull(meetingDate, "Meeting date must not be null");
+    Objects.requireNonNull(meetingTime, "Meeting time must not be null");
+    ZoneId zoneId = resolveZoneId(timezone);
+    LocalDate zonedDate = meetingDate.atTime(meetingTime).atZone(zoneId).toLocalDate();
+    return zonedDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
   }
 
   private static boolean isMonthDayInQuarterRange(MonthDay monthDay, Quarter quarter) {

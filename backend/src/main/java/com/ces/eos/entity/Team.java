@@ -37,9 +37,17 @@ public class Team {
   @Builder.Default
   Boolean isLeadership = false;
 
+  @Column(nullable = false, length = 100)
+  @Builder.Default
+  String timezone = "UTC";
+
   @ManyToMany(mappedBy = "teams", fetch = FetchType.LAZY)
   @Builder.Default
   Set<User> users = new HashSet<>();
+
+  @OneToMany(mappedBy = "team", fetch = FetchType.LAZY)
+  @Builder.Default
+  List<L10Meeting> l10Meetings = new ArrayList<>();
 
   @OneToMany(mappedBy = "team", fetch = FetchType.LAZY)
   @Builder.Default

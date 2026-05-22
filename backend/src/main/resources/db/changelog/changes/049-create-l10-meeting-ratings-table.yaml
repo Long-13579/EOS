@@ -1,0 +1,94 @@
+databaseChangeLog:
+  - changeSet:
+      id: 049-create-l10-meeting-ratings-table
+      author: eos-team
+      changes:
+        - createTable:
+            tableName: l10_meeting_ratings
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: meeting_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: member_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: rating
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: true
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: true
+              - column:
+                  name: created_by
+                  type: UUID
+                  constraints:
+                    nullable: true
+              - column:
+                  name: updated_by
+                  type: UUID
+                  constraints:
+                    nullable: true
+
+        - addForeignKeyConstraint:
+            baseTableName: l10_meeting_ratings
+            baseColumnNames: meeting_id
+            referencedTableName: l10_meetings
+            referencedColumnNames: id
+            constraintName: fk_l10_meeting_ratings_meeting_id
+            onDelete: CASCADE
+            onUpdate: CASCADE
+
+        - addForeignKeyConstraint:
+            baseTableName: l10_meeting_ratings
+            baseColumnNames: member_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_l10_meeting_ratings_member_id
+            onDelete: CASCADE
+            onUpdate: CASCADE
+
+        - addForeignKeyConstraint:
+            baseTableName: l10_meeting_ratings
+            baseColumnNames: created_by
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_l10_meeting_ratings_created_by
+            onDelete: SET NULL
+            onUpdate: CASCADE
+
+        - addForeignKeyConstraint:
+            baseTableName: l10_meeting_ratings
+            baseColumnNames: updated_by
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_l10_meeting_ratings_updated_by
+            onDelete: SET NULL
+            onUpdate: CASCADE
+
+        - addUniqueConstraint:
+            tableName: l10_meeting_ratings
+            columnNames: meeting_id, member_id
+            constraintName: uq_l10_meeting_ratings_meeting_member
+
+      rollback:
+        - dropTable:
+            tableName: l10_meeting_ratings
