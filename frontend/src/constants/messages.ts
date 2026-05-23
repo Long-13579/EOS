@@ -56,6 +56,10 @@ export const ERROR_MESSAGES = {
         ARCHIVE_FAILED: 'Failed to archive headline. Please try again.',
         UNARCHIVE_FAILED: 'Failed to unarchive headline. Please try again.',
     },
+    L10_MEETING: {
+        LOAD_FAILED: 'Failed to load L10 meetings. Please try again.',
+        NOT_FOUND: 'No L10 meetings found.',
+    },
     ROCK: {
         LOAD_FAILED: 'Failed to load rocks. Please try again.',
         NOT_FOUND: 'No rocks found.',
@@ -112,6 +116,9 @@ export const SUCCESS_MESSAGES = {
         DELETED: 'Headline deleted successfully!',
         ARCHIVED: 'Headline archived successfully!',
         UNARCHIVED: 'Headline unarchived successfully!',
+    },
+    L10_MEETING: {
+        SCHEDULED: 'L10 meeting scheduled successfully!',
     },
     ROCK: {
         CREATED: 'Rock created successfully!',

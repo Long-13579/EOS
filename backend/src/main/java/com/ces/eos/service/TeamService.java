@@ -7,6 +7,7 @@ import com.ces.eos.dto.response.PagedEntityResponse;
 import com.ces.eos.dto.response.TeamResponse;
 import com.ces.eos.dto.response.UserBaseResponse;
 import com.ces.eos.entity.Team;
+import com.ces.eos.entity.User;
 import com.ces.eos.enums.UserRole;
 import java.util.List;
 import java.util.UUID;

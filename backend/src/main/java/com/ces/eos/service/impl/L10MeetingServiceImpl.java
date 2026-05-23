@@ -1,10 +1,12 @@
 package com.ces.eos.service.impl;
 
 import com.ces.eos.dto.request.CreateL10MeetingRequest;
+import com.ces.eos.dto.request.PaginationRequest;
 import com.ces.eos.dto.request.UpdateL10MeetingConcludeRequest;
 import com.ces.eos.dto.request.UpsertL10MeetingRatingsRequest;
 import com.ces.eos.dto.response.L10MeetingRatingResponse;
 import com.ces.eos.dto.response.L10MeetingResponse;
+import com.ces.eos.dto.response.PagedEntityResponse;
 import com.ces.eos.entity.L10Meeting;
 import com.ces.eos.entity.L10MeetingRating;
 import com.ces.eos.entity.Team;
@@ -26,11 +28,17 @@ import com.ces.eos.util.EnumParserUtil;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -160,6 +168,50 @@ public class L10MeetingServiceImpl implements L10MeetingService {
 
     log.info("action=upsertRatings.success meetingId={} count={}", meetingId, responses.size());
     return responses;
+  }
+
+  @Override
+  public PagedEntityResponse<L10MeetingResponse> getMeetingsByTeam(
+      UUID teamId, L10MeetingStatus status, PaginationRequest request) {
+    log.info(
+        "action=getMeetingsByTeam.start teamId={} status={} page={} limit={}",
+        teamId, status, request.page(), request.limit());
+    teamService.validateTeamExists(teamId);
+
+    Sort sort;
+    if (status == L10MeetingStatus.FINISHED) {
+      sort = Sort.by(Sort.Order.desc("meetingDate"), Sort.Order.desc("meetingTime"), Sort.Order.desc("id"));
+    } else {
+      sort = Sort.by(Sort.Order.asc("meetingDate"), Sort.Order.asc("meetingTime"), Sort.Order.asc("id"));
+    }
+
+    Pageable pageable = PageRequest.of(request.page() - 1, request.limit(), sort);
+
+    Page<UUID> meetingIdsPage =
+        l10MeetingRepository.findMeetingIdsByTeamIdAndStatus(teamId, status, pageable);
+
+    if (meetingIdsPage.isEmpty()) {
+      log.info(
+          "action=getMeetingsByTeam.success teamId={} status={} count=0", teamId, status);
+      return PagedEntityResponse.from(Page.empty(pageable));
+    }
+
+    Map<UUID, L10Meeting> meetingMap =
+        l10MeetingRepository.findAllByIdIn(meetingIdsPage.getContent()).stream()
+            .collect(Collectors.toMap(L10Meeting::getId, Function.identity()));
+
+    List<L10MeetingResponse> responses =
+        meetingIdsPage.getContent().stream()
+            .map(meetingMap::get)
+            .filter(Objects::nonNull)
+            .map(l10MeetingMapper::toL10MeetingResponse)
+            .toList();
+
+    log.info(
+        "action=getMeetingsByTeam.success teamId={} status={} count={}",
+        teamId, status, responses.size());
+    return PagedEntityResponse.from(
+        new PageImpl<>(responses, pageable, meetingIdsPage.getTotalElements()));
   }
 
   private void validateMeetingWeekAvailable(UUID teamId, LocalDate weekStartDate) {

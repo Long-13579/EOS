@@ -1,10 +1,13 @@
 package com.ces.eos.controller;
 
 import com.ces.eos.dto.request.CreateL10MeetingRequest;
+import com.ces.eos.dto.request.PaginationRequest;
 import com.ces.eos.dto.request.UpdateL10MeetingConcludeRequest;
 import com.ces.eos.dto.request.UpsertL10MeetingRatingsRequest;
 import com.ces.eos.dto.response.L10MeetingRatingResponse;
 import com.ces.eos.dto.response.L10MeetingResponse;
+import com.ces.eos.dto.response.PagedEntityResponse;
+import com.ces.eos.enums.L10MeetingStatus;
 import com.ces.eos.security.CustomUserDetails;
 import com.ces.eos.service.L10MeetingService;
 import jakarta.validation.Valid;
@@ -15,11 +18,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -28,6 +34,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class L10MeetingController {
 
   private final L10MeetingService l10MeetingService;
+
+  @GetMapping
+  @PreAuthorize(
+      "hasRole('ADMIN') or @teamSecurityService.isCurrentUserMemberOfTeam(#teamId)")
+  public ResponseEntity<PagedEntityResponse<L10MeetingResponse>> getMeetingsByTeam(
+      @Valid @ModelAttribute PaginationRequest request,
+      @RequestParam UUID teamId,
+      @RequestParam L10MeetingStatus status) {
+    PagedEntityResponse<L10MeetingResponse> response =
+        l10MeetingService.getMeetingsByTeam(teamId, status, request);
+    return ResponseEntity.ok(response);
+  }
 
   @PostMapping
   @PreAuthorize(
