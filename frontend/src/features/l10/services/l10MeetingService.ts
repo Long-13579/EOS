@@ -7,3 +7,6 @@ export const getL10Meetings = (params: GetL10MeetingsParams): Promise<PaginatedR
 
 export const scheduleL10Meeting = (payload: ScheduleL10MeetingPayload): Promise<L10Meeting> =>
     apiPost<L10Meeting>('/l10-meetings', payload);
+
+export const startL10Meeting = (meetingId: string): Promise<L10Meeting> =>
+    apiPost<L10Meeting>(`/l10-meetings/${meetingId}/start`);

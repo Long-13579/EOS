@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Plus } from 'lucide-react';
+import { toast } from 'sonner';
 import { PageHeaderGroup } from '@/components/shared/PageHeaderGroup';
 import { CustomPagination } from '@/components/shared/CustomPagination';
 import { QueryState } from '@/components/shared/QueryState';
@@ -10,6 +11,7 @@ import { DEFAULT_LIMIT } from '@/types/pagination';
 import { useActiveTeamId } from '@/hooks/useActiveTeamId';
 import {
     useL10Meetings,
+    useStartL10Meeting,
     L10MeetingCard,
     ScheduleL10MeetingDialog,
 } from '@/features/l10';
@@ -23,7 +25,21 @@ export function L10Meetings() {
     const [activeTab, setActiveTab] = useState<L10Tab>('upcoming');
     const [isScheduleDialogOpen, setScheduleDialogOpen] = useState(false);
 
+    const { startMeeting } = useStartL10Meeting();
+
     const status = activeTab === 'upcoming' ? 'SCHEDULED' : 'FINISHED';
+
+    const handleStart = (meetingId: string) => {
+        startMeeting(meetingId);
+    };
+
+    const handleResume = () => {
+        toast.info('Resume meeting - feature coming soon');
+    };
+
+    const handleSummary = () => {
+        toast.info('View meeting summary - feature coming soon');
+    };
 
     const {
         data: meetingsResponse,
@@ -87,7 +103,13 @@ export function L10Meetings() {
                         >
                             <div className={isPlaceholderData ? 'opacity-50 transition-opacity' : 'flex flex-col gap-3'}>
                                 {meetings.map((meeting) => (
-                                    <L10MeetingCard key={meeting.id} meeting={meeting} />
+                                    <L10MeetingCard
+                                        key={meeting.id}
+                                        meeting={meeting}
+                                        onStart={() => handleStart(meeting.id)}
+                                        onResume={handleResume}
+                                        onSummary={handleSummary}
+                                    />
                                 ))}
 
                                 <CustomPagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
