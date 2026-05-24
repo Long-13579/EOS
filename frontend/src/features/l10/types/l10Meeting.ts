@@ -23,7 +23,7 @@ export interface L10Meeting {
 
 export interface GetL10MeetingsParams extends PaginationParams {
     teamId: string;
-    status: L10MeetingStatus;
+    statuses: string;
 }
 
 export interface ScheduleL10MeetingPayload {

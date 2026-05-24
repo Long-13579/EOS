@@ -23,5 +23,5 @@ public interface L10MeetingService {
       UUID meetingId, UUID userId, UpsertL10MeetingRatingsRequest request);
 
   PagedEntityResponse<L10MeetingResponse> getMeetingsByTeam(
-      UUID teamId, L10MeetingStatus status, PaginationRequest request);
+      UUID teamId, List<L10MeetingStatus> statuses, PaginationRequest request);
 }

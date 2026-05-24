@@ -172,27 +172,37 @@ public class L10MeetingServiceImpl implements L10MeetingService {
 
   @Override
   public PagedEntityResponse<L10MeetingResponse> getMeetingsByTeam(
-      UUID teamId, L10MeetingStatus status, PaginationRequest request) {
+      UUID teamId, List<L10MeetingStatus> statuses, PaginationRequest request) {
     log.info(
-        "action=getMeetingsByTeam.start teamId={} status={} page={} limit={}",
-        teamId, status, request.page(), request.limit());
+        "action=getMeetingsByTeam.start teamId={} statuses={} page={} limit={}",
+        teamId, statuses, request.page(), request.limit());
     teamService.validateTeamExists(teamId);
 
-    Sort sort;
-    if (status == L10MeetingStatus.FINISHED) {
-      sort = Sort.by(Sort.Order.desc("meetingDate"), Sort.Order.desc("meetingTime"), Sort.Order.desc("id"));
+    boolean isFinishedOnly = statuses.size() == 1 && statuses.contains(L10MeetingStatus.FINISHED);
+
+    Page<UUID> meetingIdsPage;
+    Pageable pageable;
+    if (isFinishedOnly) {
+      Sort sort =
+          Sort.by(
+              Sort.Order.desc("meetingDate"),
+              Sort.Order.desc("meetingTime"),
+              Sort.Order.desc("id"));
+      pageable = PageRequest.of(request.page() - 1, request.limit(), sort);
+      meetingIdsPage =
+          l10MeetingRepository.findMeetingIdsByTeamIdAndStatus(
+              teamId, L10MeetingStatus.FINISHED, pageable);
     } else {
-      sort = Sort.by(Sort.Order.asc("meetingDate"), Sort.Order.asc("meetingTime"), Sort.Order.asc("id"));
+      pageable =
+          PageRequest.of(request.page() - 1, request.limit(), Sort.unsorted());
+      meetingIdsPage =
+          l10MeetingRepository.findMeetingIdsByTeamIdAndStatusIn(
+              teamId, statuses, pageable);
     }
-
-    Pageable pageable = PageRequest.of(request.page() - 1, request.limit(), sort);
-
-    Page<UUID> meetingIdsPage =
-        l10MeetingRepository.findMeetingIdsByTeamIdAndStatus(teamId, status, pageable);
 
     if (meetingIdsPage.isEmpty()) {
       log.info(
-          "action=getMeetingsByTeam.success teamId={} status={} count=0", teamId, status);
+          "action=getMeetingsByTeam.success teamId={} statuses={} count=0", teamId, statuses);
       return PagedEntityResponse.from(Page.empty(pageable));
     }
 
@@ -208,8 +218,8 @@ public class L10MeetingServiceImpl implements L10MeetingService {
             .toList();
 
     log.info(
-        "action=getMeetingsByTeam.success teamId={} status={} count={}",
-        teamId, status, responses.size());
+        "action=getMeetingsByTeam.success teamId={} statuses={} count={}",
+        teamId, statuses, responses.size());
     return PagedEntityResponse.from(
         new PageImpl<>(responses, pageable, meetingIdsPage.getTotalElements()));
   }
@@ -224,7 +234,7 @@ public class L10MeetingServiceImpl implements L10MeetingService {
           teamId, weekStartDate);
       throw new ConflictException(
           Map.of(
-              "teamId",
+              "meetingDate",
               List.of("An L10 meeting is already scheduled for that team and week.")));
     }
   }

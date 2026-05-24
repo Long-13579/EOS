@@ -27,7 +27,7 @@ export function L10Meetings() {
 
     const { startMeeting } = useStartL10Meeting();
 
-    const status = activeTab === 'upcoming' ? 'SCHEDULED' : 'FINISHED';
+    const statuses = activeTab === 'upcoming' ? 'SCHEDULED,STARTED' : 'FINISHED';
 
     const handleStart = (meetingId: string) => {
         startMeeting(meetingId);
@@ -50,7 +50,7 @@ export function L10Meetings() {
         page,
         limit: DEFAULT_LIMIT,
         teamId: activeTeamId!,
-        status,
+        statuses,
     });
 
     const meetings = meetingsResponse?.data ?? [];

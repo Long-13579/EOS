@@ -11,8 +11,8 @@ import com.ces.eos.enums.L10MeetingStatus;
 import com.ces.eos.security.CustomUserDetails;
 import com.ces.eos.service.L10MeetingService;
 import jakarta.validation.Valid;
-import java.util.UUID;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,9 +41,9 @@ public class L10MeetingController {
   public ResponseEntity<PagedEntityResponse<L10MeetingResponse>> getMeetingsByTeam(
       @Valid @ModelAttribute PaginationRequest request,
       @RequestParam UUID teamId,
-      @RequestParam L10MeetingStatus status) {
+      @RequestParam List<L10MeetingStatus> statuses) {
     PagedEntityResponse<L10MeetingResponse> response =
-        l10MeetingService.getMeetingsByTeam(teamId, status, request);
+        l10MeetingService.getMeetingsByTeam(teamId, statuses, request);
     return ResponseEntity.ok(response);
   }
 

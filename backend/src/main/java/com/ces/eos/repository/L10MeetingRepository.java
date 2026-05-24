@@ -3,6 +3,7 @@ package com.ces.eos.repository;
 import com.ces.eos.entity.L10Meeting;
 import com.ces.eos.enums.L10MeetingStatus;
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -33,6 +34,16 @@ public interface L10MeetingRepository extends JpaRepository<L10Meeting, UUID> {
   Page<UUID> findMeetingIdsByTeamIdAndStatus(
       @Param("teamId") UUID teamId,
       @Param("status") L10MeetingStatus status,
+      Pageable pageable);
+
+  @Query(
+      "SELECT m.id FROM L10Meeting m "
+          + "WHERE m.team.id = :teamId AND m.status IN :statuses "
+          + "ORDER BY CASE WHEN m.status = 'STARTED' THEN 0 ELSE 1 END, "
+          + "m.meetingDate ASC, m.meetingTime ASC, m.id ASC")
+  Page<UUID> findMeetingIdsByTeamIdAndStatusIn(
+      @Param("teamId") UUID teamId,
+      @Param("statuses") Collection<L10MeetingStatus> statuses,
       Pageable pageable);
 
   @Query(
