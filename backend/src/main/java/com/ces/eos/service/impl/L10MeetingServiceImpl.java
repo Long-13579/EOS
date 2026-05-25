@@ -89,10 +89,14 @@ public class L10MeetingServiceImpl implements L10MeetingService {
     if (meeting.getStatus() != L10MeetingStatus.SCHEDULED) {
       log.warn("action=startMeeting.validationFailed reason=status meetingId={} status={}",
           meetingId, meeting.getStatus());
-      throw new ConflictException(
-          Map.of(
-              "meetingId",
-              List.of("Meeting cannot be started again once it has already started.")));
+      throw new ConflictException("Meeting cannot be started again once it has already started.");
+    }
+
+    LocalDate today = DateUtils.getTodayForTimezone(meeting.getTeam().getTimezone());
+    if (!meeting.getMeetingDate().equals(today)) {
+      log.warn("action=startMeeting.validationFailed reason=notMeetingDay meetingId={} meetingDate={} today={}",
+          meetingId, meeting.getMeetingDate(), today);
+      throw new ConflictException("Meeting can only be started on the scheduled date.");
     }
 
     meeting.setStatus(L10MeetingStatus.STARTED);

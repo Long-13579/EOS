@@ -59,6 +59,10 @@ public class DateUtils {
     return ZoneId.of(timezone);
   }
 
+  public static LocalDate getTodayForTimezone(String timezone) {
+    return LocalDate.now(resolveZoneId(timezone));
+  }
+
   public static LocalDate getWeekStartDate(
       LocalDate meetingDate, LocalTime meetingTime, String timezone) {
     Objects.requireNonNull(meetingDate, "Meeting date must not be null");

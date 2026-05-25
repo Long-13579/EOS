@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { normalizeApiError } from '@/utils/apiErrorNormalizer';
 import { l10MeetingKeys } from '../types/l10MeetingKeys';
 import { startL10Meeting } from '../services/l10MeetingService';
 
@@ -11,6 +12,10 @@ export const useStartL10Meeting = () => {
 
         onSuccess: () => {
             toast.success('L10 meeting started successfully!');
+        },
+        onError: (error) => {
+            const normalized = normalizeApiError(error);
+            toast.error(normalized.message);
         },
         onSettled: () => {
             queryClient.invalidateQueries({
