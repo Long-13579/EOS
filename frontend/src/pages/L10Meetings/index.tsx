@@ -12,10 +12,14 @@ import { useActiveTeamId } from '@/hooks/useActiveTeamId';
 import {
     useL10Meetings,
     useStartL10Meeting,
+    useDeleteL10Meeting,
     L10MeetingCard,
     ScheduleL10MeetingDialog,
+    EditL10MeetingDialog,
+    DeleteL10MeetingDialog,
 } from '@/features/l10';
 import { ERROR_MESSAGES } from '@/constants/messages';
+import type { L10Meeting } from '@/features/l10';
 
 type L10Tab = 'upcoming' | 'finished';
 
@@ -24,8 +28,11 @@ export function L10Meetings() {
     const [page, setPage] = useState(1);
     const [activeTab, setActiveTab] = useState<L10Tab>('upcoming');
     const [isScheduleDialogOpen, setScheduleDialogOpen] = useState(false);
+    const [editingMeeting, setEditingMeeting] = useState<L10Meeting | null>(null);
+    const [deletingMeeting, setDeletingMeeting] = useState<L10Meeting | null>(null);
 
     const { startMeeting } = useStartL10Meeting();
+    const { deleteMeeting, isDeleting } = useDeleteL10Meeting();
 
     const statuses = activeTab === 'upcoming' ? 'SCHEDULED,STARTED' : 'FINISHED';
 
@@ -39,6 +46,23 @@ export function L10Meetings() {
 
     const handleSummary = () => {
         toast.info('View meeting summary - feature coming soon');
+    };
+
+    const handleEdit = (meeting: L10Meeting) => {
+        setEditingMeeting(meeting);
+    };
+
+    const handleDeleteConfirm = async () => {
+        if (!deletingMeeting) {
+            return;
+        }
+
+        try {
+            await deleteMeeting(deletingMeeting.id);
+            setDeletingMeeting(null);
+        } catch {
+            // Error is handled by the mutation's onError (toast)
+        }
     };
 
     const {
@@ -61,10 +85,7 @@ export function L10Meetings() {
         setPage(1);
     };
 
-    const emptyMessage =
-        activeTab === 'upcoming'
-            ? 'No upcoming L10 meetings. Schedule one to get started.'
-            : 'No finished L10 meetings.';
+    const emptyMessage = activeTab === 'upcoming' ? 'No upcoming L10 meetings. Schedule one to get started.' : 'No finished L10 meetings.';
 
     const scheduleButton = (
         <Button onClick={() => setScheduleDialogOpen(true)} disabled={!activeTeamId}>
@@ -80,6 +101,29 @@ export function L10Meetings() {
             </PageHeaderGroup>
 
             <ScheduleL10MeetingDialog isOpen={isScheduleDialogOpen} onOpenChange={setScheduleDialogOpen} />
+
+            {editingMeeting && (
+                <EditL10MeetingDialog
+                    isOpen={!!editingMeeting}
+                    onOpenChange={(open) => {
+                        if (!open) {
+                            setEditingMeeting(null);
+                        }
+                    }}
+                    meeting={editingMeeting}
+                />
+            )}
+
+            <DeleteL10MeetingDialog
+                isOpen={!!deletingMeeting}
+                onOpenChange={(open) => {
+                    if (!open) {
+                        setDeletingMeeting(null);
+                    }
+                }}
+                onConfirm={handleDeleteConfirm}
+                isDeleting={isDeleting}
+            />
 
             {!activeTeamId ? (
                 <EmptyTeamState />
@@ -109,6 +153,8 @@ export function L10Meetings() {
                                         onStart={() => handleStart(meeting.id)}
                                         onResume={handleResume}
                                         onSummary={handleSummary}
+                                        onEdit={() => handleEdit(meeting)}
+                                        onDelete={() => setDeletingMeeting(meeting)}
                                     />
                                 ))}
 

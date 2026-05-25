@@ -1,10 +1,14 @@
 export { L10MeetingCard } from './components/L10MeetingCard';
 export { L10MeetingStatusBadge } from './components/L10MeetingStatusBadge';
 export { ScheduleL10MeetingDialog } from './components/ScheduleL10MeetingDialog';
+export { EditL10MeetingDialog } from './components/EditL10MeetingDialog';
+export { DeleteL10MeetingDialog } from './components/DeleteL10MeetingDialog';
 export { useL10Meetings } from './hooks/useL10Meetings';
 export { useScheduleL10Meeting } from './hooks/useScheduleL10Meeting';
 export { useStartL10Meeting } from './hooks/useStartL10Meeting';
+export { useUpdateL10Meeting } from './hooks/useUpdateL10Meeting';
+export { useDeleteL10Meeting } from './hooks/useDeleteL10Meeting';
 export { startL10Meeting } from './services/l10MeetingService';
 export { scheduleL10MeetingSchema } from './schemas/l10MeetingSchema';
 export type { ScheduleL10MeetingFormValues } from './schemas/l10MeetingSchema';
-export type { L10Meeting, L10MeetingStatus, GetL10MeetingsParams, ScheduleL10MeetingPayload } from './types/l10Meeting';
+export type { L10Meeting, L10MeetingStatus, GetL10MeetingsParams, ScheduleL10MeetingPayload, UpdateL10MeetingPayload } from './types/l10Meeting';

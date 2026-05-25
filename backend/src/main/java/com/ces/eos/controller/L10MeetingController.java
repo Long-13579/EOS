@@ -3,6 +3,7 @@ package com.ces.eos.controller;
 import com.ces.eos.dto.request.CreateL10MeetingRequest;
 import com.ces.eos.dto.request.PaginationRequest;
 import com.ces.eos.dto.request.UpdateL10MeetingConcludeRequest;
+import com.ces.eos.dto.request.UpdateL10MeetingRequest;
 import com.ces.eos.dto.request.UpsertL10MeetingRatingsRequest;
 import com.ces.eos.dto.response.L10MeetingRatingResponse;
 import com.ces.eos.dto.response.L10MeetingResponse;
@@ -18,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -85,5 +87,25 @@ public class L10MeetingController {
     List<L10MeetingRatingResponse> response =
         l10MeetingService.upsertRatings(meetingId, userDetails.getId(), request);
     return ResponseEntity.ok(response);
+  }
+
+  @PutMapping("/{meetingId}")
+  @PreAuthorize("hasRole('ADMIN') or @teamSecurityService.isCurrentUserMemberOfL10Meeting(#meetingId)")
+  public ResponseEntity<L10MeetingResponse> updateMeeting(
+      @PathVariable UUID meetingId,
+      @Valid @RequestBody UpdateL10MeetingRequest request,
+      @AuthenticationPrincipal CustomUserDetails userDetails) {
+    L10MeetingResponse response =
+        l10MeetingService.updateMeeting(meetingId, request, userDetails.getId());
+    return ResponseEntity.ok(response);
+  }
+
+  @DeleteMapping("/{meetingId}")
+  @PreAuthorize("hasRole('ADMIN') or @teamSecurityService.isCurrentUserMemberOfL10Meeting(#meetingId)")
+  public ResponseEntity<Void> deleteMeeting(
+      @PathVariable UUID meetingId,
+      @AuthenticationPrincipal CustomUserDetails userDetails) {
+    l10MeetingService.deleteMeeting(meetingId, userDetails.getId());
+    return ResponseEntity.noContent().build();
   }
 }

@@ -33,3 +33,10 @@ export interface ScheduleL10MeetingPayload {
     facilitatorId: string;
     scribeId: string;
 }
+
+export interface UpdateL10MeetingPayload {
+    meetingDate: string;
+    meetingTime: string;
+    facilitatorId: string;
+    scribeId: string;
+}

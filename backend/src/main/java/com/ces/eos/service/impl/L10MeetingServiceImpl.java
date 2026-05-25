@@ -3,6 +3,7 @@ package com.ces.eos.service.impl;
 import com.ces.eos.dto.request.CreateL10MeetingRequest;
 import com.ces.eos.dto.request.PaginationRequest;
 import com.ces.eos.dto.request.UpdateL10MeetingConcludeRequest;
+import com.ces.eos.dto.request.UpdateL10MeetingRequest;
 import com.ces.eos.dto.request.UpsertL10MeetingRatingsRequest;
 import com.ces.eos.dto.response.L10MeetingRatingResponse;
 import com.ces.eos.dto.response.L10MeetingResponse;
@@ -126,6 +127,56 @@ public class L10MeetingServiceImpl implements L10MeetingService {
 
   @Override
   @Transactional
+  public L10MeetingResponse updateMeeting(
+      UUID meetingId, UpdateL10MeetingRequest request, UUID userId) {
+    log.info("action=updateMeeting.start meetingId={} userId={}", meetingId, userId);
+    L10Meeting meeting = loadMeetingWithRelations(meetingId);
+    ensureFacilitatorOrScribe(meeting, userId);
+
+    Team team = meeting.getTeam();
+    LocalDate weekStartDate =
+        DateUtils.getWeekStartDate(request.meetingDate(), request.meetingTime(), team.getTimezone());
+
+    if (!weekStartDate.equals(meeting.getWeekStartDate())) {
+      validateMeetingWeekAvailableForUpdate(team.getId(), weekStartDate, meetingId);
+    }
+
+    User facilitator = userService.getUserByIdAndTeamId(request.facilitatorId(), team.getId());
+    User scribe = userService.getUserByIdAndTeamId(request.scribeId(), team.getId());
+
+    meeting.setMeetingDate(request.meetingDate());
+    meeting.setMeetingTime(request.meetingTime());
+    meeting.setWeekStartDate(weekStartDate);
+    meeting.setFacilitator(facilitator);
+    meeting.setScribe(scribe);
+
+    L10Meeting savedMeeting = l10MeetingRepository.save(meeting);
+    log.info("action=updateMeeting.success meetingId={}", savedMeeting.getId());
+    return l10MeetingMapper.toL10MeetingResponse(loadMeetingWithRelations(savedMeeting.getId()));
+  }
+
+  @Override
+  @Transactional
+  public void deleteMeeting(UUID meetingId, UUID userId) {
+    log.info("action=deleteMeeting.start meetingId={} userId={}", meetingId, userId);
+    L10Meeting meeting = loadMeetingWithRelations(meetingId);
+    ensureFacilitatorOrScribe(meeting, userId);
+
+    if (meeting.getStatus() != L10MeetingStatus.SCHEDULED) {
+      log.warn("action=deleteMeeting.validationFailed reason=status meetingId={} status={}",
+          meetingId, meeting.getStatus());
+      throw new ConflictException(
+          Map.of(
+              "meetingId",
+              List.of("Only scheduled meetings can be deleted.")));
+    }
+
+    l10MeetingRepository.delete(meeting);
+    log.info("action=deleteMeeting.success meetingId={}", meetingId);
+  }
+
+  @Override
+  @Transactional
   public List<L10MeetingRatingResponse> upsertRatings(
       UUID meetingId, UUID userId, UpsertL10MeetingRatingsRequest request) {
     log.info("action=upsertRatings.start meetingId={} userId={}", meetingId, userId);
@@ -237,6 +288,26 @@ public class L10MeetingServiceImpl implements L10MeetingService {
               "meetingDate",
               List.of("An L10 meeting is already scheduled for that team and week.")));
     }
+  }
+
+  private void validateMeetingWeekAvailableForUpdate(UUID teamId, LocalDate weekStartDate, UUID excludeMeetingId) {
+    log.debug(
+        "action=validateMeetingWeekAvailableForUpdate.repo.findByTeam_IdAndWeekStartDate teamId={} weekStartDate={} excludeMeetingId={}",
+        teamId, weekStartDate, excludeMeetingId);
+    l10MeetingRepository
+        .findByTeam_IdAndWeekStartDate(teamId, weekStartDate)
+        .ifPresent(
+            existing -> {
+              if (!existing.getId().equals(excludeMeetingId)) {
+                log.warn(
+                    "action=validateMeetingWeekAvailableForUpdate.validationFailed teamId={} weekStartDate={}",
+                    teamId, weekStartDate);
+                throw new ConflictException(
+                    Map.of(
+                        "meetingDate",
+                        List.of("An L10 meeting is already scheduled for that team and week.")));
+              }
+            });
   }
 
   private void ensureFacilitatorOrScribe(L10Meeting meeting, UUID userId) {

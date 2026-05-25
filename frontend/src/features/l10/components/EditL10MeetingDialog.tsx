@@ -11,27 +11,29 @@ import { TeamMemberSelect } from '@/components/shared/TeamMemberSelect';
 import { toast } from 'sonner';
 import { normalizeApiError } from '@/utils/apiErrorNormalizer';
 import { useFormError } from '@/hooks/useFormError';
+import { useUpdateL10Meeting } from '../hooks/useUpdateL10Meeting';
 import { useActiveTeamId } from '@/hooks/useActiveTeamId';
-import { useScheduleL10Meeting } from '../hooks/useScheduleL10Meeting';
 import { scheduleL10MeetingSchema, type ScheduleL10MeetingFormValues } from '../schemas/l10MeetingSchema';
+import type { L10Meeting } from '../types/l10Meeting';
 
-interface ScheduleL10MeetingDialogProps {
+interface EditL10MeetingDialogProps {
     isOpen: boolean;
     onOpenChange: (open: boolean) => void;
+    meeting: L10Meeting;
 }
 
-export function ScheduleL10MeetingDialog({ isOpen, onOpenChange }: ScheduleL10MeetingDialogProps) {
+export function EditL10MeetingDialog({ isOpen, onOpenChange, meeting }: EditL10MeetingDialogProps) {
     const formId = useId();
     const activeTeamId = useActiveTeamId();
-    const { scheduleMeeting, isScheduling } = useScheduleL10Meeting();
+    const { updateMeeting, isUpdating } = useUpdateL10Meeting();
 
     const form = useForm<ScheduleL10MeetingFormValues>({
         resolver: zodResolver(scheduleL10MeetingSchema),
         defaultValues: {
-            meetingDate: undefined,
-            meetingTime: '',
-            facilitatorId: '',
-            scribeId: '',
+            meetingDate: new Date(meeting.meetingDate + 'T00:00:00'),
+            meetingTime: meeting.meetingTime.substring(0, 5),
+            facilitatorId: meeting.facilitator.id,
+            scribeId: meeting.scribe.id,
         },
         mode: 'onSubmit',
     });
@@ -46,16 +48,17 @@ export function ScheduleL10MeetingDialog({ isOpen, onOpenChange }: ScheduleL10Me
             }
 
             try {
-                await scheduleMeeting({
-                    teamId: activeTeamId,
-                    meetingDate: format(data.meetingDate, 'yyyy-MM-dd'),
-                    meetingTime: data.meetingTime,
-                    facilitatorId: data.facilitatorId,
-                    scribeId: data.scribeId,
+                await updateMeeting({
+                    meetingId: meeting.id,
+                    payload: {
+                        meetingDate: format(data.meetingDate, 'yyyy-MM-dd'),
+                        meetingTime: data.meetingTime,
+                        facilitatorId: data.facilitatorId,
+                        scribeId: data.scribeId,
+                    },
                 });
 
                 onOpenChange(false);
-                reset();
             } catch (error) {
                 const normalized = normalizeApiError(error);
                 const isHandledByForm = handleFormError(normalized);
@@ -65,11 +68,11 @@ export function ScheduleL10MeetingDialog({ isOpen, onOpenChange }: ScheduleL10Me
                 }
             }
         },
-        [activeTeamId, scheduleMeeting, onOpenChange, reset, handleFormError],
+        [activeTeamId, updateMeeting, meeting.id, onOpenChange, handleFormError],
     );
 
     const handleOpenChange = (open: boolean) => {
-        if (!isScheduling) {
+        if (!isUpdating) {
             if (!open) {
                 reset();
             }
@@ -77,13 +80,13 @@ export function ScheduleL10MeetingDialog({ isOpen, onOpenChange }: ScheduleL10Me
         }
     };
 
-    const isSubmitting = isScheduling;
+    const isSubmitting = isUpdating;
 
     return (
         <Dialog open={isOpen} onOpenChange={handleOpenChange}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Schedule L10 Meeting</DialogTitle>
+                    <DialogTitle>Edit L10 Meeting</DialogTitle>
                 </DialogHeader>
 
                 <form
@@ -91,7 +94,7 @@ export function ScheduleL10MeetingDialog({ isOpen, onOpenChange }: ScheduleL10Me
                     onSubmit={form.handleSubmit(handleSubmit)}
                     className="space-y-6"
                     aria-busy={isSubmitting}
-                    aria-label="Schedule L10 meeting form"
+                    aria-label="Edit L10 meeting form"
                 >
                     <FieldGroup className="gap-5">
                         <Controller
@@ -169,7 +172,7 @@ export function ScheduleL10MeetingDialog({ isOpen, onOpenChange }: ScheduleL10Me
                             Cancel
                         </Button>
                         <Button type="submit" disabled={isSubmitting}>
-                            {isSubmitting ? 'Scheduling...' : 'Schedule Meeting'}
+                            {isSubmitting ? 'Updating...' : 'Update Meeting'}
                         </Button>
                     </div>
                 </form>
