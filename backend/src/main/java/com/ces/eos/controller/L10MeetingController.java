@@ -89,6 +89,31 @@ public class L10MeetingController {
     return ResponseEntity.ok(response);
   }
 
+  @GetMapping("/{meetingId}")
+  @PreAuthorize("hasRole('ADMIN') or @teamSecurityService.isCurrentUserMemberOfL10Meeting(#meetingId)")
+  public ResponseEntity<L10MeetingResponse> getMeeting(
+      @PathVariable UUID meetingId) {
+    L10MeetingResponse response = l10MeetingService.getMeeting(meetingId);
+    return ResponseEntity.ok(response);
+  }
+
+  @PostMapping("/{meetingId}/finish")
+  @PreAuthorize("hasRole('ADMIN') or @teamSecurityService.isCurrentUserMemberOfL10Meeting(#meetingId)")
+  public ResponseEntity<L10MeetingResponse> finishMeeting(
+      @PathVariable UUID meetingId,
+      @AuthenticationPrincipal CustomUserDetails userDetails) {
+    L10MeetingResponse response = l10MeetingService.finishMeeting(meetingId, userDetails.getId());
+    return ResponseEntity.ok(response);
+  }
+
+  @GetMapping("/{meetingId}/ratings")
+  @PreAuthorize("hasRole('ADMIN') or @teamSecurityService.isCurrentUserMemberOfL10Meeting(#meetingId)")
+  public ResponseEntity<List<L10MeetingRatingResponse>> getRatings(
+      @PathVariable UUID meetingId) {
+    List<L10MeetingRatingResponse> response = l10MeetingService.getRatings(meetingId);
+    return ResponseEntity.ok(response);
+  }
+
   @PutMapping("/{meetingId}")
   @PreAuthorize("hasRole('ADMIN') or @teamSecurityService.isCurrentUserMemberOfL10Meeting(#meetingId)")
   public ResponseEntity<L10MeetingResponse> updateMeeting(

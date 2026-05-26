@@ -30,4 +30,10 @@ public interface L10MeetingService {
 
   PagedEntityResponse<L10MeetingResponse> getMeetingsByTeam(
       UUID teamId, List<L10MeetingStatus> statuses, PaginationRequest request);
+
+  L10MeetingResponse getMeeting(UUID meetingId);
+
+  L10MeetingResponse finishMeeting(UUID meetingId, UUID userId);
+
+  List<L10MeetingRatingResponse> getRatings(UUID meetingId);
 }

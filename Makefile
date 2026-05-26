@@ -1,7 +1,13 @@
-.PHONY: backend frontend dev
+.PHONY: backend frontend dev docker
 
 backend:
 	cd backend && mvn spring-boot:run -Dspring-boot.run.profiles=dev
+
+docker-up:
+	cd backend && docker compose up -d
+
+docker-down:
+	cd backend && docker compose down
 
 frontend:
 	cd frontend && npm run dev

@@ -374,6 +374,41 @@ public class L10MeetingServiceImpl implements L10MeetingService {
     }
   }
 
+  @Override
+  public L10MeetingResponse getMeeting(UUID meetingId) {
+    log.info("action=getMeeting.start meetingId={}", meetingId);
+    return l10MeetingMapper.toL10MeetingResponse(loadMeetingWithRelations(meetingId));
+  }
+
+  @Override
+  @Transactional
+  public L10MeetingResponse finishMeeting(UUID meetingId, UUID userId) {
+    log.info("action=finishMeeting.start meetingId={} userId={}", meetingId, userId);
+    L10Meeting meeting = loadMeetingWithRelations(meetingId);
+    ensureFacilitatorOrScribe(meeting, userId);
+
+    if (meeting.getStatus() != L10MeetingStatus.STARTED) {
+      log.warn("action=finishMeeting.validationFailed reason=status meetingId={} status={}",
+          meetingId, meeting.getStatus());
+      throw new ConflictException(
+          Map.of("meetingId", List.of("Only started meetings can be finished.")));
+    }
+
+    meeting.setStatus(L10MeetingStatus.FINISHED);
+    L10Meeting savedMeeting = l10MeetingRepository.save(meeting);
+    log.info("action=finishMeeting.success meetingId={}", savedMeeting.getId());
+    return l10MeetingMapper.toL10MeetingResponse(loadMeetingWithRelations(savedMeeting.getId()));
+  }
+
+  @Override
+  public List<L10MeetingRatingResponse> getRatings(UUID meetingId) {
+    log.info("action=getRatings.start meetingId={}", meetingId);
+    loadMeetingWithRelations(meetingId);
+    return l10MeetingRatingRepository.findByMeeting_Id(meetingId).stream()
+        .map(l10MeetingRatingMapper::toL10MeetingRatingResponse)
+        .toList();
+  }
+
   private L10MeetingRating upsertRatingForMember(
       L10Meeting meeting, User member, L10MeetingRatingValue rating) {
     L10MeetingRating meetingRating =

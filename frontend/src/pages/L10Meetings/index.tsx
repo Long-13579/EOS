@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
+import { useNavigate } from '@tanstack/react-router';
 import { Plus } from 'lucide-react';
-import { toast } from 'sonner';
 import { PageHeaderGroup } from '@/components/shared/PageHeaderGroup';
 import { CustomPagination } from '@/components/shared/CustomPagination';
 import { QueryState } from '@/components/shared/QueryState';
@@ -24,6 +24,7 @@ import type { L10Meeting } from '@/features/l10';
 type L10Tab = 'upcoming' | 'finished';
 
 export function L10Meetings() {
+    const navigate = useNavigate();
     const activeTeamId = useActiveTeamId();
     const [page, setPage] = useState(1);
     const [activeTab, setActiveTab] = useState<L10Tab>('upcoming');
@@ -36,17 +37,22 @@ export function L10Meetings() {
 
     const statuses = activeTab === 'upcoming' ? 'SCHEDULED,STARTED' : 'FINISHED';
 
-    const handleStart = (meetingId: string) => {
-        startMeeting(meetingId);
-    };
+    const handleStart = useCallback(async (meetingId: string) => {
+        try {
+            await startMeeting(meetingId);
+            navigate({ to: '/l10-meetings/$meetingId', params: { meetingId } });
+        } catch {
+            // Error handled by mutation
+        }
+    }, [startMeeting, navigate]);
 
-    const handleResume = () => {
-        toast.info('Resume meeting - feature coming soon');
-    };
+    const handleResume = useCallback((meetingId: string) => {
+        navigate({ to: '/l10-meetings/$meetingId', params: { meetingId } });
+    }, [navigate]);
 
-    const handleSummary = () => {
-        toast.info('View meeting summary - feature coming soon');
-    };
+    const handleSummary = useCallback((meetingId: string) => {
+        navigate({ to: '/l10-meetings/$meetingId', params: { meetingId } });
+    }, [navigate]);
 
     const handleEdit = (meeting: L10Meeting) => {
         setEditingMeeting(meeting);
@@ -151,8 +157,8 @@ export function L10Meetings() {
                                         key={meeting.id}
                                         meeting={meeting}
                                         onStart={() => handleStart(meeting.id)}
-                                        onResume={handleResume}
-                                        onSummary={handleSummary}
+                                        onResume={() => handleResume(meeting.id)}
+                                        onSummary={() => handleSummary(meeting.id)}
                                         onEdit={() => handleEdit(meeting)}
                                         onDelete={() => setDeletingMeeting(meeting)}
                                     />

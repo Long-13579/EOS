@@ -152,6 +152,15 @@ The primary user journey through the EOS Platform follows the weekly L10 meeting
 │  ROCKS   │    │  ISSUES  │    │  TODOS   │    │ HEADLINES│
 │ (quarter)│    │          │    │          │    │          │
 └──────────┘    └──────────┘    └──────────┘    └──────────┘
+                                                      │
+     ┌────────────────────────────────────────────────┘
+     ▼
+┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
+│ 9. L10   │───▶│10. AGENDA│───▶│11. CONCL-│───▶│12. VIEW  │
+│ MEETING  │    │  SESSIONS│    │ UDE +    │    │ HISTORY  │
+│ (sched.) │    │  (Segue, │    │ RATINGS  │    │ (finished│
+│          │    │  Score..) │    │          │    │ meetings)│
+└──────────┘    └──────────┘    └──────────┘    └──────────┘
 ```
 
 **Step-by-step:**
@@ -164,6 +173,10 @@ The primary user journey through the EOS Platform follows the weekly L10 meeting
 6. **Track Issues** - Log new issues, categorize by type, discuss in meetings
 7. **Manage Todos** - Create action items, assign to team members, update statuses
 8. **Share Headlines** - Post team announcements and good news
+9. **Schedule L10 Meeting** - Create a weekly meeting with facilitator, scribe, date, and time (one meeting per team per week enforced)
+10. **Agenda Sessions** - Start the meeting and navigate through fixed sessions: Segue, Scorecard Review, Rock Review, Headlines, To-dos, Issues, Conclude. Facilitator/scribe controls the flow.
+11. **Conclude + Ratings** - Record key decisions and cascading messages. Each member submits a 1-10 rating (or Absent) before the meeting finishes.
+12. **View History** - Review past finished meetings with read-only conclude notes and rating results.
 
 ## 6. User Roles & Permissions
 
@@ -181,13 +194,23 @@ The primary user journey through the EOS Platform follows the weekly L10 meeting
 ├────────────────┼───────────────────────────────────────────────────┤
 │                │                                                   │
 │  TEAM MEMBER   │  - View dashboard with personal widgets          │
-│  (USER role)   │  - Create/edit/archive rocks for their teams     │
+│  (USER role)   │  - Schedule and view L10 meetings                │
+│                │  - Submit meeting ratings during Conclude phase   │
+│                │  - Create/edit/archive rocks for their teams     │
 │                │  - Create/edit/delete issues for their teams      │
 │                │  - Create/edit/delete todos for their teams       │
 │                │  - Create/edit/delete headlines for their teams   │
 │                │  - Create/edit metrics and update weekly values   │
 │                │  - View scorecard trends across weeks             │
 │                │  - Switch between assigned teams                  │
+│                │                                                   │
+│  FACILITATOR / │  - All Team Member permissions                   │
+│  SCRIBE        │  - Start and finish the meeting                  │
+│  (per-meeting  │  - Navigate through agenda sessions              │
+│   role)        │  - Update conclude fields (key decisions,        │
+│                │    cascading message)                            │
+│                │  - Edit meeting details                          │
+│                │  - Cancel (delete) scheduled meetings            │
 │                │                                                   │
 └────────────────┴───────────────────────────────────────────────────┘
 
@@ -231,7 +254,46 @@ Access Control Model:
 │       CORE FEATURES          │      SUPPORTING FEATURES         │
 ├──────────────────────────────┼──────────────────────────────────┤
 │                              │                                  │
-│  Rocks (Quarterly Goals)     │  Google OAuth Authentication     │
+│  L10 Meetings                │  Google OAuth Authentication     │
+│  - Weekly scheduling         │  - One-click Google sign-in      │
+│  - One meeting per team/week │  - JWT access + refresh tokens   │
+│  - Facilitator/scribe roles  │  - HTTP-only cookie security     │
+│  - Start/finish lifecycle    │                                  │
+│  - Agenda sessions (Segue,   │  Team Management                 │
+│    Scorecard, Rocks,         │  - Multi-team support            │
+│    Headlines, To-dos,        │  - Leadership team flag          │
+│    Issues, Conclude)         │  - Member assignment             │
+│  - Conclude key decisions    │  - Global team switcher          │
+│  - Per-member ratings 1-10   │                                  │
+│  - Read-only post-meeting    │  User Management (Admin)         │
+│                              │  - Create/update users           │
+│  Rocks (Quarterly Goals)     │  - Role assignment               │
+│  - Company / Dept / Indiv.   │  - Pagination and search         │
+│  - Status tracking           │                                  │
+│  - Year/quarter filtering    │  Dashboard                       │
+│  - Archive support           │  - Personal rocks widget         │
+│                              │  - Personal todos widget         │
+│  Issues Tracking             │  - At-a-glance overview          │
+│  - Type classification       │                                  │
+│  - Short-term / Long-term    │  Background Schedulers           │
+│  - Archive support           │  - Token cleanup (weekly/daily)  │
+│                              │  - Week calendar auto-creation   │
+│  Todos (Action Items)        │                                  │
+│  - Multi-assignee support    │  Audit Trail                     │
+│  - Status workflow           │  - Created/updated timestamps    │
+│  - Due date tracking         │  - Created/updated by user       │
+│  - Archive support           │                                  │
+│                              │                                  │
+│  Scorecard / Metrics         │                                  │
+│  - Weekly value entry        │                                  │
+│  - Goal comparison           │                                  │
+│  - Trend analysis            │                                  │
+│  - Multiple unit types       │                                  │
+│  - Operator-based goals      │                                  │
+│                              │                                  │
+│  Headlines                   │                                  │
+│  - Team announcements        │                                  │
+│  - Archive support           │                                  │
 │  - Company / Dept / Indiv.   │  - One-click Google sign-in      │
 │  - Status tracking           │  - JWT access + refresh tokens   │
 │  - Year/quarter filtering    │  - HTTP-only cookie security     │

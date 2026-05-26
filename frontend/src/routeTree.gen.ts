@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SplatRouteImport } from './routes/$'
+import { Route as meetingRouteRouteImport } from './routes/(meeting)/route'
 import { Route as appRouteRouteImport } from './routes/(app)/route'
 import { Route as appIndexRouteImport } from './routes/(app)/index'
 import { Route as authLoginRouteImport } from './routes/(auth)/login'
@@ -21,10 +22,15 @@ import { Route as appRocksIndexRouteImport } from './routes/(app)/rocks/index'
 import { Route as appL10MeetingsIndexRouteImport } from './routes/(app)/l10-meetings/index'
 import { Route as appIssuesIndexRouteImport } from './routes/(app)/issues/index'
 import { Route as appHeadlinesIndexRouteImport } from './routes/(app)/headlines/index'
+import { Route as meetingL10MeetingsMeetingIdRouteImport } from './routes/(meeting)/l10-meetings/$meetingId'
 
 const SplatRoute = SplatRouteImport.update({
   id: '/$',
   path: '/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const meetingRouteRoute = meetingRouteRouteImport.update({
+  id: '/(meeting)',
   getParentRoute: () => rootRouteImport,
 } as any)
 const appRouteRoute = appRouteRouteImport.update({
@@ -81,11 +87,18 @@ const appHeadlinesIndexRoute = appHeadlinesIndexRouteImport.update({
   path: '/headlines/',
   getParentRoute: () => appRouteRoute,
 } as any)
+const meetingL10MeetingsMeetingIdRoute =
+  meetingL10MeetingsMeetingIdRouteImport.update({
+    id: '/l10-meetings/$meetingId',
+    path: '/l10-meetings/$meetingId',
+    getParentRoute: () => meetingRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/$': typeof SplatRoute
   '/login': typeof authLoginRoute
   '/': typeof appIndexRoute
+  '/l10-meetings/$meetingId': typeof meetingL10MeetingsMeetingIdRoute
   '/headlines/': typeof appHeadlinesIndexRoute
   '/issues/': typeof appIssuesIndexRoute
   '/l10-meetings/': typeof appL10MeetingsIndexRoute
@@ -99,6 +112,7 @@ export interface FileRoutesByTo {
   '/$': typeof SplatRoute
   '/login': typeof authLoginRoute
   '/': typeof appIndexRoute
+  '/l10-meetings/$meetingId': typeof meetingL10MeetingsMeetingIdRoute
   '/headlines': typeof appHeadlinesIndexRoute
   '/issues': typeof appIssuesIndexRoute
   '/l10-meetings': typeof appL10MeetingsIndexRoute
@@ -111,9 +125,11 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/(app)': typeof appRouteRouteWithChildren
+  '/(meeting)': typeof meetingRouteRouteWithChildren
   '/$': typeof SplatRoute
   '/(auth)/login': typeof authLoginRoute
   '/(app)/': typeof appIndexRoute
+  '/(meeting)/l10-meetings/$meetingId': typeof meetingL10MeetingsMeetingIdRoute
   '/(app)/headlines/': typeof appHeadlinesIndexRoute
   '/(app)/issues/': typeof appIssuesIndexRoute
   '/(app)/l10-meetings/': typeof appL10MeetingsIndexRoute
@@ -129,6 +145,7 @@ export interface FileRouteTypes {
     | '/$'
     | '/login'
     | '/'
+    | '/l10-meetings/$meetingId'
     | '/headlines/'
     | '/issues/'
     | '/l10-meetings/'
@@ -142,6 +159,7 @@ export interface FileRouteTypes {
     | '/$'
     | '/login'
     | '/'
+    | '/l10-meetings/$meetingId'
     | '/headlines'
     | '/issues'
     | '/l10-meetings'
@@ -153,9 +171,11 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/(app)'
+    | '/(meeting)'
     | '/$'
     | '/(auth)/login'
     | '/(app)/'
+    | '/(meeting)/l10-meetings/$meetingId'
     | '/(app)/headlines/'
     | '/(app)/issues/'
     | '/(app)/l10-meetings/'
@@ -168,6 +188,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   appRouteRoute: typeof appRouteRouteWithChildren
+  meetingRouteRoute: typeof meetingRouteRouteWithChildren
   SplatRoute: typeof SplatRoute
   authLoginRoute: typeof authLoginRoute
 }
@@ -179,6 +200,13 @@ declare module '@tanstack/react-router' {
       path: '/$'
       fullPath: '/$'
       preLoaderRoute: typeof SplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(meeting)': {
+      id: '/(meeting)'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof meetingRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(app)': {
@@ -258,6 +286,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof appHeadlinesIndexRouteImport
       parentRoute: typeof appRouteRoute
     }
+    '/(meeting)/l10-meetings/$meetingId': {
+      id: '/(meeting)/l10-meetings/$meetingId'
+      path: '/l10-meetings/$meetingId'
+      fullPath: '/l10-meetings/$meetingId'
+      preLoaderRoute: typeof meetingL10MeetingsMeetingIdRouteImport
+      parentRoute: typeof meetingRouteRoute
+    }
   }
 }
 
@@ -289,8 +324,21 @@ const appRouteRouteWithChildren = appRouteRoute._addFileChildren(
   appRouteRouteChildren,
 )
 
+interface meetingRouteRouteChildren {
+  meetingL10MeetingsMeetingIdRoute: typeof meetingL10MeetingsMeetingIdRoute
+}
+
+const meetingRouteRouteChildren: meetingRouteRouteChildren = {
+  meetingL10MeetingsMeetingIdRoute: meetingL10MeetingsMeetingIdRoute,
+}
+
+const meetingRouteRouteWithChildren = meetingRouteRoute._addFileChildren(
+  meetingRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   appRouteRoute: appRouteRouteWithChildren,
+  meetingRouteRoute: meetingRouteRouteWithChildren,
   SplatRoute: SplatRoute,
   authLoginRoute: authLoginRoute,
 }

@@ -62,6 +62,10 @@ export function HeadlinesList({ data, onDelete, onArchive, deletingHeadlineIds, 
         setEditingId(null);
     };
 
+    if (data.length === 0) {
+        return <div className="py-10 text-center text-muted-foreground">No headlines.</div>;
+    }
+
     return (
         <div className="flex flex-col gap-3">
             {data.map((headline) => {

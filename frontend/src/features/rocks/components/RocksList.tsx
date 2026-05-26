@@ -20,6 +20,12 @@ export function RocksList({ data, onUpdate }: RocksListProps) {
         <RockListItem key={rock.id} rock={rock} onArchive={handleArchive} onUpdate={onUpdate} isArchiving={isArchiving} />
     );
 
+    const hasAnyRocks = companyRocks?.length || departmentRocks.length || individualRocks.length;
+
+    if (!hasAnyRocks) {
+        return <div className="py-10 text-center text-muted-foreground">No rocks.</div>;
+    }
+
     return (
         <div className="space-y-8">
             {companyRocks && <RocksGroup title="Company Rocks" rocks={companyRocks} renderRock={renderRock} />}
