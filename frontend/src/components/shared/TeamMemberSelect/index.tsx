@@ -2,6 +2,7 @@ import { User } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useTeamMembers } from '@/features/settings/hooks/useTeamMembers';
 import { useActiveTeamId } from '@/hooks/useActiveTeamId';
+import { formatUserName, isUserNameTruncated } from '@/features/l10/utils/userNameDisplay';
 
 interface TeamMemberSelectProps {
     value?: string;
@@ -31,8 +32,11 @@ export function TeamMemberSelect({ value, onChange, disabled, teamId }: TeamMemb
 
                 {members.map((member) => (
                     <SelectItem key={member.id} value={member.id}>
-                        <p className="max-w-[400px] truncate">
-                            {member.firstName} {member.lastName}
+                        <p
+                            className="max-w-[400px] truncate"
+                            title={isUserNameTruncated(member.firstName, member.lastName) ? formatUserName(member.firstName, member.lastName) : undefined}
+                        >
+                            {formatUserName(member.firstName, member.lastName)}
                         </p>
                     </SelectItem>
                 ))}

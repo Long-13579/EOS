@@ -14,6 +14,7 @@ import { IssuesSession } from './sessions/IssuesSession';
 import { ConcludeSession } from './sessions/ConcludeSession';
 import { useL10Meeting } from '../hooks/useL10Meeting';
 import { useUserStore } from '@/stores/useUserStore';
+import { formatUserName, isUserNameTruncated } from '../utils/userNameDisplay';
 import type { AgendaSession } from '../types/l10Meeting';
 import { AGENDA_SESSIONS } from '../types/l10Meeting';
 
@@ -94,12 +95,12 @@ export function MeetingFlow({ meetingId }: MeetingFlowProps) {
                     </div>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <span>
-                        Facilitator: {meeting.facilitator.firstName} {meeting.facilitator.lastName}
+                    <span title={isUserNameTruncated(meeting.facilitator.firstName, meeting.facilitator.lastName) ? `${meeting.facilitator.firstName} ${meeting.facilitator.lastName}` : undefined}>
+                        Facilitator: {formatUserName(meeting.facilitator.firstName, meeting.facilitator.lastName)}
                     </span>
                     <span className="text-border">|</span>
-                    <span>
-                        Scribe: {meeting.scribe.firstName} {meeting.scribe.lastName}
+                    <span title={isUserNameTruncated(meeting.scribe.firstName, meeting.scribe.lastName) ? `${meeting.scribe.firstName} ${meeting.scribe.lastName}` : undefined}>
+                        Scribe: {formatUserName(meeting.scribe.firstName, meeting.scribe.lastName)}
                     </span>
                 </div>
             </div>

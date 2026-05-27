@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { L10MeetingStatusBadge } from './L10MeetingStatusBadge';
 import { useL10Meeting } from '../hooks/useL10Meeting';
 import { useTeamMembers } from '@/features/settings/hooks/useTeamMembers';
+import { formatUserName, isUserNameTruncated } from '../utils/userNameDisplay';
 import type { L10MeetingRatingValue } from '../types/l10Meeting';
 
 const RATING_LABEL: Record<L10MeetingRatingValue, string> = {
@@ -93,11 +94,11 @@ export function MeetingSummary({ meetingId }: MeetingSummaryProps) {
             </div>
 
             <div className="flex gap-6 text-sm text-muted-foreground">
-                <span>
-                    Facilitator: {meeting.facilitator.firstName} {meeting.facilitator.lastName}
+                <span title={isUserNameTruncated(meeting.facilitator.firstName, meeting.facilitator.lastName) ? `${meeting.facilitator.firstName} ${meeting.facilitator.lastName}` : undefined}>
+                    Facilitator: {formatUserName(meeting.facilitator.firstName, meeting.facilitator.lastName)}
                 </span>
-                <span>
-                    Scribe: {meeting.scribe.firstName} {meeting.scribe.lastName}
+                <span title={isUserNameTruncated(meeting.scribe.firstName, meeting.scribe.lastName) ? `${meeting.scribe.firstName} ${meeting.scribe.lastName}` : undefined}>
+                    Scribe: {formatUserName(meeting.scribe.firstName, meeting.scribe.lastName)}
                 </span>
             </div>
 
@@ -115,8 +116,11 @@ export function MeetingSummary({ meetingId }: MeetingSummaryProps) {
                                     key={member.id}
                                     className="flex items-center justify-between rounded-md border px-4 py-2.5"
                                 >
-                                    <span className="text-sm font-medium">
-                                        {member.firstName} {member.lastName}
+                                    <span
+                                        className="text-sm font-medium"
+                                        title={isUserNameTruncated(member.firstName, member.lastName) ? `${member.firstName} ${member.lastName}` : undefined}
+                                    >
+                                        {formatUserName(member.firstName, member.lastName)}
                                     </span>
                                     <span className="text-sm tabular-nums">
                                         {rating ? RATING_LABEL[rating] : <span className="text-muted-foreground italic">Not rated</span>}

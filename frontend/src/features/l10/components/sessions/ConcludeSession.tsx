@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { normalizeApiError } from '@/utils/apiErrorNormalizer';
+import { formatUserName, isUserNameTruncated } from '../../utils/userNameDisplay';
 import { useUpdateConclude } from '../../hooks/useUpdateConclude';
 import { useUpsertRatings } from '../../hooks/useUpsertRatings';
 import { useFinishL10Meeting } from '../../hooks/useFinishL10Meeting';
@@ -118,8 +119,11 @@ export function ConcludeSession({ meeting, onFinished, canEdit }: ConcludeSessio
                         <Label>Team Member Ratings (1-10 or Absent)</Label>
                         {members.map((member) => (
                             <div key={member.id} className="flex items-center gap-3 rounded-md border p-3">
-                                <span className="min-w-0 flex-1 text-sm font-medium truncate">
-                                    {member.firstName} {member.lastName}
+                                <span
+                                    className="min-w-0 flex-1 text-sm font-medium truncate"
+                                    title={isUserNameTruncated(member.firstName, member.lastName) ? `${member.firstName} ${member.lastName}` : undefined}
+                                >
+                                    {formatUserName(member.firstName, member.lastName)}
                                 </span>
                                 <Select
                                     value={ratings[member.id] || 'ABSENT'}

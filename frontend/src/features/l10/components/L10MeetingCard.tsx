@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { L10MeetingStatusBadge } from './L10MeetingStatusBadge';
 import { TableActions } from '@/components/shared/Table/TableActions';
+import { formatUserName, isUserNameTruncated } from '../utils/userNameDisplay';
 import type { L10Meeting, L10MeetingStatus } from '../types/l10Meeting';
 
 interface L10MeetingCardProps {
@@ -76,12 +77,13 @@ export function L10MeetingCard({ meeting, onStart, onResume, onSummary, onEdit, 
                         <L10MeetingStatusBadge status={meeting.status} />
                     </div>
                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                        <span>
-                            <span className="font-medium text-foreground">Facilitator:</span> {meeting.facilitator.firstName}{' '}
-                            {meeting.facilitator.lastName}
+                        <span title={isUserNameTruncated(meeting.facilitator.firstName, meeting.facilitator.lastName) ? `${meeting.facilitator.firstName} ${meeting.facilitator.lastName}` : undefined}>
+                            <span className="font-medium text-foreground">Facilitator:</span>{' '}
+                            {formatUserName(meeting.facilitator.firstName, meeting.facilitator.lastName)}
                         </span>
-                        <span>
-                            <span className="font-medium text-foreground">Scribe:</span> {meeting.scribe.firstName} {meeting.scribe.lastName}
+                        <span title={isUserNameTruncated(meeting.scribe.firstName, meeting.scribe.lastName) ? `${meeting.scribe.firstName} ${meeting.scribe.lastName}` : undefined}>
+                            <span className="font-medium text-foreground">Scribe:</span>{' '}
+                            {formatUserName(meeting.scribe.firstName, meeting.scribe.lastName)}
                         </span>
                     </div>
                 </div>
