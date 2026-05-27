@@ -27,7 +27,10 @@ public interface L10MeetingRepository extends JpaRepository<L10Meeting, UUID> {
           + "LEFT JOIN FETCH m.scribe "
           + "LEFT JOIN FETCH m.createdBy "
           + "LEFT JOIN FETCH m.updatedBy "
-          + "WHERE m.id = :meetingId")
+          + "LEFT JOIN FETCH m.ratings r "
+          + "LEFT JOIN FETCH r.member "
+          + "WHERE m.id = :meetingId "
+          + "ORDER BY r.member.lastName, r.member.firstName")
   Optional<L10Meeting> findByIdWithRelations(@Param("meetingId") UUID meetingId);
 
   @Query("SELECT m.id FROM L10Meeting m WHERE m.team.id = :teamId AND m.status = :status")

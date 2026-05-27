@@ -12,7 +12,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
     componentModel = "spring",
     nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
     nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
-    uses = {EntityMapper.class})
+    uses = {EntityMapper.class, L10MeetingRatingMapper.class})
 public interface L10MeetingMapper {
   L10MeetingResponse toL10MeetingResponse(L10Meeting entity);
 

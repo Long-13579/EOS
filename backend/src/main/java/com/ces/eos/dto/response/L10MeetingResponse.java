@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.UUID;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -22,4 +23,5 @@ public record L10MeetingResponse(
     Instant createdAt,
     Instant updatedAt,
     UserBaseResponse createdBy,
-    UserBaseResponse updatedBy) {}
+    UserBaseResponse updatedBy,
+    List<L10MeetingRatingResponse> ratings) {}

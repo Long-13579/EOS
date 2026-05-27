@@ -21,6 +21,7 @@ export interface L10Meeting {
     updatedAt: string;
     createdBy: TeamMember | null;
     updatedBy: TeamMember | null;
+    ratings?: L10MeetingRating[];
 }
 
 export interface L10MeetingRating {

@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { format, parse } from 'date-fns';
 import { ArrowLeft } from 'lucide-react';
@@ -6,6 +6,22 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { L10MeetingStatusBadge } from './L10MeetingStatusBadge';
 import { useL10Meeting } from '../hooks/useL10Meeting';
+import { useTeamMembers } from '@/features/settings/hooks/useTeamMembers';
+import type { L10MeetingRatingValue } from '../types/l10Meeting';
+
+const RATING_LABEL: Record<L10MeetingRatingValue, string> = {
+    ABSENT: 'Absent',
+    ONE: '1/10',
+    TWO: '2/10',
+    THREE: '3/10',
+    FOUR: '4/10',
+    FIVE: '5/10',
+    SIX: '6/10',
+    SEVEN: '7/10',
+    EIGHT: '8/10',
+    NINE: '9/10',
+    TEN: '10/10',
+};
 
 interface MeetingSummaryProps {
     meetingId: string;
@@ -14,6 +30,30 @@ interface MeetingSummaryProps {
 export function MeetingSummary({ meetingId }: MeetingSummaryProps) {
     const navigate = useNavigate();
     const { data: meeting, isPending, isError } = useL10Meeting(meetingId);
+    const { data: members } = useTeamMembers(meeting?.team.id);
+
+    const ratingsByMemberId = useMemo(() => {
+        if (!meeting?.ratings) return {};
+        const map: Record<string, L10MeetingRatingValue> = {};
+        for (const r of meeting.ratings) {
+            map[r.member.id] = r.rating;
+        }
+        return map;
+    }, [meeting?.ratings]);
+
+    const ratingsDisplay = useMemo(() => {
+        if (!members) return [];
+        return members
+            .map((m) => ({
+                member: m,
+                rating: ratingsByMemberId[m.id] ?? null,
+            }))
+            .sort((a, b) => {
+                const cmp = a.member.lastName.localeCompare(b.member.lastName);
+                if (cmp !== 0) return cmp;
+                return a.member.firstName.localeCompare(b.member.firstName);
+            });
+    }, [members, ratingsByMemberId]);
 
     const handleBack = useCallback(() => {
         navigate({ to: '/l10-meetings' });
@@ -60,6 +100,33 @@ export function MeetingSummary({ meetingId }: MeetingSummaryProps) {
                     Scribe: {meeting.scribe.firstName} {meeting.scribe.lastName}
                 </span>
             </div>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Member Ratings</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    {ratingsDisplay.length === 0 ? (
+                        <p className="text-sm text-muted-foreground">No ratings available.</p>
+                    ) : (
+                        <div className="space-y-2">
+                            {ratingsDisplay.map(({ member, rating }) => (
+                                <div
+                                    key={member.id}
+                                    className="flex items-center justify-between rounded-md border px-4 py-2.5"
+                                >
+                                    <span className="text-sm font-medium">
+                                        {member.firstName} {member.lastName}
+                                    </span>
+                                    <span className="text-sm tabular-nums">
+                                        {rating ? RATING_LABEL[rating] : <span className="text-muted-foreground italic">Not rated</span>}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
 
             <Card>
                 <CardHeader>
