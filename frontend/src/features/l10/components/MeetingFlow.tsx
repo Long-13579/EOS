@@ -29,10 +29,7 @@ export function MeetingFlow({ meetingId }: MeetingFlowProps) {
 
     const isFacilitatorOrScribe = useMemo(() => {
         if (!meeting || !currentUser) return false;
-        return (
-            meeting.facilitator.id === currentUser.id ||
-            meeting.scribe.id === currentUser.id
-        );
+        return meeting.facilitator.id === currentUser.id || meeting.scribe.id === currentUser.id;
     }, [meeting, currentUser]);
 
     const handleBack = useCallback(() => {
@@ -97,9 +94,13 @@ export function MeetingFlow({ meetingId }: MeetingFlowProps) {
                     </div>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <span>Facilitator: {meeting.facilitator.firstName} {meeting.facilitator.lastName}</span>
+                    <span>
+                        Facilitator: {meeting.facilitator.firstName} {meeting.facilitator.lastName}
+                    </span>
                     <span className="text-border">|</span>
-                    <span>Scribe: {meeting.scribe.firstName} {meeting.scribe.lastName}</span>
+                    <span>
+                        Scribe: {meeting.scribe.firstName} {meeting.scribe.lastName}
+                    </span>
                 </div>
             </div>
 

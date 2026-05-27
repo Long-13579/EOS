@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useActiveTeamId } from '@/hooks/useActiveTeamId';
 import { useIssues } from '@/features/issues/hooks/useIssues';
 import { useIssueDialog } from '@/features/issues/hooks/useIssueDialog';
@@ -6,31 +7,41 @@ import { useArchiveIssue } from '@/features/issues/hooks/useArchiveIssue';
 import { IssuesTable } from '@/features/issues/components/IssuesTable';
 import { IssueDialog } from '@/features/issues/components/IssueDialog';
 import { ConfirmationDialog } from '@/components/shared/ConfirmationDialog';
+import { CustomPagination } from '@/components/shared/CustomPagination';
+import { IssueViewFilter } from '@/components/shared/IssueViewFilter';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { DEFAULT_LIMIT } from '@/types/pagination';
+import { ISSUE_VIEW, type IssueView } from '@/features/issues';
 
 export function IssuesSession() {
     const teamId = useActiveTeamId();
+    const [page, setPage] = useState(1);
+    const [view, setView] = useState<IssueView>(ISSUE_VIEW.ISSUES);
 
     const { isIssueDialogOpen, setIssueDialogOpen, editingIssue, openCreate, openEdit, handleSubmit } = useIssueDialog({
         activeTeamId: teamId,
     });
-    const { data: issuesResponse, isPending, isError } = useIssues({
-        page: 1,
+    const {
+        data: issuesResponse,
+        isPending,
+        isError,
+    } = useIssues({
+        page,
         limit: DEFAULT_LIMIT,
         teamId: teamId!,
+        view,
     });
-    const {
-        deletingIssueIds,
-        isDeleteDialogOpen,
-        setDeleteDialogOpen,
-        deletingIssue,
-        openDelete,
-        handleConfirmDelete,
-    } = useDeleteIssue();
+    const { deletingIssueIds, isDeleteDialogOpen, setDeleteDialogOpen, deletingIssue, openDelete, handleConfirmDelete } = useDeleteIssue();
     const { handleArchiveToggle } = useArchiveIssue();
+
+    const totalPages = issuesResponse?.pagination.totalPages ?? 0;
+
+    const handleViewChange = (value: IssueView) => {
+        setView(value);
+        setPage(1);
+    };
 
     return (
         <>
@@ -45,6 +56,9 @@ export function IssuesSession() {
                     </div>
                 </CardHeader>
                 <CardContent>
+                    <div className="mb-4">
+                        <IssueViewFilter value={view} onChange={handleViewChange} disabled={isPending} />
+                    </div>
                     <IssuesTable
                         data={issuesResponse?.data ?? []}
                         isPending={isPending}
@@ -55,6 +69,7 @@ export function IssuesSession() {
                         deletingIssueIds={deletingIssueIds}
                         emptyMessage="No issues."
                     />
+                    <CustomPagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
                 </CardContent>
             </Card>
             <IssueDialog isOpen={isIssueDialogOpen} onOpenChange={setIssueDialogOpen} onSubmit={handleSubmit} issue={editingIssue} />

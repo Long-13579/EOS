@@ -24,7 +24,11 @@ export function ScorecardSession({ weekStartDate }: ScorecardSessionProps) {
 
     const { isMetricDialogOpen, setMetricDialogOpen, editingMetric, openCreate, openUpdate, handleSubmit } = useMetricDialog();
 
-    const { data: metrics, isPending, isError } = useMetrics({
+    const {
+        data: metrics,
+        isPending,
+        isError,
+    } = useMetrics({
         teamId: teamId!,
         weekId: weekId!,
     });

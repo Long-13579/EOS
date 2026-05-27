@@ -15,14 +15,8 @@ export function HeadlinesSession() {
     const { data: headlines } = useHeadlines({ teamId: teamId! } as GetHeadlinesParams);
 
     const { handleSubmit: createHeadline } = useCreateHeadline({ activeTeamId: teamId });
-    const {
-        isDeleteDialogOpen,
-        setDeleteDialogOpen,
-        deletingHeadline,
-        deletingHeadlineIds,
-        handleOpenDelete,
-        handleConfirmDelete,
-    } = useDeleteHeadline();
+    const { isDeleteDialogOpen, setDeleteDialogOpen, deletingHeadline, deletingHeadlineIds, handleOpenDelete, handleConfirmDelete } =
+        useDeleteHeadline();
     const { handleArchiveToggle, archivingHeadlineIds } = useArchiveHeadline();
 
     return (

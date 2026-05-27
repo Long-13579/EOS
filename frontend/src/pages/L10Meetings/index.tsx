@@ -37,22 +37,31 @@ export function L10Meetings() {
 
     const statuses = activeTab === 'upcoming' ? 'SCHEDULED,STARTED' : 'FINISHED';
 
-    const handleStart = useCallback(async (meetingId: string) => {
-        try {
-            await startMeeting(meetingId);
+    const handleStart = useCallback(
+        async (meetingId: string) => {
+            try {
+                await startMeeting(meetingId);
+                navigate({ to: '/l10-meetings/$meetingId', params: { meetingId } });
+            } catch {
+                // Error handled by mutation
+            }
+        },
+        [startMeeting, navigate],
+    );
+
+    const handleResume = useCallback(
+        (meetingId: string) => {
             navigate({ to: '/l10-meetings/$meetingId', params: { meetingId } });
-        } catch {
-            // Error handled by mutation
-        }
-    }, [startMeeting, navigate]);
+        },
+        [navigate],
+    );
 
-    const handleResume = useCallback((meetingId: string) => {
-        navigate({ to: '/l10-meetings/$meetingId', params: { meetingId } });
-    }, [navigate]);
-
-    const handleSummary = useCallback((meetingId: string) => {
-        navigate({ to: '/l10-meetings/$meetingId', params: { meetingId } });
-    }, [navigate]);
+    const handleSummary = useCallback(
+        (meetingId: string) => {
+            navigate({ to: '/l10-meetings/$meetingId', params: { meetingId } });
+        },
+        [navigate],
+    );
 
     const handleEdit = (meeting: L10Meeting) => {
         setEditingMeeting(meeting);

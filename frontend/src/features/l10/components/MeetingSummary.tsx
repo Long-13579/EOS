@@ -53,8 +53,12 @@ export function MeetingSummary({ meetingId }: MeetingSummaryProps) {
             </div>
 
             <div className="flex gap-6 text-sm text-muted-foreground">
-                <span>Facilitator: {meeting.facilitator.firstName} {meeting.facilitator.lastName}</span>
-                <span>Scribe: {meeting.scribe.firstName} {meeting.scribe.lastName}</span>
+                <span>
+                    Facilitator: {meeting.facilitator.firstName} {meeting.facilitator.lastName}
+                </span>
+                <span>
+                    Scribe: {meeting.scribe.firstName} {meeting.scribe.lastName}
+                </span>
             </div>
 
             <Card>
@@ -62,9 +66,7 @@ export function MeetingSummary({ meetingId }: MeetingSummaryProps) {
                     <CardTitle>Key Decisions</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <p className="whitespace-pre-wrap text-sm">
-                        {meeting.concludeKeyDecisions || 'No key decisions recorded.'}
-                    </p>
+                    <p className="whitespace-pre-wrap text-sm">{meeting.concludeKeyDecisions || 'No key decisions recorded.'}</p>
                 </CardContent>
             </Card>
 
@@ -73,9 +75,7 @@ export function MeetingSummary({ meetingId }: MeetingSummaryProps) {
                     <CardTitle>Cascading Message</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <p className="whitespace-pre-wrap text-sm">
-                        {meeting.concludeCascadingMessage || 'No cascading message recorded.'}
-                    </p>
+                    <p className="whitespace-pre-wrap text-sm">{meeting.concludeCascadingMessage || 'No cascading message recorded.'}</p>
                 </CardContent>
             </Card>
         </div>

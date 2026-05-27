@@ -9,8 +9,7 @@ export const useUpsertRatings = () => {
     const queryClient = useQueryClient();
 
     const { mutateAsync, isPending } = useMutation({
-        mutationFn: ({ meetingId, payload }: { meetingId: string; payload: UpsertRatingsPayload }) =>
-            upsertRatings(meetingId, payload),
+        mutationFn: ({ meetingId, payload }: { meetingId: string; payload: UpsertRatingsPayload }) => upsertRatings(meetingId, payload),
 
         onSuccess: () => {
             toast.success('Ratings saved.');

@@ -9,8 +9,7 @@ export const useUpdateConclude = () => {
     const queryClient = useQueryClient();
 
     const { mutateAsync, isPending } = useMutation({
-        mutationFn: ({ meetingId, payload }: { meetingId: string; payload: UpdateConcludePayload }) =>
-            updateConclude(meetingId, payload),
+        mutationFn: ({ meetingId, payload }: { meetingId: string; payload: UpdateConcludePayload }) => updateConclude(meetingId, payload),
 
         onSuccess: () => {
             toast.success('Conclude notes saved.');
