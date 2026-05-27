@@ -67,17 +67,14 @@ export function L10Meetings() {
         setEditingMeeting(meeting);
     };
 
-    const handleDeleteConfirm = async () => {
+    const handleDeleteConfirm = () => {
         if (!deletingMeeting) {
             return;
         }
 
-        try {
-            await deleteMeeting(deletingMeeting.id);
-            setDeletingMeeting(null);
-        } catch {
-            // Error is handled by the mutation's onError (toast)
-        }
+        deleteMeeting(deletingMeeting.id, {
+            onSuccess: () => setDeletingMeeting(null),
+        });
     };
 
     const {
