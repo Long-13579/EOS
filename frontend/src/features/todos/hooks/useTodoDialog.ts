@@ -4,9 +4,11 @@ import { useActiveTeamId } from '@/hooks/useActiveTeamId';
 
 interface UseTodoDialogParams {
     onSuccess?: () => void;
+    issueId?: string;
+    teamId?: string;
 }
 
-export function useTodoDialog({ onSuccess }: UseTodoDialogParams = {}) {
+export function useTodoDialog({ onSuccess, issueId, teamId }: UseTodoDialogParams = {}) {
     const activeTeamId = useActiveTeamId();
     const [isTodoDialogOpen, setTodoDialogOpen] = useState(false);
     const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
@@ -25,9 +27,9 @@ export function useTodoDialog({ onSuccess }: UseTodoDialogParams = {}) {
     };
 
     const handleSubmit = async (data: TodoFormValues) => {
-        const teamId = activeTeamId;
+        const resolvedTeamId = teamId ?? activeTeamId;
 
-        if (!teamId) {
+        if (!resolvedTeamId) {
             return;
         }
 
@@ -37,13 +39,15 @@ export function useTodoDialog({ onSuccess }: UseTodoDialogParams = {}) {
                 data: {
                     ...data,
                     dueDate: data.dueDate?.toISOString(),
+                    issueId: issueId ?? editingTodo.issueId,
                 },
             });
         } else {
             const payload: CreateTodo = {
                 ...data,
-                teamId: activeTeamId,
+                teamId: resolvedTeamId,
                 dueDate: data.dueDate?.toISOString(),
+                issueId,
             };
 
             await createTodo(payload);

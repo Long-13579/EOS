@@ -7,6 +7,7 @@ import { queryClient } from '@/lib/reactQuery';
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from '@/constants/messages';
 
 import { todoKeys } from '../types/todoKeys';
+import { issueKeys } from '@/features/issues/types/issueKeys';
 import type { Todo } from '../types/todo';
 import { archiveTodo } from '../services/todoService';
 
@@ -18,9 +19,10 @@ interface ArchiveTodoParams {
 interface UseArchiveTodoProps {
     onPageChange?: (page: number) => void;
     onItemRemoved?: () => void;
+    issueId?: string;
 }
 
-export const useArchiveTodo = ({ onPageChange, onItemRemoved }: UseArchiveTodoProps) => {
+export const useArchiveTodo = ({ onPageChange, onItemRemoved, issueId }: UseArchiveTodoProps) => {
     const [showArchived, setShowArchived] = useState(false);
 
     const toggleShowArchived = (checked: CheckedState) => {
@@ -40,6 +42,15 @@ export const useArchiveTodo = ({ onPageChange, onItemRemoved }: UseArchiveTodoPr
             onItemRemoved?.();
             queryClient.setQueryData(todoKeys.detail(id), serverTodo);
             toast.success(isArchived ? SUCCESS_MESSAGES.TODO.ARCHIVED : SUCCESS_MESSAGES.TODO.UNARCHIVED);
+            const linkedIssueId = issueId ?? serverTodo.issueId ?? undefined;
+            if (linkedIssueId) {
+                queryClient.invalidateQueries({
+                    queryKey: issueKeys.lists(),
+                });
+                queryClient.invalidateQueries({
+                    queryKey: issueKeys.detail(linkedIssueId),
+                });
+            }
         },
 
         onSettled: () => {

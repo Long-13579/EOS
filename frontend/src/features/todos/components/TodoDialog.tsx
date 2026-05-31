@@ -8,9 +8,10 @@ interface TodoDialogProps {
     onOpenChange: (open: boolean) => void;
     onSubmit: (data: TodoFormValues) => void | Promise<void>;
     editingTodo: Todo | null;
+    teamId?: string;
 }
 
-export function TodoDialog({ isOpen, onOpenChange, onSubmit, editingTodo }: Readonly<TodoDialogProps>) {
+export function TodoDialog({ isOpen, onOpenChange, onSubmit, editingTodo, teamId }: Readonly<TodoDialogProps>) {
     const mode = editingTodo ? 'edit' : 'create';
 
     const initialData: TodoFormValues | undefined = editingTodo
@@ -36,7 +37,7 @@ export function TodoDialog({ isOpen, onOpenChange, onSubmit, editingTodo }: Read
                     mode={mode}
                     onSubmit={onSubmit}
                     onCancel={() => onOpenChange(false)}
-                    teamId={editingTodo?.team.id}
+                    teamId={teamId ?? editingTodo?.team.id}
                 />
             </DialogContent>
         </Dialog>

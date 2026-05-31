@@ -24,7 +24,6 @@ export function IssueDialog({ isOpen, onOpenChange, onSubmit, issue }: Readonly<
                 <DialogHeader>
                     <DialogTitle>{mode === 'edit' ? 'Edit Issue' : 'Create Issue'}</DialogTitle>
                 </DialogHeader>
-
                 <IssueForm key={mode} initialData={initialData} mode={mode} onSubmit={onSubmit} onCancel={() => onOpenChange(false)} />
             </DialogContent>
         </Dialog>

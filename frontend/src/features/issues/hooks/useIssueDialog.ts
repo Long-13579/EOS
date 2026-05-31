@@ -45,6 +45,7 @@ export function useIssueDialog({ activeTeamId, onCreated }: UseIssueDialogParams
         }
 
         setIssueDialogOpen(false);
+        setEditingIssue(null);
     };
 
     return {

@@ -15,16 +15,19 @@ export interface Todo extends BaseEntity {
     isArchived: boolean;
     dueDate?: string;
     assignees?: TeamMember[];
+    issueId?: string | null;
     team: Team;
 }
 
 export interface CreateTodo extends Omit<TodoFormValues, 'dueDate'> {
     dueDate?: string;
     teamId: string;
+    issueId?: string | null;
 }
 
 export interface UpdateTodo extends Omit<TodoFormValues, 'dueDate'> {
     dueDate?: string;
+    issueId?: string | null;
 }
 
 export interface ArchiveTodo {
@@ -43,4 +46,5 @@ export interface GetTodosParams extends PaginationParams {
     teamId?: string;
     status?: TodoStatus;
     isArchived?: boolean;
+    issueId?: string;
 }

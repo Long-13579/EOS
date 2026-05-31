@@ -65,8 +65,9 @@ export function Todos() {
     const todos = todosResponse?.data ?? [];
     const totalPages = todosResponse?.pagination.totalPages ?? 0;
 
-    const { isDeleteDialogOpen, setDeleteDialogOpen, deletingTodo, deletingTodoIds, handleDelete, handleConfirmDelete } =
-        useDeleteTodo(resetPageIfNeeded);
+    const { isDeleteDialogOpen, setDeleteDialogOpen, deletingTodo, deletingTodoIds, handleDelete, handleConfirmDelete } = useDeleteTodo({
+        onSuccess: resetPageIfNeeded,
+    });
 
     const handleTodoSubmit = async (data: TodoFormValues) => {
         await handleSubmit(data);

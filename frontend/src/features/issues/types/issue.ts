@@ -25,6 +25,7 @@ export interface Issue extends BaseEntity {
     issueType: IssueType | null;
     creator: TeamMember | null;
     isArchived: boolean;
+    totalTodosCount?: number;
     team?: Team;
 }
 

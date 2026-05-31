@@ -19,12 +19,20 @@ interface TodosTableProps extends DataTableProps<Todo> {
     onToggleArchive: (data: Todo) => void;
     deletingTodoIds?: string[];
     isArchiving?: boolean;
+    isReadOnly?: boolean;
 }
 
-const getTodoActions = (todo: Todo, onUpdate: (data: Todo) => void, onDelete: (data: Todo) => void, onToggleArchive: (data: Todo) => void) => {
+const getTodoActions = (
+    todo: Todo,
+    onUpdate: (data: Todo) => void,
+    onDelete: (data: Todo) => void,
+    onToggleArchive: (data: Todo) => void,
+    isReadOnly: boolean,
+) => {
     const { isArchived } = todo;
+    const shouldDisableActions = isReadOnly;
     return [
-        ...(isArchived
+        ...(isArchived || shouldDisableActions
             ? []
             : [
                   {
@@ -37,12 +45,14 @@ const getTodoActions = (todo: Todo, onUpdate: (data: Todo) => void, onDelete: (d
             label: isArchived ? 'Unarchive To-do' : 'Archive To-do',
             icon: isArchived ? ArchiveRestore : Archive,
             onClick: () => onToggleArchive(todo),
+            disabled: shouldDisableActions,
         },
         {
             label: 'Delete To-do',
             icon: Trash2,
             variant: 'destructive' as const,
             onClick: () => onDelete(todo),
+            disabled: shouldDisableActions,
         },
     ];
 };
@@ -57,6 +67,7 @@ export function TodosTable({
     onToggleArchive,
     deletingTodoIds,
     isArchiving,
+    isReadOnly,
 }: TodosTableProps) {
     return (
         <div className="rounded-md border">
@@ -83,6 +94,7 @@ export function TodosTable({
                         {data.map((todo) => {
                             const isBeingDeleted = deletingTodoIds?.includes(todo.id);
                             const isArchived = todo.isArchived;
+                            const disableActions = Boolean(isReadOnly);
                             return (
                                 <TableRow
                                     key={todo.id}
@@ -91,8 +103,9 @@ export function TodosTable({
                                         isBeingDeleted && 'opacity-50 grayscale',
                                         isArchiving && 'opacity-70',
                                         isArchived && '[&>td:not(:last-child)]:opacity-60',
+                                        disableActions && '[&>td:not(:last-child)]:opacity-70',
                                     )}
-                                    aria-disabled={isBeingDeleted || isArchived || isArchiving}
+                                    aria-disabled={isBeingDeleted || isArchived || isArchiving || disableActions}
                                 >
                                     <TableCell className="pl-6 font-medium">
                                         <button
@@ -101,7 +114,7 @@ export function TodosTable({
                                             onClick={() => onUpdate(todo)}
                                             title={todo.title}
                                             aria-label={`Edit To-do: ${todo.title}`}
-                                            disabled={isBeingDeleted || isArchived || isArchiving}
+                                            disabled={isBeingDeleted || isArchived || isArchiving || disableActions}
                                         >
                                             {todo.title}
                                         </button>
@@ -127,7 +140,7 @@ export function TodosTable({
                                     </TableCell>
 
                                     <TableCell className="text-right pr-4.5">
-                                        <TableActions actions={getTodoActions(todo, onUpdate, onDelete, onToggleArchive)} />
+                                        <TableActions actions={getTodoActions(todo, onUpdate, onDelete, onToggleArchive, disableActions)} />
                                     </TableCell>
                                 </TableRow>
                             );

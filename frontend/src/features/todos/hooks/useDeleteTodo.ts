@@ -4,9 +4,15 @@ import { toast } from 'sonner';
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from '@/constants/messages';
 import { deleteTodo } from '../services/todoService';
 import { todoKeys } from '../types/todoKeys';
+import { issueKeys } from '@/features/issues/types/issueKeys';
 import type { Todo } from '../types/todo';
 
-export const useDeleteTodo = (onSuccess?: () => void) => {
+interface UseDeleteTodoParams {
+    onSuccess?: () => void;
+    issueId?: string;
+}
+
+export const useDeleteTodo = ({ onSuccess, issueId }: UseDeleteTodoParams = {}) => {
     const queryClient = useQueryClient();
     const [deletingTodo, setDeletingTodo] = useState<Todo | null>(null);
     const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -22,7 +28,18 @@ export const useDeleteTodo = (onSuccess?: () => void) => {
 
         onSuccess: () => {
             toast.success(SUCCESS_MESSAGES.TODO.DELETED);
+            setDeletingTodo(null);
+            setDeleteDialogOpen(false);
             onSuccess?.();
+            const linkedIssueId = issueId ?? deletingTodo?.issueId ?? undefined;
+            if (linkedIssueId) {
+                queryClient.invalidateQueries({
+                    queryKey: issueKeys.lists(),
+                });
+                queryClient.invalidateQueries({
+                    queryKey: issueKeys.detail(linkedIssueId),
+                });
+            }
         },
 
         onError: () => {

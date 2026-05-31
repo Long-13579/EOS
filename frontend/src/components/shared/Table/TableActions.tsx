@@ -8,6 +8,7 @@ export interface ActionItem {
     icon: LucideIcon;
     onClick?: () => void;
     variant?: 'default' | 'ghost' | 'destructive';
+    disabled?: boolean;
 }
 
 interface TableActionsProps {
@@ -29,9 +30,11 @@ export function TableActions({ actions }: Readonly<TableActionsProps>) {
                                 variant="ghost"
                                 onClick={action.onClick}
                                 aria-label={action.label}
+                                disabled={action.disabled}
                                 className={cn(
                                     'transition-colors',
                                     isDestructive && 'text-destructive hover:bg-destructive/10 hover:text-destructive',
+                                    action.disabled && 'pointer-events-none opacity-50',
                                 )}
                             >
                                 <Icon className="h-4 w-4" />

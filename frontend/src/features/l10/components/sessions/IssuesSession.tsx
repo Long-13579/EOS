@@ -6,6 +6,8 @@ import { useDeleteIssue } from '@/features/issues/hooks/useDeleteIssue';
 import { useArchiveIssue } from '@/features/issues/hooks/useArchiveIssue';
 import { IssuesTable } from '@/features/issues/components/IssuesTable';
 import { IssueDialog } from '@/features/issues/components/IssueDialog';
+import { IssueTodosDialog } from '@/features/issues/components/IssueTodosDialog';
+import { useIssueTodosDialog } from '@/features/issues/hooks/useIssueTodosDialog';
 import { ConfirmationDialog } from '@/components/shared/ConfirmationDialog';
 import { CustomPagination } from '@/components/shared/CustomPagination';
 import { IssueViewFilter } from '@/components/shared/IssueViewFilter';
@@ -23,6 +25,7 @@ export function IssuesSession() {
     const { isIssueDialogOpen, setIssueDialogOpen, editingIssue, openCreate, openEdit, handleSubmit } = useIssueDialog({
         activeTeamId: teamId,
     });
+    const { isIssueTodosDialogOpen, setIssueTodosDialogOpen, issue, openIssueTodos } = useIssueTodosDialog();
     const {
         data: issuesResponse,
         isPending,
@@ -68,11 +71,13 @@ export function IssuesSession() {
                         onToggleArchive={handleArchiveToggle}
                         deletingIssueIds={deletingIssueIds}
                         emptyMessage="No issues."
+                        onOpenTodos={openIssueTodos}
                     />
                     <CustomPagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
                 </CardContent>
             </Card>
             <IssueDialog isOpen={isIssueDialogOpen} onOpenChange={setIssueDialogOpen} onSubmit={handleSubmit} issue={editingIssue} />
+            <IssueTodosDialog isOpen={isIssueTodosDialogOpen} onOpenChange={setIssueTodosDialogOpen} issue={issue} />
             <ConfirmationDialog
                 isOpen={isDeleteDialogOpen}
                 onOpenChange={setDeleteDialogOpen}

@@ -17,6 +17,7 @@ interface IssuesTableProps extends DataTableProps<Issue> {
     onDelete: (data: Issue) => void;
     deletingIssueIds?: string[];
     onToggleArchive: (issue: Issue) => void;
+    onOpenTodos?: (issue: Issue) => void;
 }
 
 const getIssueActions = (issue: Issue, onUpdate: (data: Issue) => void, onDelete: (data: Issue) => void, onToggleArchive: (issue: Issue) => void) => {
@@ -46,7 +47,17 @@ const getIssueActions = (issue: Issue, onUpdate: (data: Issue) => void, onDelete
     ];
 };
 
-export function IssuesTable({ data, isPending, isError, emptyMessage, onUpdate, onDelete, onToggleArchive, deletingIssueIds }: IssuesTableProps) {
+export function IssuesTable({
+    data,
+    isPending,
+    isError,
+    emptyMessage,
+    onUpdate,
+    onDelete,
+    onToggleArchive,
+    deletingIssueIds,
+    onOpenTodos,
+}: IssuesTableProps) {
     return (
         <div className="rounded-md border">
             <Table className="table-fixed w-full">
@@ -54,6 +65,7 @@ export function IssuesTable({ data, isPending, isError, emptyMessage, onUpdate, 
                     <TableRow>
                         <TableHead className="pl-6 w-110">Title</TableHead>
                         <TableHead>Issue Type</TableHead>
+                        <TableHead className="w-28">Todos</TableHead>
                         <TableHead>Created By</TableHead>
                         <TableHead>Date Created</TableHead>
                         <TableHead className="text-right pr-12 w-30">Actions</TableHead>
@@ -65,7 +77,7 @@ export function IssuesTable({ data, isPending, isError, emptyMessage, onUpdate, 
                         isPending={isPending}
                         isError={isError}
                         isEmpty={data.length === 0}
-                        colSpan={5}
+                        colSpan={6}
                         errorMessage={ERROR_MESSAGES.ISSUE.LOAD_FAILED}
                         emptyMessage={emptyMessage ?? ERROR_MESSAGES.ISSUE.NOT_FOUND}
                     >
@@ -96,6 +108,25 @@ export function IssuesTable({ data, isPending, isError, emptyMessage, onUpdate, 
                                     </TableCell>
 
                                     <TableCell>{issue.issueType?.name ?? '-'}</TableCell>
+
+                                    <TableCell>
+                                        {onOpenTodos ? (
+                                            <button
+                                                type="button"
+                                                className={cn(
+                                                    'text-sm font-medium text-foreground/80 hover:text-primary hover:underline',
+                                                    isArchived && 'text-muted-foreground',
+                                                )}
+                                                onClick={() => onOpenTodos(issue)}
+                                                aria-label={`Open todos for issue ${issue.title}`}
+                                                disabled={isBeingDeleted}
+                                            >
+                                                {issue.totalTodosCount ?? 0}
+                                            </button>
+                                        ) : (
+                                            <span className="text-sm text-muted-foreground">{issue.totalTodosCount ?? 0}</span>
+                                        )}
+                                    </TableCell>
 
                                     <TableCell>
                                         {issue.creator ? (

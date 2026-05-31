@@ -11,7 +11,9 @@ import { useActiveTeamId } from '@/hooks/useActiveTeamId';
 import {
     IssuesTable,
     IssueDialog,
+    IssueTodosDialog,
     useIssueDialog,
+    useIssueTodosDialog,
     useIssues,
     useDeleteIssue,
     useArchiveIssue,
@@ -32,6 +34,7 @@ export function Issues() {
         activeTeamId,
         onCreated: () => setPage(1),
     });
+    const { isIssueTodosDialogOpen, setIssueTodosDialogOpen, issue, openIssueTodos } = useIssueTodosDialog();
     const { isDeleteDialogOpen, setDeleteDialogOpen, deletingIssue, deletingIssueIds, openDelete, handleConfirmDelete } = useDeleteIssue();
 
     const { handleArchiveToggle } = useArchiveIssue();
@@ -85,6 +88,7 @@ export function Issues() {
             </PageHeaderGroup>
 
             <IssueDialog isOpen={isIssueDialogOpen} onOpenChange={setIssueDialogOpen} issue={editingIssue} onSubmit={handleSubmit} />
+            <IssueTodosDialog isOpen={isIssueTodosDialogOpen} onOpenChange={setIssueTodosDialogOpen} issue={issue} />
 
             <IssueViewFilter value={view} onChange={handleViewChange} disabled={isViewDisabled} />
 
@@ -112,6 +116,7 @@ export function Issues() {
                             onDelete={openDelete}
                             deletingIssueIds={deletingIssueIds}
                             onToggleArchive={handleArchiveToggle}
+                            onOpenTodos={openIssueTodos}
                         />
                     </div>
                     <CustomPagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
