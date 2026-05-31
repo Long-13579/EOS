@@ -22,6 +22,7 @@ import com.ces.eos.exception.BadRequestException;
 import com.ces.eos.exception.ConflictException;
 import com.ces.eos.exception.ResourceNotFoundException;
 import com.ces.eos.mapper.TodoMapper;
+import com.ces.eos.repository.IssueRepository;
 import com.ces.eos.repository.TeamRepository;
 import com.ces.eos.repository.TodoRepository;
 import com.ces.eos.repository.UserRepository;
@@ -45,6 +46,7 @@ import org.springframework.data.domain.PageRequest;
 class TodoServiceImplTest {
 
   @Mock private TodoRepository todoRepository;
+  @Mock private IssueRepository issueRepository;
   @Mock private TeamRepository teamRepository;
   @Mock private UserRepository userRepository;
   @Mock private TodoMapper todoMapper;
@@ -61,7 +63,7 @@ class TodoServiceImplTest {
       UUID assigneeId = UUID.randomUUID();
       CreateTodoRequest request =
           new CreateTodoRequest(
-              "Task", "desc", "IN_PROGRESS", Instant.now(), teamId, Set.of(assigneeId));
+              "Task", "desc", "IN_PROGRESS", Instant.now(), teamId, Set.of(assigneeId), null);
 
       Todo todo = org.mockito.Mockito.mock(Todo.class);
       Team team = Team.builder().id(teamId).build();
@@ -80,6 +82,7 @@ class TodoServiceImplTest {
               null,
               null,
               List.of(),
+              null,
               null);
 
       when(todoMapper.toEntity(request)).thenReturn(todo);
@@ -102,7 +105,7 @@ class TodoServiceImplTest {
       UUID assigneeId = UUID.randomUUID();
       CreateTodoRequest request =
           new CreateTodoRequest(
-              "Task", "desc", "IN_PROGRESS", Instant.now(), teamId, Set.of(assigneeId));
+              "Task", "desc", "IN_PROGRESS", Instant.now(), teamId, Set.of(assigneeId), null);
 
       Todo todo = org.mockito.Mockito.mock(Todo.class);
       Team team = Team.builder().id(teamId).build();
@@ -127,7 +130,7 @@ class TodoServiceImplTest {
     void addTodo_missingTeam_throwsResourceNotFoundException() {
       UUID teamId = UUID.randomUUID();
       CreateTodoRequest request =
-          new CreateTodoRequest("Task", "desc", "IN_PROGRESS", Instant.now(), teamId, Set.of());
+          new CreateTodoRequest("Task", "desc", "IN_PROGRESS", Instant.now(), teamId, Set.of(), null);
 
       Todo todo = org.mockito.Mockito.mock(Todo.class);
       when(todoMapper.toEntity(request)).thenReturn(todo);
@@ -156,7 +159,7 @@ class TodoServiceImplTest {
 
       PagedEntityResponse<TodoResponse> result =
           todoService.getTodosByFilter(
-              teamId, new PaginationRequest(1, 10), false, TodoStatus.IN_PROGRESS);
+              teamId, new PaginationRequest(1, 10), false, TodoStatus.IN_PROGRESS, null);
 
       assertThat(result.data()).isEmpty();
       verify(teamService).validateTeamExists(teamId);
@@ -181,6 +184,7 @@ class TodoServiceImplTest {
               null,
               null,
               List.of(),
+              null,
               null);
 
       when(todoRepository.findActiveTodoIdsByAssigneeId(any(), any())).thenReturn(idsPage);
@@ -210,7 +214,7 @@ class TodoServiceImplTest {
                   todoService.updateTodoById(
                       todoId,
                       new UpdateTodoRequest(
-                          "Title", "Desc", "IN_PROGRESS", Instant.now(), Set.of())))
+                          "Title", "Desc", "IN_PROGRESS", Instant.now(), Set.of(), null)))
           .isInstanceOf(ConflictException.class)
           .satisfies(
               ex ->
@@ -227,7 +231,7 @@ class TodoServiceImplTest {
               () ->
                   todoService.updateTodoById(
                       todoId,
-                      new UpdateTodoRequest("Title", "Desc", "IN_PROGRESS", Instant.now(), Set.of())))
+                      new UpdateTodoRequest("Title", "Desc", "IN_PROGRESS", Instant.now(), Set.of(), null)))
           .isInstanceOf(ResourceNotFoundException.class)
           .satisfies(
               ex ->
@@ -263,7 +267,8 @@ class TodoServiceImplTest {
                           "Desc",
                           "IN_PROGRESS",
                           Instant.now(),
-                          Set.of(validAssigneeId, missingAssigneeId))))
+                          Set.of(validAssigneeId, missingAssigneeId),
+                          null)))
           .isInstanceOf(BadRequestException.class)
           .satisfies(
               ex -> assertThat(((BadRequestException) ex).getErrorCode()).isEqualTo(ErrorCode.BAD_REQUEST));
@@ -288,6 +293,7 @@ class TodoServiceImplTest {
               null,
               null,
               List.of(),
+              null,
               null);
 
       when(todoRepository.findById(todoId)).thenReturn(Optional.of(todo));

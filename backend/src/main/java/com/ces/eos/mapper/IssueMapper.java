@@ -14,6 +14,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
     nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
     uses = {EntityMapper.class})
 public interface IssueMapper {
+  @Mapping(target = "totalTodosCount", ignore = true)
   IssueResponse toIssueResponse(Issue entity);
 
   @Mapping(target = "id", ignore = true)

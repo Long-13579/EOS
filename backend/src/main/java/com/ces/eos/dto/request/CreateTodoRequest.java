@@ -15,4 +15,5 @@ public record CreateTodoRequest(
     @NotBlank(message = "Status cannot be blank") String status,
     Instant dueDate,
     @NotNull(message = "Team ID cannot be null") UUID teamId,
-    Set<UUID> assigneeIds) {}
+    Set<UUID> assigneeIds,
+    UUID issueId) {}

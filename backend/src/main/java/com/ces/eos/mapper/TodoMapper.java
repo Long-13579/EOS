@@ -16,6 +16,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
     nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
     uses = {EntityMapper.class})
 public interface TodoMapper {
+  @Mapping(target = "issueId", source = "issue.id")
   TodoResponse toTodoResponse(Todo entity);
 
   @Mapping(target = "id", ignore = true)
@@ -26,6 +27,7 @@ public interface TodoMapper {
   @Mapping(target = "assignees", ignore = true)
   @Mapping(target = "isArchived", ignore = true)
   @Mapping(target = "team", ignore = true)
+  @Mapping(target = "issue", ignore = true)
   Todo toEntity(CreateTodoRequest dto);
 
   default TodoStatus mapStatus(String status) {

@@ -7,6 +7,7 @@ import com.ces.eos.dto.request.PaginationRequest;
 import com.ces.eos.dto.request.UpdateTodoRequest;
 import com.ces.eos.dto.response.PagedEntityResponse;
 import com.ces.eos.dto.response.TodoResponse;
+import com.ces.eos.entity.Issue;
 import com.ces.eos.entity.Team;
 import com.ces.eos.entity.Todo;
 import com.ces.eos.entity.User;
@@ -15,6 +16,7 @@ import com.ces.eos.exception.BadRequestException;
 import com.ces.eos.exception.ConflictException;
 import com.ces.eos.exception.ResourceNotFoundException;
 import com.ces.eos.mapper.TodoMapper;
+import com.ces.eos.repository.IssueRepository;
 import com.ces.eos.repository.TeamRepository;
 import com.ces.eos.repository.TodoRepository;
 import com.ces.eos.repository.UserRepository;
@@ -49,6 +51,7 @@ public class TodoServiceImpl implements TodoService {
   private final UserRepository userRepository;
   private final TodoMapper todoMapper;
   private final TeamService teamService;
+  private final IssueRepository issueRepository;
 
   @Override
   @Transactional
@@ -59,6 +62,9 @@ public class TodoServiceImpl implements TodoService {
     log.debug("action=addTodo.service.getTeamById teamId={}", request.teamId());
     todo.setTeam(getTeamById(request.teamId()));
     assignUsersToTodo(todo, request.assigneeIds());
+    if (request.issueId() != null) {
+      todo.setIssue(getIssueById(request.issueId()));
+    }
 
     log.debug("action=addTodo.repo.save teamId={}", request.teamId());
     Todo savedTodo = todoRepository.save(todo);
@@ -68,7 +74,7 @@ public class TodoServiceImpl implements TodoService {
 
   @Override
   public PagedEntityResponse<TodoResponse> getTodosByFilter(
-      UUID teamId, PaginationRequest request, boolean isArchived, TodoStatus status) {
+      UUID teamId, PaginationRequest request, boolean isArchived, TodoStatus status, UUID issueId) {
     log.info(
         "action=getTodosByFilter.start teamId={} page={} limit={}",
         teamId,
@@ -79,7 +85,14 @@ public class TodoServiceImpl implements TodoService {
 
     Pageable pageable;
     Page<UUID> todoIdsPage;
-    if (status != null) {
+    if (issueId != null) {
+      log.debug(
+          "action=getTodosByFilter.branch.withIssueId teamId={} issueId={}", teamId, issueId);
+      pageable = PageRequest.of(request.page() - 1, request.limit());
+      todoIdsPage =
+          todoRepository.findTodoIdsByTeamIdAndIssueId(
+              teamId, issueId, isArchived, pageable);
+    } else if (status != null) {
       log.debug("action=getTodosByFilter.branch.withStatus teamId={} status={}", teamId, status);
       pageable =
           PageRequest.of(
@@ -142,6 +155,11 @@ public class TodoServiceImpl implements TodoService {
     todo.setStatus(todoMapper.mapStatus(request.status()));
     todo.setDueDate(request.dueDate());
     assignUsersToTodo(todo, request.assigneeIds());
+    if (request.issueId() != null) {
+      todo.setIssue(getIssueById(request.issueId()));
+    } else {
+      todo.setIssue(null);
+    }
 
     log.debug("action=updateTodoById.repo.save todoId={}", todoId);
     Todo updatedTodo = todoRepository.save(todo);
@@ -224,6 +242,19 @@ public class TodoServiceImpl implements TodoService {
     }
 
     todo.setAssignees(assignees);
+  }
+
+  private Issue getIssueById(UUID issueId) {
+    log.debug("action=getIssueById.repo.findById issueId={}", issueId);
+    return issueRepository
+        .findById(issueId)
+        .orElseThrow(
+            () -> {
+              log.warn("action=getIssueById.validationFailed issueId={}", issueId);
+              return new ResourceNotFoundException(
+                  Map.of(
+                      "issueId", List.of(String.format("Issue not found with id: %s", issueId))));
+            });
   }
 
   private Todo getTodoById(UUID todoId) {

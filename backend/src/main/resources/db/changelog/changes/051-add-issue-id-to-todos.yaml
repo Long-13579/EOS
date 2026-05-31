@@ -1,0 +1,44 @@
+databaseChangeLog:
+  - changeSet:
+      id: 051-add-issue-id-to-todos
+      author: eos
+      preConditions:
+        - onFail: HALT
+        - tableExists:
+            tableName: todos
+        - not:
+            - columnExists:
+                tableName: todos
+                columnName: issue_id
+      changes:
+        - addColumn:
+            tableName: todos
+            columns:
+              - column:
+                  name: issue_id
+                  type: UUID
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: todos
+            baseColumnNames: issue_id
+            referencedTableName: issues
+            referencedColumnNames: id
+            constraintName: fk_todos_issue_id
+            onDelete: SET NULL
+        - createIndex:
+            tableName: todos
+            indexName: idx_todos_issue_id
+            columns:
+              - column:
+                  name: issue_id
+      rollback:
+        - dropIndex:
+            tableName: todos
+            indexName: idx_todos_issue_id
+        - dropForeignKeyConstraint:
+            baseTableName: todos
+            constraintName: fk_todos_issue_id
+        - dropColumn:
+            tableName: todos
+            columnName: issue_id

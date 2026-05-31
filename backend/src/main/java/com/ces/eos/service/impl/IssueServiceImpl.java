@@ -13,6 +13,7 @@ import com.ces.eos.exception.ConflictException;
 import com.ces.eos.exception.ResourceNotFoundException;
 import com.ces.eos.mapper.IssueMapper;
 import com.ces.eos.repository.IssueRepository;
+import com.ces.eos.repository.TodoRepository;
 import com.ces.eos.service.IssueService;
 import com.ces.eos.service.IssueTypeService;
 import com.ces.eos.service.TeamService;
@@ -40,6 +41,7 @@ public class IssueServiceImpl implements IssueService {
 
   private final IssueRepository issueRepository;
   private final IssueMapper issueMapper;
+  private final TodoRepository todoRepository;
 
   private final TeamService teamService;
   private final UserService userService;
@@ -107,6 +109,14 @@ public class IssueServiceImpl implements IssueService {
         issueRepository.findAllByIdIn(issueIdsPage.getContent()).stream()
             .collect(Collectors.toMap(Issue::getId, Function.identity()));
 
+    log.debug("action=getIssuesByTeam.repo.countTodosByIssueIds count={}",
+        issueIdsPage.getContent().size());
+    Map<UUID, Long> todoCounts =
+        todoRepository.countTodosByIssueIds(issueIdsPage.getContent()).stream()
+            .collect(Collectors.toMap(
+                row -> (UUID) row[0],
+                row -> (Long) row[1]));
+
     List<IssueResponse> issueResponses =
         issueIdsPage.getContent().stream()
             .peek(
@@ -119,7 +129,8 @@ public class IssueServiceImpl implements IssueService {
                 })
             .map(issueMap::get)
             .filter(Objects::nonNull)
-            .map(issueMapper::toIssueResponse)
+            .map(issue -> withTodoCount(issueMapper.toIssueResponse(issue),
+                todoCounts.getOrDefault(issue.getId(), 0L)))
             .toList();
 
     log.info("action=getIssuesByTeam.success teamId={} count={}", teamId, issueResponses.size());
@@ -183,6 +194,14 @@ public class IssueServiceImpl implements IssueService {
     Issue updatedIssue = issueRepository.save(issue);
     log.info("action=updateIssueArchiveStatus.success issueId={}", updatedIssue.getId());
     return issueMapper.toIssueResponse(updatedIssue);
+  }
+
+  private IssueResponse withTodoCount(IssueResponse response, Long count) {
+    return new IssueResponse(
+        response.id(), response.title(), response.description(),
+        response.issueType(), response.isArchived(), response.createdAt(),
+        response.updatedAt(), response.createdBy(), response.updatedBy(),
+        response.creator(), response.team(), count);
   }
 
   private Issue getIssueById(UUID issueId) {

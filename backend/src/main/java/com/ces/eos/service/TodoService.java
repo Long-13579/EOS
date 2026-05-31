@@ -12,7 +12,7 @@ public interface TodoService {
   TodoResponse addTodo(CreateTodoRequest request);
 
   PagedEntityResponse<TodoResponse> getTodosByFilter(
-      UUID teamId, PaginationRequest request, boolean isArchived, TodoStatus status);
+      UUID teamId, PaginationRequest request, boolean isArchived, TodoStatus status, UUID issueId);
 
   PagedEntityResponse<TodoResponse> getActiveTodosByUserAcrossTeams(
       UUID userId, PaginationRequest request);

@@ -57,6 +57,10 @@ public class Todo {
   @JoinColumn(name = "team_id", nullable = false)
   Team team;
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "issue_id")
+  Issue issue;
+
   @CreatedDate
   @Column(name = "created_at", updatable = false)
   Instant createdAt;

@@ -24,6 +24,7 @@ import com.ces.eos.exception.ConflictException;
 import com.ces.eos.exception.ResourceNotFoundException;
 import com.ces.eos.mapper.IssueMapper;
 import com.ces.eos.repository.IssueRepository;
+import com.ces.eos.repository.TodoRepository;
 import com.ces.eos.service.IssueTypeService;
 import com.ces.eos.service.TeamService;
 import com.ces.eos.service.UserService;
@@ -46,6 +47,7 @@ class IssueServiceImplTest {
 
   @Mock private IssueRepository issueRepository;
   @Mock private IssueMapper issueMapper;
+  @Mock private TodoRepository todoRepository;
   @Mock private TeamService teamService;
   @Mock private UserService userService;
   @Mock private IssueTypeService issueTypeService;
@@ -67,7 +69,7 @@ class IssueServiceImplTest {
       Issue saved = org.mockito.Mockito.mock(Issue.class);
       IssueResponse response =
           new IssueResponse(
-              UUID.randomUUID(), "Bug", "desc", null, false, null, null, null, null, null, null);
+              UUID.randomUUID(), "Bug", "desc", null, false, null, null, null, null, null, null, null);
 
       when(issueMapper.toEntity(request)).thenReturn(issue);
       when(issueTypeService.getIssueTypeById(issueTypeId)).thenReturn(issueType);
@@ -96,7 +98,7 @@ class IssueServiceImplTest {
       Issue saved = org.mockito.Mockito.mock(Issue.class);
       IssueResponse response =
           new IssueResponse(
-              UUID.randomUUID(), "Bug", "desc", null, false, null, null, null, null, null, null);
+              UUID.randomUUID(), "Bug", "desc", null, false, null, null, null, null, null, null, null);
 
       when(issueMapper.toEntity(request)).thenReturn(issue);
       when(userService.getUserById(creatorId)).thenReturn(creator);
@@ -177,7 +179,9 @@ class IssueServiceImplTest {
       Issue issue = org.mockito.Mockito.mock(Issue.class);
       IssueResponse response =
           new IssueResponse(
-              issueId, "Bug", "desc", null, false, null, null, null, null, null, null);
+              issueId, "Bug", "desc", null, false, null, null, null, null, null, null, 0L);
+
+      when(todoRepository.countTodosByIssueIds(List.of(issueId))).thenReturn(List.of());
 
       when(issueRepository.findIssueIdsByTeamIdAndIssueTypeIsNull(
               eq(teamId), eq(false), any(Pageable.class)))
@@ -206,7 +210,9 @@ class IssueServiceImplTest {
       Issue issue = org.mockito.Mockito.mock(Issue.class);
       IssueResponse response =
           new IssueResponse(
-              issueId, "Bug", "desc", null, false, null, null, null, null, null, null);
+              issueId, "Bug", "desc", null, false, null, null, null, null, null, null, 0L);
+
+      when(todoRepository.countTodosByIssueIds(List.of(issueId))).thenReturn(List.of());
 
       when(issueRepository.findIssueIdsByTeamIdAndIssueTypeId(
               eq(teamId), eq(issueTypeId), eq(false), any(Pageable.class)))
@@ -254,7 +260,7 @@ class IssueServiceImplTest {
       Issue issue = org.mockito.Mockito.mock(Issue.class);
       Issue saved = org.mockito.Mockito.mock(Issue.class);
       IssueResponse response =
-          new IssueResponse(issueId, "T", "D", null, false, null, null, null, null, null, null);
+          new IssueResponse(issueId, "T", "D", null, false, null, null, null, null, null, null, null);
 
       when(issueRepository.findById(issueId)).thenReturn(Optional.of(issue));
       when(issue.getIsArchived()).thenReturn(false);
@@ -293,7 +299,7 @@ class IssueServiceImplTest {
       UUID issueId = UUID.randomUUID();
       Issue issue = org.mockito.Mockito.mock(Issue.class);
       IssueResponse response =
-          new IssueResponse(issueId, "T", "D", null, false, null, null, null, null, null, null);
+          new IssueResponse(issueId, "T", "D", null, false, null, null, null, null, null, null, null);
       when(issueRepository.findById(issueId)).thenReturn(Optional.of(issue));
       when(issue.getIsArchived()).thenReturn(false);
       when(issueMapper.toIssueResponse(issue)).thenReturn(response);

@@ -17,4 +17,5 @@ public record IssueResponse(
     UUID createdBy,
     UUID updatedBy,
     UserBaseResponse creator,
-    TeamBaseResponse team) {}
+    TeamBaseResponse team,
+    Long totalTodosCount) {}

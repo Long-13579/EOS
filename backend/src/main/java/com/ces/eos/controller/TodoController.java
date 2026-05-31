@@ -39,9 +39,10 @@ public class TodoController {
       @Valid @ModelAttribute PaginationRequest request,
       @RequestParam UUID teamId,
       @RequestParam(required = false) TodoStatus status,
-      @RequestParam(defaultValue = "false") Boolean isArchived) {
+      @RequestParam(defaultValue = "false") Boolean isArchived,
+      @RequestParam(required = false) UUID issueId) {
     PagedEntityResponse<TodoResponse> response =
-        todoService.getTodosByFilter(teamId, request, isArchived, status);
+        todoService.getTodosByFilter(teamId, request, isArchived, status, issueId);
     return ResponseEntity.ok(response);
   }
 

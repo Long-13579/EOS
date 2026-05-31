@@ -20,4 +20,5 @@ public record TodoResponse(
     UUID createdBy,
     UUID updatedBy,
     List<UserBaseResponse> assignees,
-    TeamBaseResponse team) {}
+    TeamBaseResponse team,
+    UUID issueId) {}

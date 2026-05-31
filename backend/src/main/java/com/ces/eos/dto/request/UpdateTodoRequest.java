@@ -13,4 +13,5 @@ public record UpdateTodoRequest(
     String description,
     @NotBlank(message = "Status cannot be blank") String status,
     Instant dueDate,
-    Set<UUID> assigneeIds) {}
+    Set<UUID> assigneeIds,
+    UUID issueId) {}

@@ -38,6 +38,16 @@ public interface TodoRepository extends JpaRepository<Todo, UUID> {
 
   @Query(
       value =
+          "SELECT t.id FROM Todo t "
+              + "WHERE t.team.id = :teamId AND t.issue.id = :issueId AND t.isArchived = :isArchived")
+  Page<UUID> findTodoIdsByTeamIdAndIssueId(
+      @Param("teamId") UUID teamId,
+      @Param("issueId") UUID issueId,
+      @Param("isArchived") boolean isArchived,
+      Pageable pageable);
+
+  @Query(
+      value =
           "SELECT t.id FROM Todo t JOIN t.assignees assignee JOIN t.team.users teamUser"
               + " WHERE assignee.id = :assigneeId AND teamUser.id = :assigneeId AND t.isArchived = false"
               + " ORDER BY CASE WHEN t.status ="
@@ -50,8 +60,15 @@ public interface TodoRepository extends JpaRepository<Todo, UUID> {
           "SELECT DISTINCT t FROM Todo t "
               + "LEFT JOIN FETCH t.team "
               + "LEFT JOIN FETCH t.assignees "
+              + "LEFT JOIN FETCH t.issue "
               + "WHERE t.id IN :ids")
   List<Todo> findAllByIdIn(@Param("ids") List<UUID> ids);
 
   boolean existsByIdAndTeam_Users_Id(UUID todoId, UUID userId);
+
+  @Query(
+      value =
+          "SELECT t.issue.id, COUNT(t) FROM Todo t "
+              + "WHERE t.issue.id IN :issueIds GROUP BY t.issue.id")
+  List<Object[]> countTodosByIssueIds(@Param("issueIds") List<UUID> issueIds);
 }
