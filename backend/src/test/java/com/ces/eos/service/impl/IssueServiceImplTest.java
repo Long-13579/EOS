@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -26,11 +28,13 @@ import com.ces.eos.mapper.IssueMapper;
 import com.ces.eos.repository.IssueRepository;
 import com.ces.eos.repository.TodoRepository;
 import com.ces.eos.service.IssueTypeService;
+import com.ces.eos.service.L10MeetingChangeLogService;
 import com.ces.eos.service.TeamService;
 import com.ces.eos.service.UserService;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,6 +45,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @ExtendWith(MockitoExtension.class)
 class IssueServiceImplTest {
@@ -51,8 +57,15 @@ class IssueServiceImplTest {
   @Mock private TeamService teamService;
   @Mock private UserService userService;
   @Mock private IssueTypeService issueTypeService;
+  @Mock private L10MeetingChangeLogService l10MeetingChangeLogService;
+  @Mock private ObjectMapper objectMapper;
 
   @InjectMocks private IssueServiceImpl issueService;
+
+  @BeforeEach
+  void setUp() {
+    lenient().when(objectMapper.valueToTree(any())).thenReturn(mock(tools.jackson.databind.JsonNode.class));
+  }
 
   @Nested
   class AddIssue {
@@ -257,15 +270,17 @@ class IssueServiceImplTest {
     @Test
     void updateIssue_nullIssueTypeId_clearsIssueTypeAndSaves() {
       UUID issueId = UUID.randomUUID();
+      Team team = Team.builder().id(UUID.randomUUID()).build();
       Issue issue = org.mockito.Mockito.mock(Issue.class);
       Issue saved = org.mockito.Mockito.mock(Issue.class);
       IssueResponse response =
           new IssueResponse(issueId, "T", "D", null, false, null, null, null, null, null, null, null);
 
+      when(issue.getTeam()).thenReturn(team);
       when(issueRepository.findById(issueId)).thenReturn(Optional.of(issue));
       when(issue.getIsArchived()).thenReturn(false);
       when(issueRepository.save(issue)).thenReturn(saved);
-      when(issueMapper.toIssueResponse(saved)).thenReturn(response);
+      when(issueMapper.toIssueResponse(any())).thenReturn(response);
 
       IssueResponse result =
           issueService.updateIssue(issueId, new UpdateIssueRequest("T", "D", null));
@@ -326,7 +341,9 @@ class IssueServiceImplTest {
     @Test
     void deleteIssueById_existingIssue_deletesSuccessfully() {
       UUID issueId = UUID.randomUUID();
+      Team team = Team.builder().id(UUID.randomUUID()).build();
       Issue issue = org.mockito.Mockito.mock(Issue.class);
+      when(issue.getTeam()).thenReturn(team);
       when(issueRepository.findById(issueId)).thenReturn(Optional.of(issue));
 
       issueService.deleteIssueById(issueId);

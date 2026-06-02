@@ -3,6 +3,8 @@ package com.ces.eos.service.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -10,6 +12,7 @@ import static org.mockito.Mockito.when;
 import com.ces.eos.dto.response.MetricResponse;
 import com.ces.eos.entity.Metric;
 import com.ces.eos.entity.MetricValue;
+import com.ces.eos.entity.Team;
 import com.ces.eos.entity.User;
 import com.ces.eos.entity.Week;
 import com.ces.eos.enums.ErrorCode;
@@ -18,8 +21,10 @@ import com.ces.eos.exception.BadRequestException;
 import com.ces.eos.exception.ResourceNotFoundException;
 import com.ces.eos.exception.ServerInternalException;
 import com.ces.eos.mapper.MetricMapper;
+import com.ces.eos.mapper.MetricValueMapper;
 import com.ces.eos.repository.MetricRepository;
 import com.ces.eos.repository.MetricValueRepository;
+import com.ces.eos.service.L10MeetingChangeLogService;
 import com.ces.eos.service.UserService;
 import com.ces.eos.service.WeekService;
 import java.time.LocalDate;
@@ -27,12 +32,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @ExtendWith(MockitoExtension.class)
 class MetricValueServiceImplTest {
@@ -42,8 +50,16 @@ class MetricValueServiceImplTest {
   @Mock private UserService userService;
   @Mock private WeekService weekService;
   @Mock private MetricRepository metricRepository;
+  @Mock private MetricValueMapper metricValueMapper;
+  @Mock private L10MeetingChangeLogService l10MeetingChangeLogService;
+  @Mock private ObjectMapper objectMapper;
 
   @InjectMocks private MetricValueServiceImpl metricValueService;
+
+  @BeforeEach
+  void setUp() {
+    lenient().when(objectMapper.valueToTree(any())).thenReturn(mock(tools.jackson.databind.JsonNode.class));
+  }
 
   @Nested
   class UpdateMetricValue {
@@ -55,6 +71,7 @@ class MetricValueServiceImplTest {
       UUID currentWeekId = UUID.randomUUID();
       UUID previousWeekId = UUID.randomUUID();
 
+      Team team = Team.builder().id(UUID.randomUUID()).build();
       Metric metric = org.mockito.Mockito.mock(Metric.class);
       Week currentWeek = org.mockito.Mockito.mock(Week.class);
       Week previousWeek = org.mockito.Mockito.mock(Week.class);
@@ -79,6 +96,7 @@ class MetricValueServiceImplTest {
 
       when(metricRepository.findByIdWithTeam(metricId)).thenReturn(Optional.of(metric));
       when(metric.getUnit()).thenReturn(MetricUnit.NUMBER);
+      when(metric.getTeam()).thenReturn(team);
       when(weekService.getOrCreateCurrentWeek()).thenReturn(currentWeek);
       when(currentWeek.getId()).thenReturn(currentWeekId);
       when(metricValueRepository.findByMetricIdAndWeekId(metricId, currentWeekId))
@@ -92,6 +110,7 @@ class MetricValueServiceImplTest {
       when(previousWeek.getId()).thenReturn(previousWeekId);
       when(metricValueRepository.findByMetricIdAndWeekId(metricId, previousWeekId))
           .thenReturn(Optional.of(previousValue));
+      when(metricValueMapper.toMetricValueResponse(any())).thenReturn(mock(com.ces.eos.dto.response.MetricValueResponse.class));
       when(metricMapper.toMetricResponse(metric, currentValue, previousValue)).thenReturn(response);
 
       MetricResponse result = metricValueService.updateMetricValue(metricId, "12", updaterId);

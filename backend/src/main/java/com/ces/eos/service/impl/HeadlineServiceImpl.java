@@ -13,8 +13,10 @@ import com.ces.eos.exception.ResourceNotFoundException;
 import com.ces.eos.mapper.HeadlineMapper;
 import com.ces.eos.repository.HeadlineRepository;
 import com.ces.eos.service.HeadlineService;
+import com.ces.eos.service.L10MeetingChangeLogService;
 import com.ces.eos.service.TeamService;
 import com.ces.eos.service.UserService;
+import tools.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -40,6 +42,8 @@ public class HeadlineServiceImpl implements HeadlineService {
   private final HeadlineMapper headlineMapper;
   private final TeamService teamService;
   private final UserService userService;
+  private final L10MeetingChangeLogService l10MeetingChangeLogService;
+  private final ObjectMapper objectMapper;
 
   @Override
   @Transactional
@@ -58,6 +62,16 @@ public class HeadlineServiceImpl implements HeadlineService {
 
     log.debug("action=createHeadline.repo.save teamId={}", request.teamId());
     Headline savedHeadline = headlineRepository.save(headline);
+    
+    // Log the new headline creation
+    log.debug("action=createHeadline.logChange headlineId={}", savedHeadline.getId());
+    l10MeetingChangeLogService.logChange(
+        request.teamId(),
+        "HEADLINE",
+        savedHeadline.getId(),
+        null,
+        objectMapper.valueToTree(headlineMapper.toHeadlineResponse(savedHeadline)).toString());
+    
     log.info("action=createHeadline.success headlineId={}", savedHeadline.getId());
     return headlineMapper.toHeadlineResponse(savedHeadline);
   }
@@ -128,6 +142,9 @@ public class HeadlineServiceImpl implements HeadlineService {
               List.of("Cannot update an archived headline. Please unarchive it first.")));
     }
 
+    // Capture before snapshot
+    var beforeSnapshot = objectMapper.valueToTree(headlineMapper.toHeadlineResponse(headline)).toString();
+
     headline.setTitle(request.title());
 
     log.debug("action=updateHeadline.service.getUserById updaterId={}", updaterId);
@@ -136,6 +153,16 @@ public class HeadlineServiceImpl implements HeadlineService {
 
     log.debug("action=updateHeadline.repo.save headlineId={}", headlineId);
     Headline savedHeadline = headlineRepository.save(headline);
+    
+    // Log the headline update
+    log.debug("action=updateHeadline.logChange headlineId={}", savedHeadline.getId());
+    l10MeetingChangeLogService.logChange(
+        headline.getTeam().getId(),
+        "HEADLINE",
+        savedHeadline.getId(),
+        beforeSnapshot,
+        objectMapper.valueToTree(headlineMapper.toHeadlineResponse(savedHeadline)).toString());
+    
     log.info("action=updateHeadline.success headlineId={}", savedHeadline.getId());
     return headlineMapper.toHeadlineResponse(savedHeadline);
   }
@@ -155,9 +182,22 @@ public class HeadlineServiceImpl implements HeadlineService {
       return headlineMapper.toHeadlineResponse(headline);
     }
 
+    // Capture before snapshot
+    var beforeSnapshot = objectMapper.valueToTree(headlineMapper.toHeadlineResponse(headline)).toString();
+
     headline.setIsArchived(isArchived);
     log.debug("action=updateHeadlineArchiveStatus.repo.save headlineId={}", headlineId);
     Headline updatedHeadline = headlineRepository.save(headline);
+    
+    // Log the archive status change
+    log.debug("action=updateHeadlineArchiveStatus.logChange headlineId={}", updatedHeadline.getId());
+    l10MeetingChangeLogService.logChange(
+        headline.getTeam().getId(),
+        "HEADLINE",
+        updatedHeadline.getId(),
+        beforeSnapshot,
+        objectMapper.valueToTree(headlineMapper.toHeadlineResponse(updatedHeadline)).toString());
+    
     log.info("action=updateHeadlineArchiveStatus.success headlineId={}", updatedHeadline.getId());
     return headlineMapper.toHeadlineResponse(updatedHeadline);
   }
@@ -167,6 +207,16 @@ public class HeadlineServiceImpl implements HeadlineService {
   public void deleteHeadline(UUID headlineId) {
     log.info("action=deleteHeadline.start headlineId={}", headlineId);
     Headline headline = getHeadlineById(headlineId);
+    
+    // Log the headline deletion
+    log.debug("action=deleteHeadline.logChange headlineId={}", headline.getId());
+    l10MeetingChangeLogService.logChange(
+        headline.getTeam().getId(),
+        "HEADLINE",
+        headline.getId(),
+        objectMapper.valueToTree(headlineMapper.toHeadlineResponse(headline)).toString(),
+        null);
+    
     log.debug("action=deleteHeadline.repo.delete headlineId={}", headlineId);
     headlineRepository.delete(headline);
     log.info("action=deleteHeadline.success headlineId={}", headlineId);

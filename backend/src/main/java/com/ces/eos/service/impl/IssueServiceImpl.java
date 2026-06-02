@@ -11,11 +11,13 @@ import com.ces.eos.entity.Issue;
 import com.ces.eos.exception.BadRequestException;
 import com.ces.eos.exception.ConflictException;
 import com.ces.eos.exception.ResourceNotFoundException;
+import tools.jackson.databind.ObjectMapper;
 import com.ces.eos.mapper.IssueMapper;
 import com.ces.eos.repository.IssueRepository;
 import com.ces.eos.repository.TodoRepository;
 import com.ces.eos.service.IssueService;
 import com.ces.eos.service.IssueTypeService;
+import com.ces.eos.service.L10MeetingChangeLogService;
 import com.ces.eos.service.TeamService;
 import com.ces.eos.service.UserService;
 import java.util.List;
@@ -46,6 +48,8 @@ public class IssueServiceImpl implements IssueService {
   private final TeamService teamService;
   private final UserService userService;
   private final IssueTypeService issueTypeService;
+  private final L10MeetingChangeLogService l10MeetingChangeLogService;
+  private final ObjectMapper objectMapper;
 
   @Override
   @Transactional
@@ -68,6 +72,16 @@ public class IssueServiceImpl implements IssueService {
 
     log.debug("action=addIssue.repo.save teamId={}", request.teamId());
     Issue savedIssue = issueRepository.save(issue);
+    
+    // Log the new issue creation
+    log.debug("action=addIssue.logChange issueId={}", savedIssue.getId());
+    l10MeetingChangeLogService.logChange(
+        request.teamId(),
+        "ISSUE",
+        savedIssue.getId(),
+        null,
+        objectMapper.valueToTree(issueMapper.toIssueResponse(savedIssue)).toString());
+    
     log.info("action=addIssue.success issueId={}", savedIssue.getId());
     return issueMapper.toIssueResponse(savedIssue);
   }
@@ -143,6 +157,16 @@ public class IssueServiceImpl implements IssueService {
   public void deleteIssueById(UUID issueId) {
     log.info("action=deleteIssueById.start issueId={}", issueId);
     Issue issue = getIssueById(issueId);
+    
+    // Log the issue deletion
+    log.debug("action=deleteIssueById.logChange issueId={}", issue.getId());
+    l10MeetingChangeLogService.logChange(
+        issue.getTeam().getId(),
+        "ISSUE",
+        issue.getId(),
+        objectMapper.valueToTree(issueMapper.toIssueResponse(issue)).toString(),
+        null);
+    
     log.debug("action=deleteIssueById.repo.delete issueId={}", issueId);
     issueRepository.delete(issue);
     log.info("action=deleteIssueById.success issueId={}", issueId);
@@ -161,6 +185,9 @@ public class IssueServiceImpl implements IssueService {
               "issueId", List.of("Cannot update an archived issue. Please unarchive it first.")));
     }
 
+    // Capture before snapshot
+    var beforeSnapshot = objectMapper.valueToTree(issueMapper.toIssueResponse(issue)).toString();
+
     issue.setTitle(request.title());
     issue.setDescription(request.description());
 
@@ -174,6 +201,16 @@ public class IssueServiceImpl implements IssueService {
 
     log.debug("action=updateIssue.repo.save issueId={}", issueId);
     Issue updatedIssue = issueRepository.save(issue);
+    
+    // Log the issue update
+    log.debug("action=updateIssue.logChange issueId={}", updatedIssue.getId());
+    l10MeetingChangeLogService.logChange(
+        issue.getTeam().getId(),
+        "ISSUE",
+        updatedIssue.getId(),
+        beforeSnapshot,
+        objectMapper.valueToTree(issueMapper.toIssueResponse(updatedIssue)).toString());
+    
     log.info("action=updateIssue.success issueId={}", updatedIssue.getId());
     return issueMapper.toIssueResponse(updatedIssue);
   }
@@ -189,9 +226,22 @@ public class IssueServiceImpl implements IssueService {
       return issueMapper.toIssueResponse(issue);
     }
 
+    // Capture before snapshot
+    var beforeSnapshot = objectMapper.valueToTree(issueMapper.toIssueResponse(issue)).toString();
+
     issue.setIsArchived(isArchived);
     log.debug("action=updateIssueArchiveStatus.repo.save issueId={}", issueId);
     Issue updatedIssue = issueRepository.save(issue);
+    
+    // Log the archive status change
+    log.debug("action=updateIssueArchiveStatus.logChange issueId={}", updatedIssue.getId());
+    l10MeetingChangeLogService.logChange(
+        issue.getTeam().getId(),
+        "ISSUE",
+        updatedIssue.getId(),
+        beforeSnapshot,
+        objectMapper.valueToTree(issueMapper.toIssueResponse(updatedIssue)).toString());
+    
     log.info("action=updateIssueArchiveStatus.success issueId={}", updatedIssue.getId());
     return issueMapper.toIssueResponse(updatedIssue);
   }

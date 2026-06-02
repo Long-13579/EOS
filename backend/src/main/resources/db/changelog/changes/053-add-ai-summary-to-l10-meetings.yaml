@@ -1,0 +1,18 @@
+databaseChangeLog:
+  - changeSet:
+      id: 053-add-ai-summary-to-l10-meetings
+      author: eos-team
+      changes:
+        - addColumn:
+            tableName: l10_meetings
+            columns:
+              - column:
+                  name: ai_summary
+                  type: TEXT
+                  constraints:
+                    nullable: true
+
+      rollback:
+        - dropColumn:
+            tableName: l10_meetings
+            columnName: ai_summary

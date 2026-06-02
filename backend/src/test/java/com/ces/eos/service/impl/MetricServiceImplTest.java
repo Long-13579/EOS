@@ -3,6 +3,8 @@ package com.ces.eos.service.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -28,18 +30,22 @@ import com.ces.eos.service.MetricValueService;
 import com.ces.eos.service.TeamService;
 import com.ces.eos.service.UserService;
 import com.ces.eos.service.WeekService;
+import com.ces.eos.service.L10MeetingChangeLogService;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @ExtendWith(MockitoExtension.class)
 class MetricServiceImplTest {
@@ -51,8 +57,15 @@ class MetricServiceImplTest {
   @Mock private WeekService weekService;
   @Mock private UserService userService;
   @Mock private TeamService teamService;
+  @Mock private L10MeetingChangeLogService l10MeetingChangeLogService;
+  @Mock private ObjectMapper objectMapper;
 
   @InjectMocks private MetricServiceImpl metricService;
+
+  @BeforeEach
+  void setUp() {
+    lenient().when(objectMapper.valueToTree(any())).thenReturn(mock(tools.jackson.databind.JsonNode.class));
+  }
 
   @Nested
   class AddMetric {
@@ -312,7 +325,7 @@ class MetricServiceImplTest {
       when(userService.getUserByIdAndTeamId(ownerId, teamId)).thenReturn(owner);
       when(userService.getUserById(updaterId)).thenReturn(updater);
       when(metricRepository.save(metric)).thenReturn(updatedMetric);
-      when(metricMapper.toMetricResponse(updatedMetric, null, null)).thenReturn(response);
+      when(metricMapper.toMetricResponse(any(), any(), any())).thenReturn(response);
 
       MetricResponse result = metricService.updateMetric(metricId, request, updaterId);
 

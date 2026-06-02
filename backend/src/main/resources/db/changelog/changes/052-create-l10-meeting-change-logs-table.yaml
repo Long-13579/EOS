@@ -1,0 +1,108 @@
+databaseChangeLog:
+  - changeSet:
+      id: 052-create-l10-meeting-change-logs-table
+      author: eos-team
+      changes:
+        - createTable:
+            tableName: l10_meeting_change_logs
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: meeting_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: entity_type
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: entity_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: before_snapshot
+                  type: jsonb
+                  constraints:
+                    nullable: true
+              - column:
+                  name: after_snapshot
+                  type: jsonb
+                  constraints:
+                    nullable: true
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: true
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: true
+              - column:
+                  name: created_by
+                  type: UUID
+                  constraints:
+                    nullable: true
+              - column:
+                  name: updated_by
+                  type: UUID
+                  constraints:
+                    nullable: true
+
+        - addForeignKeyConstraint:
+            baseTableName: l10_meeting_change_logs
+            baseColumnNames: meeting_id
+            referencedTableName: l10_meetings
+            referencedColumnNames: id
+            constraintName: fk_l10_meeting_change_logs_meeting_id
+            onDelete: CASCADE
+            onUpdate: CASCADE
+
+        - addForeignKeyConstraint:
+            baseTableName: l10_meeting_change_logs
+            baseColumnNames: created_by
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_l10_meeting_change_logs_created_by
+            onDelete: SET NULL
+            onUpdate: CASCADE
+
+        - addForeignKeyConstraint:
+            baseTableName: l10_meeting_change_logs
+            baseColumnNames: updated_by
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_l10_meeting_change_logs_updated_by
+            onDelete: SET NULL
+            onUpdate: CASCADE
+
+        - createIndex:
+            indexName: idx_l10_meeting_change_logs_meeting_id
+            tableName: l10_meeting_change_logs
+            columns:
+              - column:
+                  name: meeting_id
+
+        - createIndex:
+            indexName: idx_l10_meeting_change_logs_meeting_entity
+            tableName: l10_meeting_change_logs
+            columns:
+              - column:
+                  name: meeting_id
+              - column:
+                  name: entity_type
+              - column:
+                  name: entity_id
+
+      rollback:
+        - dropTable:
+            tableName: l10_meeting_change_logs

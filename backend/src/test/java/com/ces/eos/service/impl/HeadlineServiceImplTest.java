@@ -3,6 +3,8 @@ package com.ces.eos.service.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -20,11 +22,13 @@ import com.ces.eos.exception.ConflictException;
 import com.ces.eos.exception.ResourceNotFoundException;
 import com.ces.eos.mapper.HeadlineMapper;
 import com.ces.eos.repository.HeadlineRepository;
+import com.ces.eos.service.L10MeetingChangeLogService;
 import com.ces.eos.service.TeamService;
 import com.ces.eos.service.UserService;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,6 +38,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @ExtendWith(MockitoExtension.class)
 class HeadlineServiceImplTest {
@@ -42,8 +48,15 @@ class HeadlineServiceImplTest {
   @Mock private HeadlineMapper headlineMapper;
   @Mock private TeamService teamService;
   @Mock private UserService userService;
+  @Mock private L10MeetingChangeLogService l10MeetingChangeLogService;
+  @Mock private ObjectMapper objectMapper;
 
   @InjectMocks private HeadlineServiceImpl headlineService;
+
+  @BeforeEach
+  void setUp() {
+    lenient().when(objectMapper.valueToTree(any())).thenReturn(mock(tools.jackson.databind.JsonNode.class));
+  }
 
   @Nested
   class CreateHeadline {
@@ -173,7 +186,8 @@ class HeadlineServiceImplTest {
     @Test
     void deleteHeadline_existingHeadline_deletesEntity() {
       UUID headlineId = UUID.randomUUID();
-      Headline headline = Headline.builder().id(headlineId).build();
+      Team team = Team.builder().id(UUID.randomUUID()).build();
+      Headline headline = Headline.builder().id(headlineId).team(team).build();
       when(headlineRepository.findById(headlineId)).thenReturn(Optional.of(headline));
 
       headlineService.deleteHeadline(headlineId);

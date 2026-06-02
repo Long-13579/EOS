@@ -25,8 +25,10 @@ import com.ces.eos.service.MetricValueService;
 import com.ces.eos.service.TeamService;
 import com.ces.eos.service.UserService;
 import com.ces.eos.service.WeekService;
+import com.ces.eos.service.L10MeetingChangeLogService;
 import com.ces.eos.util.EnumParserUtil;
 import com.ces.eos.util.MetricUtil;
+import tools.jackson.databind.ObjectMapper;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -51,6 +53,8 @@ public class MetricServiceImpl implements MetricService {
   private final WeekService weekService;
   private final UserService userService;
   private final TeamService teamService;
+  private final L10MeetingChangeLogService l10MeetingChangeLogService;
+  private final ObjectMapper objectMapper;
 
   @Override
   @Transactional
@@ -77,6 +81,15 @@ public class MetricServiceImpl implements MetricService {
     log.debug("action=addMetric.repo.save teamId={}", request.teamId());
     Metric savedMetric = metricRepository.save(metric);
     MetricValue defaultMetricValue = addDefaultMetricValueForCurrentWeek(savedMetric);
+
+    // Log the new metric creation
+    log.debug("action=addMetric.logChange metricId={}", savedMetric.getId());
+    l10MeetingChangeLogService.logChange(
+        request.teamId(),
+        "METRIC",
+        savedMetric.getId(),
+        null,
+        objectMapper.valueToTree(metricMapper.toMetricResponse(savedMetric, defaultMetricValue, null)).toString());
 
     log.info("action=addMetric.success metricId={}", savedMetric.getId());
     return metricMapper.toMetricResponse(savedMetric, defaultMetricValue, null);
@@ -265,6 +278,9 @@ public class MetricServiceImpl implements MetricService {
     log.debug("action=updateMetric.service.getUserById updaterId={}", updaterId);
     User updater = userService.getUserById(updaterId);
 
+    // Capture before snapshot
+    var beforeSnapshot = objectMapper.valueToTree(metricMapper.toMetricResponse(metric, null, null)).toString();
+
     metric.setName(request.name());
     metric.setGoal(request.goal());
     metric.setOperator(newOperator);
@@ -273,6 +289,15 @@ public class MetricServiceImpl implements MetricService {
 
     log.debug("action=updateMetric.repo.save metricId={}", metricId);
     Metric updatedMetric = metricRepository.save(metric);
+
+    // Log the metric update
+    log.debug("action=updateMetric.logChange metricId={}", updatedMetric.getId());
+    l10MeetingChangeLogService.logChange(
+        teamId,
+        "METRIC",
+        updatedMetric.getId(),
+        beforeSnapshot,
+        objectMapper.valueToTree(metricMapper.toMetricResponse(updatedMetric, null, null)).toString());
 
     log.info("action=updateMetric.success metricId={}", updatedMetric.getId());
 

@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -27,11 +29,13 @@ import com.ces.eos.repository.TeamRepository;
 import com.ces.eos.repository.TodoRepository;
 import com.ces.eos.repository.UserRepository;
 import com.ces.eos.service.TeamService;
+import com.ces.eos.service.L10MeetingChangeLogService;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,6 +45,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @ExtendWith(MockitoExtension.class)
 class TodoServiceImplTest {
@@ -51,8 +57,15 @@ class TodoServiceImplTest {
   @Mock private UserRepository userRepository;
   @Mock private TodoMapper todoMapper;
   @Mock private TeamService teamService;
+  @Mock private L10MeetingChangeLogService l10MeetingChangeLogService;
+  @Mock private ObjectMapper objectMapper;
 
   @InjectMocks private TodoServiceImpl todoService;
+
+  @BeforeEach
+  void setUp() {
+    lenient().when(objectMapper.valueToTree(any())).thenReturn(mock(tools.jackson.databind.JsonNode.class));
+  }
 
   @Nested
   class AddTodo {

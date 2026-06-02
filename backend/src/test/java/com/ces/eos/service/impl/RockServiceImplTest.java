@@ -3,6 +3,8 @@ package com.ces.eos.service.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -29,17 +31,21 @@ import com.ces.eos.service.QuarterService;
 import com.ces.eos.service.TeamService;
 import com.ces.eos.service.UserService;
 import com.ces.eos.service.YearService;
+import com.ces.eos.service.L10MeetingChangeLogService;
 import java.time.Instant;
 import java.time.MonthDay;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @ExtendWith(MockitoExtension.class)
 class RockServiceImplTest {
@@ -50,8 +56,15 @@ class RockServiceImplTest {
   @Mock private QuarterService quarterService;
   @Mock private TeamService teamService;
   @Mock private UserService userService;
+  @Mock private L10MeetingChangeLogService l10MeetingChangeLogService;
+  @Mock private ObjectMapper objectMapper;
 
   @InjectMocks private RockServiceImpl rockService;
+
+  @BeforeEach
+  void setUp() {
+    lenient().when(objectMapper.valueToTree(any())).thenReturn(mock(tools.jackson.databind.JsonNode.class));
+  }
 
   @Nested
   class GetRocksByTeam {

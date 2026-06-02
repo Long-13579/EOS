@@ -20,8 +20,10 @@ import com.ces.eos.repository.IssueRepository;
 import com.ces.eos.repository.TeamRepository;
 import com.ces.eos.repository.TodoRepository;
 import com.ces.eos.repository.UserRepository;
+import com.ces.eos.service.L10MeetingChangeLogService;
 import com.ces.eos.service.TeamService;
 import com.ces.eos.service.TodoService;
+import tools.jackson.databind.ObjectMapper;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -52,6 +54,8 @@ public class TodoServiceImpl implements TodoService {
   private final TodoMapper todoMapper;
   private final TeamService teamService;
   private final IssueRepository issueRepository;
+  private final L10MeetingChangeLogService l10MeetingChangeLogService;
+  private final ObjectMapper objectMapper;
 
   @Override
   @Transactional
@@ -68,6 +72,16 @@ public class TodoServiceImpl implements TodoService {
 
     log.debug("action=addTodo.repo.save teamId={}", request.teamId());
     Todo savedTodo = todoRepository.save(todo);
+    
+    // Log the new todo creation
+    log.debug("action=addTodo.logChange todoId={}", savedTodo.getId());
+    l10MeetingChangeLogService.logChange(
+        request.teamId(),
+        "TODO",
+        savedTodo.getId(),
+        null,
+        objectMapper.valueToTree(todoMapper.toTodoResponse(savedTodo)).toString());
+    
     log.info("action=addTodo.success todoId={}", savedTodo.getId());
     return todoMapper.toTodoResponse(savedTodo);
   }
@@ -150,6 +164,10 @@ public class TodoServiceImpl implements TodoService {
       throw new ConflictException(
           Map.of("todoId", List.of("Cannot update an archived todo. Please unarchive it first.")));
     }
+
+    // Capture before snapshot
+    var beforeSnapshot = objectMapper.valueToTree(todoMapper.toTodoResponse(todo)).toString();
+
     todo.setTitle(request.title());
     todo.setDescription(request.description());
     todo.setStatus(todoMapper.mapStatus(request.status()));
@@ -163,6 +181,16 @@ public class TodoServiceImpl implements TodoService {
 
     log.debug("action=updateTodoById.repo.save todoId={}", todoId);
     Todo updatedTodo = todoRepository.save(todo);
+    
+    // Log the todo update
+    log.debug("action=updateTodoById.logChange todoId={}", updatedTodo.getId());
+    l10MeetingChangeLogService.logChange(
+        todo.getTeam().getId(),
+        "TODO",
+        updatedTodo.getId(),
+        beforeSnapshot,
+        objectMapper.valueToTree(todoMapper.toTodoResponse(updatedTodo)).toString());
+    
     log.info("action=updateTodoById.success todoId={}", updatedTodo.getId());
     return todoMapper.toTodoResponse(updatedTodo);
   }
@@ -172,6 +200,16 @@ public class TodoServiceImpl implements TodoService {
   public void deleteTodoById(UUID todoId) {
     log.info("action=deleteTodoById.start todoId={}", todoId);
     Todo todo = getTodoById(todoId);
+    
+    // Log the todo deletion
+    log.debug("action=deleteTodoById.logChange todoId={}", todo.getId());
+    l10MeetingChangeLogService.logChange(
+        todo.getTeam().getId(),
+        "TODO",
+        todo.getId(),
+        objectMapper.valueToTree(todoMapper.toTodoResponse(todo)).toString(),
+        null);
+    
     log.debug("action=deleteTodoById.repo.delete todoId={}", todoId);
     todoRepository.delete(todo);
     log.info("action=deleteTodoById.success todoId={}", todoId);
@@ -187,9 +225,23 @@ public class TodoServiceImpl implements TodoService {
       log.info("action=updateTodoArchiveStatus.success todoId={}", todoId);
       return todoMapper.toTodoResponse(todo);
     }
+
+    // Capture before snapshot
+    var beforeSnapshot = objectMapper.valueToTree(todoMapper.toTodoResponse(todo)).toString();
+
     todo.setIsArchived(isArchived);
     log.debug("action=updateTodoArchiveStatus.repo.save todoId={}", todoId);
     Todo updatedTodo = todoRepository.save(todo);
+    
+    // Log the archive status change
+    log.debug("action=updateTodoArchiveStatus.logChange todoId={}", updatedTodo.getId());
+    l10MeetingChangeLogService.logChange(
+        todo.getTeam().getId(),
+        "TODO",
+        updatedTodo.getId(),
+        beforeSnapshot,
+        objectMapper.valueToTree(todoMapper.toTodoResponse(updatedTodo)).toString());
+    
     log.info("action=updateTodoArchiveStatus.success todoId={}", updatedTodo.getId());
     return todoMapper.toTodoResponse(updatedTodo);
   }

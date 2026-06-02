@@ -24,4 +24,5 @@ public record L10MeetingResponse(
     Instant updatedAt,
     UserBaseResponse createdBy,
     UserBaseResponse updatedBy,
-    List<L10MeetingRatingResponse> ratings) {}
+    List<L10MeetingRatingResponse> ratings,
+    String aiSummary) {}

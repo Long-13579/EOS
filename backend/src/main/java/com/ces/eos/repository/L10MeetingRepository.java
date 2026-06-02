@@ -58,4 +58,13 @@ public interface L10MeetingRepository extends JpaRepository<L10Meeting, UUID> {
           + "LEFT JOIN FETCH m.updatedBy "
           + "WHERE m.id IN :ids")
   List<L10Meeting> findAllByIdIn(@Param("ids") List<UUID> ids);
+
+  @Query(
+      "SELECT m FROM L10Meeting m "
+          + "WHERE m.team.id = :teamId "
+          + "AND m.status = 'STARTED' "
+          + "AND m.meetingDate = :meetingDate")
+  Optional<L10Meeting> findActiveMeetingByTeamAndDate(
+      @Param("teamId") UUID teamId,
+      @Param("meetingDate") LocalDate meetingDate);
 }

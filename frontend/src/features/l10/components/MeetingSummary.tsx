@@ -149,6 +149,15 @@ export function MeetingSummary({ meetingId }: MeetingSummaryProps) {
                     <p className="whitespace-pre-wrap text-sm">{meeting.concludeCascadingMessage || 'No cascading message recorded.'}</p>
                 </CardContent>
             </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>AI Summary</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <pre className="whitespace-pre-wrap text-sm font-mono">{meeting.aiSummary || 'No summary available.'}</pre>
+                </CardContent>
+            </Card>
         </div>
     );
 }

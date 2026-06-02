@@ -17,12 +17,14 @@ import com.ces.eos.exception.ConflictException;
 import com.ces.eos.exception.ResourceNotFoundException;
 import com.ces.eos.mapper.RockMapper;
 import com.ces.eos.repository.RockRepository;
+import com.ces.eos.service.L10MeetingChangeLogService;
 import com.ces.eos.service.QuarterService;
 import com.ces.eos.service.RockService;
 import com.ces.eos.service.TeamService;
 import com.ces.eos.service.UserService;
 import com.ces.eos.service.YearService;
 import com.ces.eos.util.DateUtils;
+import tools.jackson.databind.ObjectMapper;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -47,6 +49,8 @@ public class RockServiceImpl implements RockService {
   private final QuarterService quarterService;
   private final TeamService teamService;
   private final UserService userService;
+  private final L10MeetingChangeLogService l10MeetingChangeLogService;
+  private final ObjectMapper objectMapper;
 
   @Override
   public RockListResponse getRocksByTeam(
@@ -142,6 +146,15 @@ public class RockServiceImpl implements RockService {
 
     log.debug("action=addRock.repo.save teamId={}", request.teamId());
     Rock savedRock = rockRepository.save(rock);
+    
+    // Log the new rock creation
+    log.debug("action=addRock.logChange rockId={}", savedRock.getId());
+    l10MeetingChangeLogService.logChange(
+        request.teamId(),
+        "ROCK",
+        savedRock.getId(),
+        null,
+        objectMapper.valueToTree(rockMapper.toRockResponse(savedRock)).toString());
 
     log.info("action=addRock.success rockId={}", savedRock.getId());
     return rockMapper.toRockResponse(savedRock);
@@ -160,9 +173,22 @@ public class RockServiceImpl implements RockService {
       return rockMapper.toRockResponse(rock);
     }
 
+    // Capture before snapshot
+    var beforeSnapshot = objectMapper.valueToTree(rockMapper.toRockResponse(rock)).toString();
+
     rock.setIsArchived(isArchived);
     log.debug("action=updateRockArchiveStatus.repo.save rockId={}", rockId);
     Rock updatedRock = rockRepository.save(rock);
+    
+    // Log the archive status change
+    log.debug("action=updateRockArchiveStatus.logChange rockId={}", updatedRock.getId());
+    l10MeetingChangeLogService.logChange(
+        rock.getTeam().getId(),
+        "ROCK",
+        updatedRock.getId(),
+        beforeSnapshot,
+        objectMapper.valueToTree(rockMapper.toRockResponse(updatedRock)).toString());
+    
     log.info("action=updateRockArchiveStatus.success rockId={}", updatedRock.getId());
     return rockMapper.toRockResponse(updatedRock);
   }
@@ -179,6 +205,10 @@ public class RockServiceImpl implements RockService {
       throw new ConflictException(
           Map.of("rockId", List.of("Cannot update an archived rock. Please unarchive it first.")));
     }
+
+    // Capture before snapshot
+    var beforeSnapshot = objectMapper.valueToTree(rockMapper.toRockResponse(rock)).toString();
+
     log.debug("action=updateRock.service.getQuarterById quarterId={}", request.quarterId());
     Quarter quarter = quarterService.getQuarterById(request.quarterId());
     validateDueDate(request.dueDate(), quarter, request.year());
@@ -197,6 +227,16 @@ public class RockServiceImpl implements RockService {
     rockMapper.updateRockFromRequest(rock, request, owner, year, quarter, updater);
     log.debug("action=updateRock.repo.save rockId={}", rockId);
     Rock savedRock = rockRepository.save(rock);
+    
+    // Log the rock update
+    log.debug("action=updateRock.logChange rockId={}", savedRock.getId());
+    l10MeetingChangeLogService.logChange(
+        teamId,
+        "ROCK",
+        savedRock.getId(),
+        beforeSnapshot,
+        objectMapper.valueToTree(rockMapper.toRockResponse(savedRock)).toString());
+    
     log.info("action=updateRock.success rockId={}", savedRock.getId());
     return rockMapper.toRockResponse(savedRock);
   }
@@ -250,9 +290,22 @@ public class RockServiceImpl implements RockService {
       return rockMapper.toRockResponse(rock);
     }
 
+    // Capture before snapshot
+    var beforeSnapshot = objectMapper.valueToTree(rockMapper.toRockResponse(rock)).toString();
+
     rock.setStatus(newStatus);
     log.debug("action=updateRockStatus.repo.save rockId={}", rockId);
     Rock updatedRock = rockRepository.save(rock);
+    
+    // Log the rock status change
+    log.debug("action=updateRockStatus.logChange rockId={}", updatedRock.getId());
+    l10MeetingChangeLogService.logChange(
+        rock.getTeam().getId(),
+        "ROCK",
+        updatedRock.getId(),
+        beforeSnapshot,
+        objectMapper.valueToTree(rockMapper.toRockResponse(updatedRock)).toString());
+    
     log.info("action=updateRockStatus.success rockId={}", updatedRock.getId());
     return rockMapper.toRockResponse(updatedRock);
   }

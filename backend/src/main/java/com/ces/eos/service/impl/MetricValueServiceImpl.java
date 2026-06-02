@@ -10,12 +10,15 @@ import com.ces.eos.exception.BadRequestException;
 import com.ces.eos.exception.ResourceNotFoundException;
 import com.ces.eos.exception.ServerInternalException;
 import com.ces.eos.mapper.MetricMapper;
+import com.ces.eos.mapper.MetricValueMapper;
 import com.ces.eos.repository.MetricRepository;
 import com.ces.eos.repository.MetricValueRepository;
 import com.ces.eos.service.MetricValueService;
 import com.ces.eos.service.UserService;
 import com.ces.eos.service.WeekService;
+import com.ces.eos.service.L10MeetingChangeLogService;
 import com.ces.eos.util.MetricUtil;
+import tools.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.HashMap;
@@ -35,9 +38,12 @@ import org.springframework.util.CollectionUtils;
 public class MetricValueServiceImpl implements MetricValueService {
   private final MetricValueRepository metricValueRepository;
   private final MetricMapper metricMapper;
+  private final MetricValueMapper metricValueMapper;
   private final UserService userService;
   private final WeekService weekService;
   private final MetricRepository metricRepository;
+  private final L10MeetingChangeLogService l10MeetingChangeLogService;
+  private final ObjectMapper objectMapper;
 
   @Override
   @Transactional
@@ -58,6 +64,9 @@ public class MetricValueServiceImpl implements MetricValueService {
 
     MetricValue metricValue = getOrCreateCurrentMetricValue(metricId);
 
+    // Capture before snapshot
+    var beforeSnapshot = objectMapper.valueToTree(metricValueMapper.toMetricValueResponse(metricValue)).toString();
+
     log.debug("action=updateMetricValue.service.getUserById updaterId={}", updaterId);
     User updater = userService.getUserById(updaterId);
 
@@ -68,6 +77,18 @@ public class MetricValueServiceImpl implements MetricValueService {
 
     log.debug("action=updateMetricValue.repo.save metricValueId={}", metricValue.getId());
     metricValueRepository.save(metricValue);
+
+    // Capture after snapshot
+    var afterSnapshot = objectMapper.valueToTree(metricValueMapper.toMetricValueResponse(metricValue)).toString();
+
+    // Log the metric value update
+    log.debug("action=updateMetricValue.logChange metricValueId={}", metricValue.getId());
+    l10MeetingChangeLogService.logChange(
+        metric.getTeam().getId(),
+        "METRIC_VALUE",
+        metricValue.getId(),
+        beforeSnapshot,
+        afterSnapshot);
 
     Week currentWeek = metricValue.getWeek();
 
