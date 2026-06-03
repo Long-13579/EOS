@@ -174,7 +174,12 @@ public class TodoServiceImpl implements TodoService {
     todo.setDueDate(request.dueDate());
     assignUsersToTodo(todo, request.assigneeIds());
     if (request.issueId() != null) {
-      todo.setIssue(getIssueById(request.issueId()));
+      try {
+        todo.setIssue(getIssueById(request.issueId()));
+      } catch (ResourceNotFoundException e) {
+        log.warn("action=updateTodoById.issueNotFound issueId={}, clearing reference", request.issueId());
+        todo.setIssue(null);
+      }
     } else {
       todo.setIssue(null);
     }

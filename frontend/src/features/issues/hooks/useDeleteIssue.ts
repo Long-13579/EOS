@@ -5,6 +5,7 @@ import { ERROR_MESSAGES, SUCCESS_MESSAGES } from '@/constants/messages';
 import type { Issue } from '../types/issue';
 import { deleteIssue } from '../services/issueService';
 import { issueKeys } from '../types/issueKeys';
+import { todoKeys } from '@/features/todos/types/todoKeys';
 
 export function useDeleteIssue() {
     const queryClient = useQueryClient();
@@ -27,6 +28,9 @@ export function useDeleteIssue() {
             if (queryClient.isMutating({ mutationKey: issueKeys.deleteIssue() }) <= 1) {
                 queryClient.invalidateQueries({
                     queryKey: issueKeys.lists(),
+                });
+                queryClient.invalidateQueries({
+                    queryKey: todoKeys.lists(),
                 });
             }
         },
