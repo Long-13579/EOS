@@ -28,6 +28,12 @@ dist-ssr
 HELP.md
 target/
 .mvn/wrapper/maven-wrapper.jar
+
+############################
+# Build artifacts
+############################
+/tools/
+backend/tools/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
