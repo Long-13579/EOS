@@ -34,6 +34,7 @@ import com.ces.eos.repository.L10MeetingRepository;
 import com.ces.eos.service.L10MeetingChangeLogService;
 import com.ces.eos.service.TeamService;
 import com.ces.eos.service.UserService;
+import com.ces.eos.util.ChangeLogDiffExtractor;
 import com.ces.eos.util.DateUtils;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
@@ -66,6 +67,7 @@ class L10MeetingServiceImplTest {
   @Mock private TeamService teamService;
   @Mock private UserService userService;
   @Mock private L10MeetingChangeLogService l10MeetingChangeLogService;
+  @Mock private ChangeLogDiffExtractor changeLogDiffExtractor;
   @Mock private ObjectMapper objectMapper;
 
   @InjectMocks private L10MeetingServiceImpl l10MeetingService;
@@ -316,11 +318,14 @@ class L10MeetingServiceImplTest {
       when(l10MeetingRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
       when(l10MeetingMapper.toL10MeetingResponse(any())).thenReturn(response);
       when(l10MeetingChangeLogService.getChangeLogsByMeetingId(meetingId)).thenReturn(List.of());
+      when(changeLogDiffExtractor.extractChanges(any())).thenReturn(List.of());
+      when(changeLogDiffExtractor.formatSummary(any())).thenReturn("No changes");
 
       L10MeetingResponse result = l10MeetingService.finishMeeting(meetingId, userId);
 
       assertThat(result).isEqualTo(response);
       assertThat(meeting.getStatus()).isEqualTo(L10MeetingStatus.FINISHED);
+      assertThat(meeting.getAiSummary()).isEqualTo("No changes");
       verify(l10MeetingRepository).save(meeting);
     }
 
