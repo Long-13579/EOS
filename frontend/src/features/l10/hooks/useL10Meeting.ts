@@ -7,5 +7,12 @@ export const useL10Meeting = (meetingId: string) => {
         queryKey: l10MeetingKeys.detail(meetingId),
         queryFn: () => getL10Meeting(meetingId),
         enabled: !!meetingId,
+        refetchInterval: (query) => {
+            const data = query.state.data;
+            if (data?.aiSummaryStatus === 'PENDING') {
+                return 3000;
+            }
+            return false;
+        },
     });
 };

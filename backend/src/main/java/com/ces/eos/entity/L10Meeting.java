@@ -1,5 +1,6 @@
 package com.ces.eos.entity;
 
+import com.ces.eos.enums.AiSummaryStatus;
 import com.ces.eos.enums.L10MeetingStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -86,6 +87,10 @@ public class L10Meeting {
 
   @Column(name = "ai_summary")
   String aiSummary;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "ai_summary_status", length = 16)
+  AiSummaryStatus aiSummaryStatus;
 
   @CreatedDate
   @Column(name = "created_at", updatable = false)

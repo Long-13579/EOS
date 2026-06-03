@@ -21,6 +21,7 @@ import com.ces.eos.entity.L10Meeting;
 import com.ces.eos.entity.L10MeetingRating;
 import com.ces.eos.entity.Team;
 import com.ces.eos.entity.User;
+import com.ces.eos.enums.AiSummaryStatus;
 import com.ces.eos.enums.ErrorCode;
 import com.ces.eos.enums.L10MeetingRatingValue;
 import com.ces.eos.enums.L10MeetingStatus;
@@ -56,6 +57,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @ExtendWith(MockitoExtension.class)
 class L10MeetingServiceImplTest {
@@ -68,21 +70,31 @@ class L10MeetingServiceImplTest {
   @Mock private UserService userService;
   @Mock private L10MeetingChangeLogService l10MeetingChangeLogService;
   @Mock private ChangeLogDiffExtractor changeLogDiffExtractor;
+  @Mock private AiSummaryGenerator aiSummaryGenerator;
   @Mock private ObjectMapper objectMapper;
 
   @InjectMocks private L10MeetingServiceImpl l10MeetingService;
 
   private MockedStatic<DateUtils> dateUtils;
+  private MockedStatic<TransactionSynchronizationManager> transactionSyncManager;
 
   @BeforeEach
   void setUp() {
     dateUtils = mockStatic(DateUtils.class);
+    transactionSyncManager = mockStatic(TransactionSynchronizationManager.class);
+    transactionSyncManager.when(TransactionSynchronizationManager::isSynchronizationActive).thenReturn(true);
+    transactionSyncManager.when(() -> TransactionSynchronizationManager.registerSynchronization(any()))
+        .thenAnswer(invocation -> {
+          var sync = invocation.getArgument(0, org.springframework.transaction.support.TransactionSynchronization.class);
+          return null;
+        });
     lenient().when(objectMapper.valueToTree(any())).thenReturn(mock(JsonNode.class));
   }
 
   @AfterEach
   void tearDown() {
     dateUtils.close();
+    transactionSyncManager.close();
   }
 
   private Team createTeam(UUID id) {
@@ -125,7 +137,7 @@ class L10MeetingServiceImplTest {
       User scribe = createUser(scribeId);
       L10Meeting meeting = L10Meeting.builder().build();
       L10Meeting saved = L10Meeting.builder().id(UUID.randomUUID()).build();
-      L10MeetingResponse response = new L10MeetingResponse(saved.getId(), null, meetingDate, meetingTime, weekStart, null, null, L10MeetingStatus.SCHEDULED, null, null, null, null, null, null, null, null);
+      L10MeetingResponse response = new L10MeetingResponse(saved.getId(), null, meetingDate, meetingTime, weekStart, null, null, L10MeetingStatus.SCHEDULED, null, null, null, null, null, null, null, null, null);
 
       when(teamService.getTeamById(teamId)).thenReturn(team);
       when(userService.getUserByIdAndTeamId(facilitatorId, teamId)).thenReturn(facilitator);
@@ -193,7 +205,7 @@ class L10MeetingServiceImplTest {
       User scribe = createUser(UUID.randomUUID());
       LocalDate today = LocalDate.of(2026, 6, 1);
       L10Meeting meeting = createMeeting(meetingId, team, L10MeetingStatus.SCHEDULED, facilitator, scribe, today);
-      L10MeetingResponse response = new L10MeetingResponse(meetingId, null, today, LocalTime.of(10, 0), today, null, null, L10MeetingStatus.STARTED, null, null, null, null, null, null, null, null);
+      L10MeetingResponse response = new L10MeetingResponse(meetingId, null, today, LocalTime.of(10, 0), today, null, null, L10MeetingStatus.STARTED, null, null, null, null, null, null, null, null, null);
 
       when(l10MeetingRepository.findByIdWithRelations(meetingId)).thenReturn(Optional.of(meeting));
       dateUtils.when(() -> DateUtils.getTodayForTimezone("UTC")).thenReturn(today);
@@ -312,20 +324,18 @@ class L10MeetingServiceImplTest {
       User scribe = createUser(UUID.randomUUID());
       LocalDate today = LocalDate.of(2026, 6, 1);
       L10Meeting meeting = createMeeting(meetingId, team, L10MeetingStatus.STARTED, facilitator, scribe, today);
-      L10MeetingResponse response = new L10MeetingResponse(meetingId, null, today, LocalTime.of(10, 0), today, null, null, L10MeetingStatus.FINISHED, null, null, null, null, null, null, null, null);
+      L10MeetingResponse response = new L10MeetingResponse(meetingId, null, today, LocalTime.of(10, 0), today, null, null, L10MeetingStatus.FINISHED, null, null, null, null, null, null, null, null, AiSummaryStatus.PENDING);
 
       when(l10MeetingRepository.findByIdWithRelations(meetingId)).thenReturn(Optional.of(meeting));
       when(l10MeetingRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
       when(l10MeetingMapper.toL10MeetingResponse(any())).thenReturn(response);
-      when(l10MeetingChangeLogService.getChangeLogsByMeetingId(meetingId)).thenReturn(List.of());
-      when(changeLogDiffExtractor.extractChanges(any())).thenReturn(List.of());
-      when(changeLogDiffExtractor.formatSummary(any())).thenReturn("No changes");
 
       L10MeetingResponse result = l10MeetingService.finishMeeting(meetingId, userId);
 
       assertThat(result).isEqualTo(response);
       assertThat(meeting.getStatus()).isEqualTo(L10MeetingStatus.FINISHED);
-      assertThat(meeting.getAiSummary()).isEqualTo("No changes");
+      assertThat(meeting.getAiSummary()).isNull();
+      assertThat(meeting.getAiSummaryStatus()).isEqualTo(AiSummaryStatus.PENDING);
       verify(l10MeetingRepository).save(meeting);
     }
 
@@ -349,6 +359,55 @@ class L10MeetingServiceImplTest {
   }
 
   @Nested
+  class RegenerateSummary {
+
+    @Test
+    void regenerateSummary_failedMeeting_resetsToPendingAndSaves() {
+      UUID meetingId = UUID.randomUUID();
+      UUID facilitatorId = UUID.randomUUID();
+      UUID userId = facilitatorId;
+      Team team = createTeam(UUID.randomUUID());
+      User facilitator = createUser(facilitatorId);
+      User scribe = createUser(UUID.randomUUID());
+      L10Meeting meeting = createMeeting(meetingId, team, L10MeetingStatus.FINISHED, facilitator, scribe, LocalDate.now());
+      meeting.setAiSummaryStatus(AiSummaryStatus.FAILED);
+      meeting.setAiSummary("Fallback summary");
+      L10MeetingResponse response = new L10MeetingResponse(meetingId, null, null, null, null, null, null, L10MeetingStatus.FINISHED, null, null, null, null, null, null, null, null, AiSummaryStatus.PENDING);
+
+      when(l10MeetingRepository.findByIdWithRelations(meetingId)).thenReturn(Optional.of(meeting));
+      when(l10MeetingRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+      when(l10MeetingMapper.toL10MeetingResponse(any())).thenReturn(response);
+
+      L10MeetingResponse result = l10MeetingService.regenerateSummary(meetingId, userId);
+
+      assertThat(result).isEqualTo(response);
+      assertThat(meeting.getAiSummary()).isNull();
+      assertThat(meeting.getAiSummaryStatus()).isEqualTo(AiSummaryStatus.PENDING);
+      verify(l10MeetingRepository).save(meeting);
+    }
+
+    @Test
+    void regenerateSummary_notFailed_throwsConflictException() {
+      UUID meetingId = UUID.randomUUID();
+      UUID facilitatorId = UUID.randomUUID();
+      UUID userId = facilitatorId;
+      Team team = createTeam(UUID.randomUUID());
+      User facilitator = createUser(facilitatorId);
+      User scribe = createUser(UUID.randomUUID());
+      L10Meeting meeting = createMeeting(meetingId, team, L10MeetingStatus.FINISHED, facilitator, scribe, LocalDate.now());
+      meeting.setAiSummaryStatus(AiSummaryStatus.COMPLETED);
+
+      when(l10MeetingRepository.findByIdWithRelations(meetingId)).thenReturn(Optional.of(meeting));
+
+      assertThatThrownBy(() -> l10MeetingService.regenerateSummary(meetingId, userId))
+          .isInstanceOf(ConflictException.class)
+          .satisfies(ex -> assertThat(((ConflictException) ex).getErrorCode()).isEqualTo(ErrorCode.CONFLICT));
+
+      verify(l10MeetingRepository, never()).save(any());
+    }
+  }
+
+  @Nested
   class UpdateConclude {
 
     @Test
@@ -361,7 +420,7 @@ class L10MeetingServiceImplTest {
       User scribe = createUser(UUID.randomUUID());
       L10Meeting meeting = createMeeting(meetingId, team, L10MeetingStatus.STARTED, facilitator, scribe, LocalDate.now());
       UpdateL10MeetingConcludeRequest request = new UpdateL10MeetingConcludeRequest("Key decisions", "Cascading message");
-      L10MeetingResponse response = new L10MeetingResponse(meetingId, null, null, null, null, null, null, L10MeetingStatus.STARTED, "Key decisions", "Cascading message", null, null, null, null, null, null);
+      L10MeetingResponse response = new L10MeetingResponse(meetingId, null, null, null, null, null, null, L10MeetingStatus.STARTED, "Key decisions", "Cascading message", null, null, null, null, null, null, null);
 
       when(l10MeetingRepository.findByIdWithRelations(meetingId)).thenReturn(Optional.of(meeting));
       when(l10MeetingRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
@@ -553,7 +612,7 @@ class L10MeetingServiceImplTest {
       when(userService.getUserByIdAndTeamId(facilitatorId, team.getId())).thenReturn(facilitator);
       when(userService.getUserByIdAndTeamId(scribeId, team.getId())).thenReturn(scribe);
       when(l10MeetingRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
-      L10MeetingResponse response = new L10MeetingResponse(meetingId, null, date, time, weekStart, null, null, L10MeetingStatus.SCHEDULED, null, null, null, null, null, null, null, null);
+      L10MeetingResponse response = new L10MeetingResponse(meetingId, null, date, time, weekStart, null, null, L10MeetingStatus.SCHEDULED, null, null, null, null, null, null, null, null, null);
       when(l10MeetingMapper.toL10MeetingResponse(any())).thenReturn(response);
 
       L10MeetingResponse result = l10MeetingService.updateMeeting(meetingId, request, userId);
@@ -618,8 +677,8 @@ class L10MeetingServiceImplTest {
       Page<UUID> idsPage = new PageImpl<>(List.of(id1, id2), PageRequest.of(0, 10), 2);
       L10Meeting m1 = L10Meeting.builder().id(id1).status(L10MeetingStatus.FINISHED).build();
       L10Meeting m2 = L10Meeting.builder().id(id2).status(L10MeetingStatus.FINISHED).build();
-      L10MeetingResponse r1 = new L10MeetingResponse(id1, null, null, null, null, null, null, L10MeetingStatus.FINISHED, null, null, null, null, null, null, null, null);
-      L10MeetingResponse r2 = new L10MeetingResponse(id2, null, null, null, null, null, null, L10MeetingStatus.FINISHED, null, null, null, null, null, null, null, null);
+      L10MeetingResponse r1 = new L10MeetingResponse(id1, null, null, null, null, null, null, L10MeetingStatus.FINISHED, null, null, null, null, null, null, null, null, null);
+      L10MeetingResponse r2 = new L10MeetingResponse(id2, null, null, null, null, null, null, L10MeetingStatus.FINISHED, null, null, null, null, null, null, null, null, null);
 
       when(l10MeetingRepository.findMeetingIdsByTeamIdAndStatus(any(), any(), any())).thenReturn(idsPage);
       when(l10MeetingRepository.findAllByIdIn(List.of(id1, id2))).thenReturn(List.of(m1, m2));
@@ -639,7 +698,7 @@ class L10MeetingServiceImplTest {
       PaginationRequest request = new PaginationRequest(1, 10);
       Page<UUID> idsPage = new PageImpl<>(List.of(id1), PageRequest.of(0, 10), 1);
       L10Meeting m1 = L10Meeting.builder().id(id1).status(L10MeetingStatus.SCHEDULED).build();
-      L10MeetingResponse r1 = new L10MeetingResponse(id1, null, null, null, null, null, null, L10MeetingStatus.SCHEDULED, null, null, null, null, null, null, null, null);
+      L10MeetingResponse r1 = new L10MeetingResponse(id1, null, null, null, null, null, null, L10MeetingStatus.SCHEDULED, null, null, null, null, null, null, null, null, null);
 
       when(l10MeetingRepository.findMeetingIdsByTeamIdAndStatusIn(any(), any(), any())).thenReturn(idsPage);
       when(l10MeetingRepository.findAllByIdIn(List.of(id1))).thenReturn(List.of(m1));
@@ -659,7 +718,7 @@ class L10MeetingServiceImplTest {
     void getMeeting_existingId_returnsMapping() {
       UUID meetingId = UUID.randomUUID();
       L10Meeting meeting = L10Meeting.builder().id(meetingId).build();
-      L10MeetingResponse response = new L10MeetingResponse(meetingId, null, null, null, null, null, null, L10MeetingStatus.SCHEDULED, null, null, null, null, null, null, null, null);
+      L10MeetingResponse response = new L10MeetingResponse(meetingId, null, null, null, null, null, null, L10MeetingStatus.SCHEDULED, null, null, null, null, null, null, null, null, null);
 
       when(l10MeetingRepository.findByIdWithRelations(meetingId)).thenReturn(Optional.of(meeting));
       when(l10MeetingMapper.toL10MeetingResponse(meeting)).thenReturn(response);

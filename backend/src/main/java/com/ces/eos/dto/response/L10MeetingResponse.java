@@ -1,5 +1,6 @@
 package com.ces.eos.dto.response;
 
+import com.ces.eos.enums.AiSummaryStatus;
 import com.ces.eos.enums.L10MeetingStatus;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.time.Instant;
@@ -25,4 +26,5 @@ public record L10MeetingResponse(
     UserBaseResponse createdBy,
     UserBaseResponse updatedBy,
     List<L10MeetingRatingResponse> ratings,
-    String aiSummary) {}
+    String aiSummary,
+    AiSummaryStatus aiSummaryStatus) {}

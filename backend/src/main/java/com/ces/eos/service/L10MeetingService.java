@@ -35,5 +35,7 @@ public interface L10MeetingService {
 
   L10MeetingResponse finishMeeting(UUID meetingId, UUID userId);
 
+  L10MeetingResponse regenerateSummary(UUID meetingId, UUID userId);
+
   List<L10MeetingRatingResponse> getRatings(UUID meetingId);
 }

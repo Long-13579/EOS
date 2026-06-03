@@ -1,12 +1,14 @@
 import { useCallback, useMemo } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { format, parse } from 'date-fns';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Loader2, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { L10MeetingStatusBadge } from './L10MeetingStatusBadge';
 import { useL10Meeting } from '../hooks/useL10Meeting';
+import { useRegenerateSummary } from '../hooks/useRegenerateSummary';
 import { useTeamMembers } from '@/features/settings/hooks/useTeamMembers';
+import ReactMarkdown from 'react-markdown';
 import { formatUserName, isUserNameTruncated } from '../utils/userNameDisplay';
 import type { L10MeetingRatingValue } from '../types/l10Meeting';
 
@@ -32,6 +34,7 @@ export function MeetingSummary({ meetingId }: MeetingSummaryProps) {
     const navigate = useNavigate();
     const { data: meeting, isPending, isError } = useL10Meeting(meetingId);
     const { data: members } = useTeamMembers(meeting?.team.id);
+    const { regenerate, isRegenerating } = useRegenerateSummary(meetingId);
 
     const ratingsByMemberId = useMemo(() => {
         if (!meeting?.ratings) return {};
@@ -60,6 +63,10 @@ export function MeetingSummary({ meetingId }: MeetingSummaryProps) {
         navigate({ to: '/l10-meetings' });
     }, [navigate]);
 
+    const handleRetry = useCallback(() => {
+        regenerate();
+    }, [regenerate]);
+
     if (isPending) {
         return (
             <div className="flex items-center justify-center py-16">
@@ -79,6 +86,68 @@ export function MeetingSummary({ meetingId }: MeetingSummaryProps) {
     const date = parse(meeting.meetingDate, 'yyyy-MM-dd', new Date());
     const formattedDate = format(date, 'MMM d, yyyy');
     const time = meeting.meetingTime.substring(0, 5);
+
+    const renderAiSummaryCard = () => {
+        const status = meeting.aiSummaryStatus;
+        if (status === 'PENDING') {
+            return (
+                <Card>
+                    <CardHeader>
+                        <CardTitle>AI Summary</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            <span>Generating summary...</span>
+                        </div>
+                    </CardContent>
+                </Card>
+            );
+        }
+
+        if (status === 'FAILED') {
+            return (
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between">
+                        <CardTitle>AI Summary</CardTitle>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleRetry}
+                            disabled={isRegenerating}
+                        >
+                            <RefreshCw className={`mr-1 h-3 w-3 ${isRegenerating ? 'animate-spin' : ''}`} />
+                            Retry
+                        </Button>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="prose prose-sm max-w-none">
+                            <ReactMarkdown>
+                                {meeting.aiSummary || 'Summary generation failed. No summary available.'}
+                            </ReactMarkdown>
+                        </div>
+                    </CardContent>
+                </Card>
+            );
+        }
+
+        return (
+            <Card>
+                <CardHeader>
+                    <CardTitle>AI Summary</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="prose prose-sm max-w-none">
+                        <ReactMarkdown>
+                            {status === 'COMPLETED'
+                                ? meeting.aiSummary || 'No summary available.'
+                                : meeting.aiSummary || 'No summary available.'}
+                        </ReactMarkdown>
+                    </div>
+                </CardContent>
+            </Card>
+        );
+    };
 
     return (
         <div className="mx-auto max-w-3xl space-y-6 py-8">
@@ -150,14 +219,7 @@ export function MeetingSummary({ meetingId }: MeetingSummaryProps) {
                 </CardContent>
             </Card>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle>AI Summary</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <pre className="whitespace-pre-wrap text-sm font-mono">{meeting.aiSummary || 'No summary available.'}</pre>
-                </CardContent>
-            </Card>
+            {renderAiSummaryCard()}
         </div>
     );
 }

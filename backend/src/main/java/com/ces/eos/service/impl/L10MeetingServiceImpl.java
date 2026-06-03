@@ -13,6 +13,7 @@ import com.ces.eos.entity.L10Meeting;
 import com.ces.eos.entity.L10MeetingRating;
 import com.ces.eos.entity.Team;
 import com.ces.eos.entity.User;
+import com.ces.eos.enums.AiSummaryStatus;
 import com.ces.eos.enums.L10MeetingRatingValue;
 import com.ces.eos.enums.L10MeetingStatus;
 import com.ces.eos.exception.AuthException;
@@ -45,6 +46,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
 @Service
@@ -60,6 +63,7 @@ public class L10MeetingServiceImpl implements L10MeetingService {
   private final ChangeLogDiffExtractor changeLogDiffExtractor;
   private final TeamService teamService;
   private final UserService userService;
+  private final AiSummaryGenerator aiSummaryGenerator;
 
   @Override
   @Transactional
@@ -400,13 +404,51 @@ public class L10MeetingServiceImpl implements L10MeetingService {
     }
 
     meeting.setStatus(L10MeetingStatus.FINISHED);
-
-    List<L10MeetingChangeLogResponse> logs = l10MeetingChangeLogService.getChangeLogsByMeetingId(meetingId);
-    String summary = buildSummaryPrompt(meeting, logs);
-    meeting.setAiSummary(summary);
+    meeting.setAiSummary(null);
+    meeting.setAiSummaryStatus(AiSummaryStatus.PENDING);
 
     L10Meeting savedMeeting = l10MeetingRepository.save(meeting);
+
+    TransactionSynchronizationManager.registerSynchronization(
+        new TransactionSynchronization() {
+          @Override
+          public void afterCommit() {
+            aiSummaryGenerator.generate(meetingId);
+          }
+        });
+
     log.info("action=finishMeeting.success meetingId={}", savedMeeting.getId());
+    return l10MeetingMapper.toL10MeetingResponse(loadMeetingWithRelations(savedMeeting.getId()));
+  }
+
+  @Override
+  @Transactional
+  public L10MeetingResponse regenerateSummary(UUID meetingId, UUID userId) {
+    log.info("action=regenerateSummary.start meetingId={} userId={}", meetingId, userId);
+    L10Meeting meeting = loadMeetingWithRelations(meetingId);
+    ensureFacilitatorOrScribe(meeting, userId);
+
+    if (meeting.getAiSummaryStatus() != AiSummaryStatus.FAILED) {
+      log.warn("action=regenerateSummary.validationFailed reason=notFailed meetingId={} status={}",
+          meetingId, meeting.getAiSummaryStatus());
+      throw new ConflictException(
+          Map.of("meetingId", List.of("Summary can only be regenerated when the previous attempt failed.")));
+    }
+
+    meeting.setAiSummary(null);
+    meeting.setAiSummaryStatus(AiSummaryStatus.PENDING);
+
+    L10Meeting savedMeeting = l10MeetingRepository.save(meeting);
+
+    TransactionSynchronizationManager.registerSynchronization(
+        new TransactionSynchronization() {
+          @Override
+          public void afterCommit() {
+            aiSummaryGenerator.generate(meetingId);
+          }
+        });
+
+    log.info("action=regenerateSummary.success meetingId={}", savedMeeting.getId());
     return l10MeetingMapper.toL10MeetingResponse(loadMeetingWithRelations(savedMeeting.getId()));
   }
 
@@ -417,43 +459,6 @@ public class L10MeetingServiceImpl implements L10MeetingService {
     return l10MeetingRatingRepository.findByMeeting_Id(meetingId).stream()
         .map(l10MeetingRatingMapper::toL10MeetingRatingResponse)
         .toList();
-  }
-
-  private String buildSummaryPrompt(L10Meeting meeting, List<L10MeetingChangeLogResponse> logs) {
-    try {
-      var groups = changeLogDiffExtractor.extractChanges(logs);
-      return changeLogDiffExtractor.formatSummary(groups);
-    } catch (Exception e) {
-      log.warn("ChangeLogDiffExtractor failed, falling back to raw JSON summary. meetingId={}",
-          meeting.getId(), e);
-      return buildSummaryPromptFallback(logs);
-    }
-  }
-
-  private String buildSummaryPromptFallback(List<L10MeetingChangeLogResponse> logs) {
-    StringBuilder sb = new StringBuilder();
-    sb.append("During this meeting, the following changes were made:\n\n");
-
-    if (logs.isEmpty()) {
-      sb.append("No changes were made during this meeting.\n");
-      return sb.toString();
-    }
-
-    for (int i = 0; i < logs.size(); i++) {
-      L10MeetingChangeLogResponse log = logs.get(i);
-      sb.append(i + 1).append(". [").append(log.entityType()).append("] ");
-
-      if (log.beforeSnapshot() == null) {
-        sb.append("Created\n   After: ").append(log.afterSnapshot()).append("\n");
-      } else if (log.afterSnapshot() == null) {
-        sb.append("Deleted\n   Before: ").append(log.beforeSnapshot()).append("\n");
-      } else {
-        sb.append("Updated\n   Before: ").append(log.beforeSnapshot()).append("\n   After:  ").append(log.afterSnapshot()).append("\n");
-      }
-      sb.append("\n");
-    }
-
-    return sb.toString();
   }
 
   private L10MeetingRating upsertRatingForMember(

@@ -4,6 +4,8 @@ import type { PaginationParams } from '@/types/pagination';
 
 export type L10MeetingStatus = 'SCHEDULED' | 'STARTED' | 'FINISHED';
 
+export type AiSummaryStatus = 'PENDING' | 'COMPLETED' | 'FAILED';
+
 export type L10MeetingRatingValue = 'ONE' | 'TWO' | 'THREE' | 'FOUR' | 'FIVE' | 'SIX' | 'SEVEN' | 'EIGHT' | 'NINE' | 'TEN' | 'ABSENT';
 
 export interface L10Meeting {
@@ -23,6 +25,7 @@ export interface L10Meeting {
     updatedBy: TeamMember | null;
     ratings?: L10MeetingRating[];
     aiSummary?: string;
+    aiSummaryStatus?: AiSummaryStatus | null;
 }
 
 export interface L10MeetingRating {

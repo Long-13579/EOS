@@ -106,6 +106,16 @@ public class L10MeetingController {
     return ResponseEntity.ok(response);
   }
 
+  @PostMapping("/{meetingId}/regenerate-summary")
+  @PreAuthorize("hasRole('ADMIN') or @teamSecurityService.isCurrentUserMemberOfL10Meeting(#meetingId)")
+  public ResponseEntity<L10MeetingResponse> regenerateSummary(
+      @PathVariable UUID meetingId,
+      @AuthenticationPrincipal CustomUserDetails userDetails) {
+    L10MeetingResponse response =
+        l10MeetingService.regenerateSummary(meetingId, userDetails.getId());
+    return ResponseEntity.ok(response);
+  }
+
   @GetMapping("/{meetingId}/ratings")
   @PreAuthorize("hasRole('ADMIN') or @teamSecurityService.isCurrentUserMemberOfL10Meeting(#meetingId)")
   public ResponseEntity<List<L10MeetingRatingResponse>> getRatings(

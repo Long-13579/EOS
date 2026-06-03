@@ -1,0 +1,18 @@
+databaseChangeLog:
+  - changeSet:
+      id: 054-add-ai-summary-status-to-l10-meetings
+      author: eos-team
+      changes:
+        - addColumn:
+            tableName: l10_meetings
+            columns:
+              - column:
+                  name: ai_summary_status
+                  type: VARCHAR(16)
+                  constraints:
+                    nullable: true
+
+      rollback:
+        - dropColumn:
+            tableName: l10_meetings
+            columnName: ai_summary_status

@@ -32,4 +32,7 @@ export const upsertRatings = (meetingId: string, payload: UpsertRatingsPayload):
 
 export const finishL10Meeting = (meetingId: string): Promise<L10Meeting> => apiPost<L10Meeting>(`/l10-meetings/${meetingId}/finish`);
 
+export const regenerateSummary = (meetingId: string): Promise<L10Meeting> =>
+    apiPost<L10Meeting>(`/l10-meetings/${meetingId}/regenerate-summary`);
+
 export const getRatings = (meetingId: string): Promise<L10MeetingRating[]> => apiGet<L10MeetingRating[]>(`/l10-meetings/${meetingId}/ratings`);
