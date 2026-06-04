@@ -28,6 +28,10 @@ public interface MetricValueRepository extends JpaRepository<MetricValue, UUID> 
       nativeQuery = true)
   void insertIfNotExists(@Param("metricId") UUID metricId, @Param("weekId") UUID weekId);
 
+  @Modifying
+  @Query("DELETE FROM MetricValue mv WHERE mv.metric.id = :metricId")
+  void deleteByMetricId(@Param("metricId") UUID metricId);
+
   @Query(
       """
       SELECT mv FROM MetricValue mv

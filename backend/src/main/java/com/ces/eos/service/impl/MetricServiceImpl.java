@@ -20,6 +20,7 @@ import com.ces.eos.exception.ResourceNotFoundException;
 import com.ces.eos.mapper.MetricMapper;
 import com.ces.eos.mapper.MetricValueMapper;
 import com.ces.eos.repository.MetricRepository;
+import com.ces.eos.repository.MetricValueRepository;
 import com.ces.eos.service.MetricService;
 import com.ces.eos.service.MetricValueService;
 import com.ces.eos.service.TeamService;
@@ -47,6 +48,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class MetricServiceImpl implements MetricService {
   private final MetricRepository metricRepository;
+  private final MetricValueRepository metricValueRepository;
   private final MetricValueService metricValueService;
   private final MetricMapper metricMapper;
   private final MetricValueMapper metricValueMapper;
@@ -302,6 +304,28 @@ public class MetricServiceImpl implements MetricService {
     log.info("action=updateMetric.success metricId={}", updatedMetric.getId());
 
     return metricMapper.toMetricResponse(updatedMetric, null, null);
+  }
+
+  @Override
+  @Transactional
+  public void deleteMetricById(UUID metricId) {
+    log.info("action=deleteMetricById.start metricId={}", metricId);
+    Metric metric = getMetricById(metricId);
+
+    log.debug("action=deleteMetricById.logChange metricId={}", metric.getId());
+    l10MeetingChangeLogService.logChange(
+        metric.getTeam().getId(),
+        "METRIC",
+        metric.getId(),
+        objectMapper.valueToTree(metricMapper.toMetricResponse(metric, null, null)).toString(),
+        null);
+
+    log.debug("action=deleteMetricById.repo.deleteValues metricId={}", metricId);
+    metricValueRepository.deleteByMetricId(metricId);
+
+    log.debug("action=deleteMetricById.repo.delete metricId={}", metricId);
+    metricRepository.delete(metric);
+    log.info("action=deleteMetricById.success metricId={}", metricId);
   }
 
   @Override

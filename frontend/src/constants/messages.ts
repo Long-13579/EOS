@@ -76,6 +76,7 @@ export const ERROR_MESSAGES = {
         VALIDATION: 'Metric data is invalid.',
         CREATE_FAILED: 'Failed to create metric. Please try again.',
         UPDATE_FAILED: 'Failed to update metric. Please try again.',
+        DELETE_FAILED: 'Failed to delete metric. Please try again.',
         TREND_LOAD_FAILED: 'Failed to load trend metrics. Please try again.',
         TREND_NOT_FOUND: 'No trend metrics found.',
     },
@@ -95,6 +96,7 @@ export const SUCCESS_MESSAGES = {
     METRIC: {
         CREATED: 'Metric created successfully!',
         UPDATED: 'Metric updated successfully!',
+        DELETED: 'Metric deleted successfully!',
     },
     TODO: {
         CREATED: 'To-do created successfully!',

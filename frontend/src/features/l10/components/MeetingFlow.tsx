@@ -67,7 +67,7 @@ export function MeetingFlow({ meetingId }: MeetingFlowProps) {
             case 'segue':
                 return <SegueSession />;
             case 'scorecard':
-                return <ScorecardSession weekStartDate={meeting.weekStartDate} />;
+                return <ScorecardSession weekStartDate={meeting.weekStartDate} meetingStatus={meeting.status} />;
             case 'rocks':
                 return <RockSession />;
             case 'headlines':

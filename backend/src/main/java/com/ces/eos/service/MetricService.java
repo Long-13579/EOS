@@ -20,4 +20,6 @@ public interface MetricService {
   TrendsTabMetricListResponse listTrendsTabMetricsByTeam(UUID teamId);
 
   List<MetricResponse> listMyAssignedMetrics(UUID userId, UUID weekId);
+
+  void deleteMetricById(UUID metricId);
 }

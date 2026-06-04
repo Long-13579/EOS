@@ -1,4 +1,4 @@
-import { apiGet, apiPost, apiPut } from '@/utils/apiRequest';
+import { apiDelete, apiGet, apiPost, apiPut } from '@/utils/apiRequest';
 import type {
     Metric,
     CreateMetric,
@@ -24,3 +24,5 @@ export const getTrendMetrics = (teamId: string): Promise<TrendsTabMetricListResp
     apiGet('/metrics/trends', {
         params: { teamId },
     });
+
+export const deleteMetric = (id: string): Promise<void> => apiDelete<void>('/metrics/' + id);

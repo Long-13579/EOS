@@ -10,11 +10,13 @@ import {
     useWeeks,
     type ScorecardTab,
     useMetricDialog,
+    useDeleteMetric,
     MetricDialog,
     WeekSelect,
 } from '@/features/scorecard';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { UI_MESSAGES, ERROR_MESSAGES } from '@/constants/messages';
+import { UI_MESSAGES, ERROR_MESSAGES, CONFIRM_MESSAGES } from '@/constants/messages';
+import { ConfirmationDialog } from '@/components/shared/ConfirmationDialog';
 import { EmptyTeamState } from '@/components/shared/EmptyTeamState';
 import { TrendsTab } from '@/features/scorecard';
 import { checkCurrentWeek } from '@/features/scorecard/utils/weekUtils';
@@ -31,6 +33,8 @@ export function Scorecards() {
     const emptyMessage = !isWeeksPending && weeks.length === 0 ? UI_MESSAGES.WEEK.NOT_FOUND : ERROR_MESSAGES.METRIC.NOT_FOUND;
 
     const { isMetricDialogOpen, setMetricDialogOpen, editingMetric, openCreate, openUpdate, handleSubmit } = useMetricDialog();
+
+    const { isDeleteDialogOpen, setDeleteDialogOpen, openDelete, handleConfirmDelete, deletingMetric } = useDeleteMetric();
 
     const {
         data: metrics,
@@ -57,6 +61,15 @@ export function Scorecards() {
             </PageHeaderGroup>
 
             <MetricDialog isOpen={isMetricDialogOpen} onOpenChange={setMetricDialogOpen} onSubmit={handleSubmit} editingMetric={editingMetric} />
+
+            <ConfirmationDialog
+                isOpen={isDeleteDialogOpen}
+                onOpenChange={setDeleteDialogOpen}
+                title="Delete Metric"
+                description={CONFIRM_MESSAGES.DELETE.CONFIRM_ITEM(deletingMetric?.name ?? '')}
+                confirmLabel="Delete"
+                onConfirm={handleConfirmDelete}
+            />
 
             {!activeTeamId ? (
                 <EmptyTeamState />
@@ -88,6 +101,7 @@ export function Scorecards() {
                             isError={isMetricsError}
                             isEditable={isEditingCurrentWeek}
                             onUpdate={openUpdate}
+                            onDelete={openDelete}
                         />
                     </TabsContent>
 

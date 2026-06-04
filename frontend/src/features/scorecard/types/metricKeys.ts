@@ -11,4 +11,6 @@ export const metricKeys = {
 
     details: (ids: string[]) => [...metricKeys.all, 'details', ids] as const,
     detail: (id: string) => [...metricKeys.all, 'detail', id] as const,
+
+    deleteMetric: () => [...metricKeys.all, 'delete'] as const,
 };
