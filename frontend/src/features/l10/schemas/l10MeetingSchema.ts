@@ -8,3 +8,10 @@ export const scheduleL10MeetingSchema = z.object({
 });
 
 export type ScheduleL10MeetingFormValues = z.infer<typeof scheduleL10MeetingSchema>;
+
+export const concludeSessionSchema = z.object({
+    keyDecisions: z.string().trim().min(1, 'Key decisions are required.'),
+    cascadingMessage: z.string().trim().min(1, 'Cascading message is required.'),
+});
+
+export type ConcludeSessionFormValues = z.infer<typeof concludeSessionSchema>;

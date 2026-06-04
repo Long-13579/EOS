@@ -1,17 +1,22 @@
-import { useState, useCallback } from 'react';
+import { useState, useId, useCallback } from 'react';
+import { useForm, Controller, type SubmitHandler } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useActiveTeamId } from '@/hooks/useActiveTeamId';
 import { useTeamMembers } from '@/features/settings/hooks/useTeamMembers';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Field, FieldLabel, FieldError } from '@/components/ui/field';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { normalizeApiError } from '@/utils/apiErrorNormalizer';
+import { useFormError } from '@/hooks/useFormError';
 import { formatUserName, isUserNameTruncated } from '../../utils/userNameDisplay';
 import { useUpdateConclude } from '../../hooks/useUpdateConclude';
 import { useUpsertRatings } from '../../hooks/useUpsertRatings';
 import { useFinishL10Meeting } from '../../hooks/useFinishL10Meeting';
+import { concludeSessionSchema, type ConcludeSessionFormValues } from '../../schemas/l10MeetingSchema';
 import type { L10Meeting, L10MeetingRatingValue } from '../../types/l10Meeting';
 
 const RATING_OPTIONS: { value: L10MeetingRatingValue; label: string }[] = [
@@ -35,54 +40,67 @@ interface ConcludeSessionProps {
 }
 
 export function ConcludeSession({ meeting, onFinished, canEdit }: ConcludeSessionProps) {
+    const formId = useId();
     const teamId = useActiveTeamId();
     const { data: members } = useTeamMembers(teamId);
     const { saveConclude } = useUpdateConclude();
     const { saveRatings } = useUpsertRatings();
     const { finishMeeting, isFinishing } = useFinishL10Meeting();
 
-    const [keyDecisions, setKeyDecisions] = useState(meeting.concludeKeyDecisions ?? '');
-    const [cascadingMessage, setCascadingMessage] = useState(meeting.concludeCascadingMessage ?? '');
     const [ratings, setRatings] = useState<Record<string, L10MeetingRatingValue>>({});
-    const [isSaving, setIsSaving] = useState(false);
+
+    const form = useForm<ConcludeSessionFormValues>({
+        resolver: zodResolver(concludeSessionSchema),
+        defaultValues: {
+            keyDecisions: meeting.concludeKeyDecisions ?? '',
+            cascadingMessage: meeting.concludeCascadingMessage ?? '',
+        },
+        mode: 'onSubmit',
+    });
+
+    const { control, handleSubmit, formState: { isSubmitting: formSubmitting } } = form;
+    const handleFormError = useFormError(form);
+
+    const isSubmitting = formSubmitting || isFinishing;
 
     const handleRatingChange = useCallback((memberId: string, value: L10MeetingRatingValue) => {
         setRatings((prev) => ({ ...prev, [memberId]: value }));
     }, []);
 
-    const handleFinish = useCallback(async () => {
-        if (!members) return;
+    const onSubmit: SubmitHandler<ConcludeSessionFormValues> = useCallback(
+        async (data) => {
+            if (!members) return;
 
-        setIsSaving(true);
-        try {
-            const ratingsPayload = members.map((m) => ({
-                memberId: m.id,
-                rating: ratings[m.id] || 'ABSENT',
-            }));
+            try {
+                const ratingsPayload = members.map((m) => ({
+                    memberId: m.id,
+                    rating: ratings[m.id] || 'ABSENT',
+                }));
 
-            await saveConclude({
-                meetingId: meeting.id,
-                payload: { keyDecisions, cascadingMessage },
-            });
+                await saveConclude({
+                    meetingId: meeting.id,
+                    payload: { keyDecisions: data.keyDecisions, cascadingMessage: data.cascadingMessage },
+                });
 
-            await saveRatings({
-                meetingId: meeting.id,
-                payload: { ratings: ratingsPayload },
-            });
+                await saveRatings({
+                    meetingId: meeting.id,
+                    payload: { ratings: ratingsPayload },
+                });
 
-            await finishMeeting(meeting.id);
+                await finishMeeting(meeting.id);
 
-            toast.success('L10 meeting finished successfully!');
-            onFinished();
-        } catch (error) {
-            const normalized = normalizeApiError(error);
-            toast.error(normalized.message);
-        } finally {
-            setIsSaving(false);
-        }
-    }, [members, ratings, keyDecisions, cascadingMessage, saveConclude, saveRatings, finishMeeting, meeting.id, onFinished]);
-
-    const isSubmitting = isSaving || isFinishing;
+                toast.success('L10 meeting finished successfully!');
+                onFinished();
+            } catch (error) {
+                const normalized = normalizeApiError(error);
+                handleFormError(normalized);
+                if (normalized.message) {
+                    toast.error(normalized.message);
+                }
+            }
+        },
+        [members, ratings, saveConclude, saveRatings, finishMeeting, meeting.id, onFinished, handleFormError],
+    );
 
     return (
         <Card>
@@ -91,26 +109,48 @@ export function ConcludeSession({ meeting, onFinished, canEdit }: ConcludeSessio
             </CardHeader>
             <CardContent className="space-y-6">
                 <div className="space-y-2">
-                    <Label htmlFor="keyDecisions">Key Decisions</Label>
-                    <Textarea
-                        id="keyDecisions"
-                        value={keyDecisions}
-                        onChange={(e) => setKeyDecisions(e.target.value)}
-                        placeholder="Enter key decisions made during this meeting..."
-                        rows={4}
-                        disabled={isSubmitting || !canEdit}
+                    <Controller
+                        name="keyDecisions"
+                        control={control}
+                        render={({ field, fieldState }) => (
+                            <Field data-invalid={fieldState.invalid}>
+                                <FieldLabel htmlFor={`${formId}-keyDecisions`}>
+                                    Key Decisions <span className="text-destructive">*</span>
+                                </FieldLabel>
+                                <Textarea
+                                    {...field}
+                                    id={`${formId}-keyDecisions`}
+                                    placeholder="Enter key decisions made during this meeting..."
+                                    rows={4}
+                                    disabled={isSubmitting || !canEdit}
+                                    aria-invalid={fieldState.invalid}
+                                />
+                                {fieldState.error && <FieldError errors={[fieldState.error]} />}
+                            </Field>
+                        )}
                     />
                 </div>
 
                 <div className="space-y-2">
-                    <Label htmlFor="cascadingMessage">Cascading Message</Label>
-                    <Textarea
-                        id="cascadingMessage"
-                        value={cascadingMessage}
-                        onChange={(e) => setCascadingMessage(e.target.value)}
-                        placeholder="Enter the cascading message for team members who were absent..."
-                        rows={4}
-                        disabled={isSubmitting}
+                    <Controller
+                        name="cascadingMessage"
+                        control={control}
+                        render={({ field, fieldState }) => (
+                            <Field data-invalid={fieldState.invalid}>
+                                <FieldLabel htmlFor={`${formId}-cascadingMessage`}>
+                                    Cascading Message <span className="text-destructive">*</span>
+                                </FieldLabel>
+                                <Textarea
+                                    {...field}
+                                    id={`${formId}-cascadingMessage`}
+                                    placeholder="Enter the cascading message for team members who were absent..."
+                                    rows={4}
+                                    disabled={isSubmitting}
+                                    aria-invalid={fieldState.invalid}
+                                />
+                                {fieldState.error && <FieldError errors={[fieldState.error]} />}
+                            </Field>
+                        )}
                     />
                 </div>
 
@@ -148,7 +188,7 @@ export function ConcludeSession({ meeting, onFinished, canEdit }: ConcludeSessio
 
                 {canEdit && (
                     <div className="flex justify-end gap-3 pt-4">
-                        <Button onClick={handleFinish} disabled={isSubmitting} size="lg">
+                        <Button onClick={handleSubmit(onSubmit)} disabled={isSubmitting} size="lg">
                             {isSubmitting ? 'Finishing Meeting...' : 'Finish Meeting'}
                         </Button>
                     </div>
