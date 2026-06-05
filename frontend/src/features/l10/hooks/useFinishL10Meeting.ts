@@ -17,9 +17,12 @@ export const useFinishL10Meeting = () => {
             const normalized = normalizeApiError(error);
             toast.error(normalized.message);
         },
-        onSettled: () => {
+        onSettled: (_data, _error, meetingId) => {
             queryClient.invalidateQueries({
                 queryKey: l10MeetingKeys.lists(),
+            });
+            queryClient.invalidateQueries({
+                queryKey: l10MeetingKeys.detail(meetingId),
             });
         },
     });

@@ -38,8 +38,8 @@ export function MeetingFlow({ meetingId }: MeetingFlowProps) {
     }, [navigate]);
 
     const handleFinished = useCallback(() => {
-        navigate({ to: '/l10-meetings' });
-    }, [navigate]);
+        navigate({ to: '/l10-meetings/$meetingId', params: { meetingId } });
+    }, [navigate, meetingId]);
 
     if (isPending) {
         return (
