@@ -9,3 +9,4 @@ export { useCreateIssue } from './hooks/useCreateIssue';
 export { useUpdateIssue } from './hooks/useUpdateIssue';
 export { useDeleteIssue } from './hooks/useDeleteIssue';
 export { useArchiveIssue } from './hooks/useArchiveIssue';
+export { useQuickUpdateIssueType } from './hooks/useQuickUpdateIssueType';

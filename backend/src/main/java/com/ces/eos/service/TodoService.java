@@ -22,4 +22,6 @@ public interface TodoService {
   void deleteTodoById(UUID todoId);
 
   TodoResponse updateTodoArchiveStatus(UUID todoId, boolean isArchived);
+
+  TodoResponse updateTodoStatus(UUID todoId, TodoStatus status);
 }

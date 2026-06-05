@@ -17,6 +17,7 @@ import {
     useIssues,
     useDeleteIssue,
     useArchiveIssue,
+    useQuickUpdateIssueType,
     type IssueView,
     ISSUE_VIEW,
     LONG_TERM_ISSUE,
@@ -38,6 +39,8 @@ export function Issues() {
     const { isDeleteDialogOpen, setDeleteDialogOpen, deletingIssue, deletingIssueIds, openDelete, handleConfirmDelete } = useDeleteIssue();
 
     const { handleArchiveToggle } = useArchiveIssue();
+
+    const { updateIssueType: quickUpdateIssueType } = useQuickUpdateIssueType();
 
     const {
         data: issuesResponse,
@@ -117,6 +120,7 @@ export function Issues() {
                             deletingIssueIds={deletingIssueIds}
                             onToggleArchive={handleArchiveToggle}
                             onOpenTodos={openIssueTodos}
+                            onQuickIssueTypeUpdate={quickUpdateIssueType}
                         />
                     </div>
                     <CustomPagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />

@@ -5,6 +5,7 @@ import type { DataTableProps } from '@/types/table';
 import { formatDate } from '@/utils/date';
 import { getUserFullName } from '@/utils/user';
 import type { Issue } from '../types/issue';
+import { IssueTypeInlineSelect } from './IssueTypeInlineSelect';
 import { TableQueryState } from '@/components/shared/Table';
 import { ERROR_MESSAGES } from '@/constants/messages';
 import { cn } from '@/lib/utils';
@@ -18,6 +19,7 @@ interface IssuesTableProps extends DataTableProps<Issue> {
     deletingIssueIds?: string[];
     onToggleArchive: (issue: Issue) => void;
     onOpenTodos?: (issue: Issue) => void;
+    onQuickIssueTypeUpdate?: (id: string, issueTypeId: string | null) => void;
 }
 
 const getIssueActions = (issue: Issue, onUpdate: (data: Issue) => void, onDelete: (data: Issue) => void, onToggleArchive: (issue: Issue) => void) => {
@@ -57,6 +59,7 @@ export function IssuesTable({
     onToggleArchive,
     deletingIssueIds,
     onOpenTodos,
+    onQuickIssueTypeUpdate,
 }: IssuesTableProps) {
     return (
         <div className="rounded-md border">
@@ -107,7 +110,17 @@ export function IssuesTable({
                                         </button>
                                     </TableCell>
 
-                                    <TableCell>{issue.issueType?.name ?? '-'}</TableCell>
+                                    <TableCell>
+                                        {onQuickIssueTypeUpdate && !isArchived && !isBeingDeleted ? (
+                                            <IssueTypeInlineSelect
+                                                currentIssueType={issue.issueType}
+                                                onSelect={(issueTypeId) => onQuickIssueTypeUpdate({ id: issue.id, issueTypeId })}
+                                                disabled={isBeingDeleted}
+                                            />
+                                        ) : (
+                                            <span>{issue.issueType?.name ?? '-'}</span>
+                                        )}
+                                    </TableCell>
 
                                     <TableCell>
                                         {onOpenTodos ? (

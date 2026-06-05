@@ -30,6 +30,10 @@ export interface UpdateTodo extends Omit<TodoFormValues, 'dueDate'> {
     issueId?: string | null;
 }
 
+export interface UpdateTodoStatus {
+    status: TodoStatus;
+}
+
 export interface ArchiveTodo {
     isArchived: boolean;
 }

@@ -4,6 +4,7 @@ import { useIssues } from '@/features/issues/hooks/useIssues';
 import { useIssueDialog } from '@/features/issues/hooks/useIssueDialog';
 import { useDeleteIssue } from '@/features/issues/hooks/useDeleteIssue';
 import { useArchiveIssue } from '@/features/issues/hooks/useArchiveIssue';
+import { useQuickUpdateIssueType } from '@/features/issues/hooks/useQuickUpdateIssueType';
 import { IssuesTable } from '@/features/issues/components/IssuesTable';
 import { IssueDialog } from '@/features/issues/components/IssueDialog';
 import { IssueTodosDialog } from '@/features/issues/components/IssueTodosDialog';
@@ -38,6 +39,7 @@ export function IssuesSession() {
     });
     const { deletingIssueIds, isDeleteDialogOpen, setDeleteDialogOpen, deletingIssue, openDelete, handleConfirmDelete } = useDeleteIssue();
     const { handleArchiveToggle } = useArchiveIssue();
+    const { updateIssueType: quickUpdateIssueType } = useQuickUpdateIssueType();
 
     const totalPages = issuesResponse?.pagination.totalPages ?? 0;
 
@@ -72,6 +74,7 @@ export function IssuesSession() {
                         deletingIssueIds={deletingIssueIds}
                         emptyMessage="No issues."
                         onOpenTodos={openIssueTodos}
+                        onQuickIssueTypeUpdate={quickUpdateIssueType}
                     />
                     <CustomPagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
                 </CardContent>

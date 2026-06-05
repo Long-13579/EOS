@@ -222,6 +222,40 @@ public class TodoServiceImpl implements TodoService {
 
   @Override
   @Transactional
+  public TodoResponse updateTodoStatus(UUID todoId, TodoStatus newStatus) {
+    log.info("action=updateTodoStatus.start todoId={} status={}", todoId, newStatus);
+    Todo todo = getTodoById(todoId);
+    if (Boolean.TRUE.equals(todo.getIsArchived())) {
+      log.warn("action=updateTodoStatus.validationFailed reason=archived todoId={}", todoId);
+      throw new ConflictException(
+          Map.of("todoId", List.of("Cannot update status of an archived todo.")));
+    }
+    if (Objects.equals(todo.getStatus(), newStatus)) {
+      log.debug("action=updateTodoStatus.branch.noChange todoId={} status={}", todoId, newStatus);
+      log.info("action=updateTodoStatus.success todoId={}", todoId);
+      return todoMapper.toTodoResponse(todo);
+    }
+
+    var beforeSnapshot = objectMapper.valueToTree(todoMapper.toTodoResponse(todo)).toString();
+
+    todo.setStatus(newStatus);
+    log.debug("action=updateTodoStatus.repo.save todoId={}", todoId);
+    Todo updatedTodo = todoRepository.save(todo);
+
+    log.debug("action=updateTodoStatus.logChange todoId={}", updatedTodo.getId());
+    l10MeetingChangeLogService.logChange(
+        todo.getTeam().getId(),
+        "TODO",
+        updatedTodo.getId(),
+        beforeSnapshot,
+        objectMapper.valueToTree(todoMapper.toTodoResponse(updatedTodo)).toString());
+
+    log.info("action=updateTodoStatus.success todoId={}", updatedTodo.getId());
+    return todoMapper.toTodoResponse(updatedTodo);
+  }
+
+  @Override
+  @Transactional
   public TodoResponse updateTodoArchiveStatus(UUID todoId, boolean isArchived) {
     log.info("action=updateTodoArchiveStatus.start todoId={} isArchived={}", todoId, isArchived);
     Todo todo = getTodoById(todoId);

@@ -4,6 +4,7 @@ import com.ces.eos.dto.request.CreateIssueRequest;
 import com.ces.eos.dto.request.PaginationRequest;
 import com.ces.eos.dto.request.UpdateIssueArchiveRequest;
 import com.ces.eos.dto.request.UpdateIssueRequest;
+import com.ces.eos.dto.request.UpdateIssueTypeRequest;
 import com.ces.eos.dto.response.IssueResponse;
 import com.ces.eos.dto.response.PagedEntityResponse;
 import com.ces.eos.security.CustomUserDetails;
@@ -66,6 +67,14 @@ public class IssueController {
   public ResponseEntity<IssueResponse> updateIssueArchiveStatus(
       @PathVariable UUID issueId, @Valid @RequestBody UpdateIssueArchiveRequest request) {
     IssueResponse response = issueService.updateIssueArchiveStatus(issueId, request.isArchived());
+    return ResponseEntity.ok(response);
+  }
+
+  @PatchMapping("/{issueId}/issue-type")
+  @PreAuthorize("hasRole('ADMIN') or @teamSecurityService.isCurrentUserMemberOfIssueTeam(#issueId)")
+  public ResponseEntity<IssueResponse> updateIssueType(
+      @PathVariable UUID issueId, @Valid @RequestBody UpdateIssueTypeRequest request) {
+    IssueResponse response = issueService.updateIssueType(issueId, request.issueTypeId());
     return ResponseEntity.ok(response);
   }
 }

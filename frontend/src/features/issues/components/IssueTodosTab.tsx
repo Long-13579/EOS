@@ -8,7 +8,7 @@ import { CustomPagination } from '@/components/shared/CustomPagination';
 import { EmptyTeamState } from '@/components/shared/EmptyTeamState';
 import { DEFAULT_LIMIT } from '@/types/pagination';
 import { CONFIRM_MESSAGES, ERROR_MESSAGES } from '@/constants/messages';
-import { TodoDialog, TodosTable, useArchiveTodo, useDeleteTodo, useTodoDialog, useTodos, type Todo } from '@/features/todos';
+import { TodoDialog, TodosTable, useArchiveTodo, useDeleteTodo, useQuickUpdateTodoStatus, useTodoDialog, useTodos, type Todo } from '@/features/todos';
 
 interface IssueTodosTabProps {
     issue: Issue | null;
@@ -27,6 +27,8 @@ export function IssueTodosTab({ issue }: Readonly<IssueTodosTabProps>) {
     const resetPageIfNeeded = () => {
         setPage((prev) => (todosLengthRef.current === 1 && prev > 1 ? prev - 1 : prev));
     };
+
+    const { updateStatus: quickUpdateTodoStatus } = useQuickUpdateTodoStatus();
 
     const {
         showArchived,
@@ -155,6 +157,7 @@ export function IssueTodosTab({ issue }: Readonly<IssueTodosTabProps>) {
                     onToggleArchive={handleArchive}
                     isArchiving={isArchiving}
                     isReadOnly={isReadOnly}
+                    onQuickStatusUpdate={isReadOnly ? undefined : quickUpdateTodoStatus}
                 />
                 <CustomPagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
             </div>

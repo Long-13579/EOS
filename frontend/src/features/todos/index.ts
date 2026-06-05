@@ -8,5 +8,6 @@ export { useArchiveTodo } from './hooks/useArchiveTodo';
 export { useDeleteTodo } from './hooks/useDeleteTodo';
 export { useTodoDialog } from './hooks/useTodoDialog';
 export { useFilterTodo } from './hooks/useFilterTodo';
+export { useQuickUpdateTodoStatus } from './hooks/useQuickUpdateTodoStatus';
 export { type CreateTodo, type TodoFormValues, type Todo, type TodoStatus, ALL_TODO_STATUSES } from './types/todo';
 export { MyTodosWidget } from './components/MyTodosWidget';

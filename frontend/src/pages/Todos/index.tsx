@@ -16,6 +16,7 @@ import {
     ALL_TODO_STATUSES,
     useArchiveTodo,
     useDeleteTodo,
+    useQuickUpdateTodoStatus,
 } from '@/features/todos';
 import { EmptyTeamState } from '@/components/shared/EmptyTeamState';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -46,6 +47,8 @@ export function Todos() {
         onPageChange: setPage,
         onItemRemoved: resetPageIfNeeded,
     });
+
+    const { updateStatus: quickUpdateTodoStatus } = useQuickUpdateTodoStatus();
 
     const {
         data: todosResponse,
@@ -119,6 +122,7 @@ export function Todos() {
                         deletingTodoIds={deletingTodoIds}
                         onToggleArchive={handleToggleArchive}
                         isArchiving={isArchiving}
+                        onQuickStatusUpdate={quickUpdateTodoStatus}
                     />
                     <CustomPagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
                 </div>

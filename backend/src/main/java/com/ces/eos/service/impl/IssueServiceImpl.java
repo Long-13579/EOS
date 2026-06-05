@@ -246,6 +246,50 @@ public class IssueServiceImpl implements IssueService {
     return issueMapper.toIssueResponse(updatedIssue);
   }
 
+  @Override
+  @Transactional
+  public IssueResponse updateIssueType(UUID issueId, UUID newIssueTypeId) {
+    log.info("action=updateIssueType.start issueId={} issueTypeId={}", issueId, newIssueTypeId);
+    Issue issue = getIssueById(issueId);
+    if (Boolean.TRUE.equals(issue.getIsArchived())) {
+      log.warn("action=updateIssueType.validationFailed reason=archived issueId={}", issueId);
+      throw new ConflictException(
+          Map.of(
+              "issueId", List.of("Cannot update an archived issue. Please unarchive it first.")));
+    }
+
+    UUID currentTypeId = issue.getIssueType() != null ? issue.getIssueType().getId() : null;
+    if (Objects.equals(currentTypeId, newIssueTypeId)) {
+      log.debug("action=updateIssueType.branch.noChange issueId={} issueTypeId={}", issueId, newIssueTypeId);
+      log.info("action=updateIssueType.success issueId={}", issueId);
+      return issueMapper.toIssueResponse(issue);
+    }
+
+    var beforeSnapshot = objectMapper.valueToTree(issueMapper.toIssueResponse(issue)).toString();
+
+    if (newIssueTypeId != null) {
+      log.debug("action=updateIssueType.branch.setIssueType issueTypeId={}", newIssueTypeId);
+      issue.setIssueType(issueTypeService.getIssueTypeById(newIssueTypeId));
+    } else {
+      log.debug("action=updateIssueType.branch.clearIssueType issueId={}", issueId);
+      issue.setIssueType(null);
+    }
+
+    log.debug("action=updateIssueType.repo.save issueId={}", issueId);
+    Issue updatedIssue = issueRepository.save(issue);
+
+    log.debug("action=updateIssueType.logChange issueId={}", updatedIssue.getId());
+    l10MeetingChangeLogService.logChange(
+        issue.getTeam().getId(),
+        "ISSUE",
+        updatedIssue.getId(),
+        beforeSnapshot,
+        objectMapper.valueToTree(issueMapper.toIssueResponse(updatedIssue)).toString());
+
+    log.info("action=updateIssueType.success issueId={}", updatedIssue.getId());
+    return issueMapper.toIssueResponse(updatedIssue);
+  }
+
   private IssueResponse withTodoCount(IssueResponse response, Long count) {
     return new IssueResponse(
         response.id(), response.title(), response.description(),

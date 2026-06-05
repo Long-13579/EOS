@@ -18,4 +18,6 @@ public interface IssueService {
   IssueResponse updateIssue(UUID issueId, UpdateIssueRequest request);
 
   IssueResponse updateIssueArchiveStatus(UUID issueId, Boolean isArchived);
+
+  IssueResponse updateIssueType(UUID issueId, UUID issueTypeId);
 }

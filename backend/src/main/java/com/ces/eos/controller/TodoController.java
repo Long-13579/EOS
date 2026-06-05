@@ -4,6 +4,7 @@ import com.ces.eos.dto.request.CreateTodoRequest;
 import com.ces.eos.dto.request.PaginationRequest;
 import com.ces.eos.dto.request.UpdateTodoArchiveRequest;
 import com.ces.eos.dto.request.UpdateTodoRequest;
+import com.ces.eos.dto.request.UpdateTodoStatusRequest;
 import com.ces.eos.dto.response.PagedEntityResponse;
 import com.ces.eos.dto.response.TodoResponse;
 import com.ces.eos.enums.TodoStatus;
@@ -78,6 +79,16 @@ public class TodoController {
   public ResponseEntity<TodoResponse> updateTodoArchiveStatus(
       @PathVariable UUID todoId, @Valid @RequestBody UpdateTodoArchiveRequest request) {
     TodoResponse response = todoService.updateTodoArchiveStatus(todoId, request.isArchived());
+    return ResponseEntity.ok(response);
+  }
+
+  @PatchMapping("/{todoId}/status")
+  @PreAuthorize(
+      "hasRole('ADMIN') or @teamSecurityService.isCurrentUserMemberOfTeamByTodoId(#todoId)")
+  public ResponseEntity<TodoResponse> updateTodoStatus(
+      @PathVariable UUID todoId, @Valid @RequestBody UpdateTodoStatusRequest request) {
+    TodoResponse response =
+        todoService.updateTodoStatus(todoId, TodoStatus.valueOf(request.status()));
     return ResponseEntity.ok(response);
   }
 }

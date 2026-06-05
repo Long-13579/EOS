@@ -3,9 +3,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Pencil, Trash2, Calendar, Archive, ArchiveRestore } from 'lucide-react';
 import { TableActions } from '@/components/shared/Table/TableActions';
 import { TableQueryState } from '@/components/shared/Table';
-import type { Todo } from '@/features/todos/types/todo';
+import type { Todo, TodoStatus } from '@/features/todos/types/todo';
 import { formatDate } from '@/utils/date';
 import { StatusBadge } from './StatusBadge';
+import { TodoStatusSelect } from './TodoStatusSelect';
 import { TodoAssigneesCell } from './TodoAssigneesCell';
 import type { DataTableProps } from '@/types/table';
 import { ERROR_MESSAGES } from '@/constants/messages';
@@ -17,6 +18,7 @@ interface TodosTableProps extends DataTableProps<Todo> {
     onUpdate: (data: Todo) => void;
     onDelete: (data: Todo) => void;
     onToggleArchive: (data: Todo) => void;
+    onQuickStatusUpdate?: (id: string, status: TodoStatus) => void;
     deletingTodoIds?: string[];
     isArchiving?: boolean;
     isReadOnly?: boolean;
@@ -65,6 +67,7 @@ export function TodosTable({
     onUpdate,
     onDelete,
     onToggleArchive,
+    onQuickStatusUpdate,
     deletingTodoIds,
     isArchiving,
     isReadOnly,
@@ -136,7 +139,15 @@ export function TodosTable({
                                     </TableCell>
 
                                     <TableCell>
-                                        <StatusBadge status={todo.status} />
+                                        {onQuickStatusUpdate && !isArchived && !isBeingDeleted ? (
+                                            <TodoStatusSelect
+                                                currentStatus={todo.status}
+                                                onSelect={(status) => onQuickStatusUpdate({ id: todo.id, status })}
+                                                disabled={isBeingDeleted || isArchiving || disableActions}
+                                            />
+                                        ) : (
+                                            <StatusBadge status={todo.status} />
+                                        )}
                                     </TableCell>
 
                                     <TableCell className="text-right pr-4.5">

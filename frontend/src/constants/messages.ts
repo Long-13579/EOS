@@ -32,6 +32,7 @@ export const ERROR_MESSAGES = {
         DELETE_FAILED: 'Failed to delete To-do. Please try again.',
         ARCHIVE_FAILED: 'Failed to archive To-do. Please try again.',
         UNARCHIVE_FAILED: 'Failed to unarchive To-do. Please try again.',
+        UPDATE_STATUS_FAILED: 'Failed to update to-do status. Please try again.',
     },
     ISSUE: {
         LOAD_FAILED: 'Failed to load issues. Please try again.',
@@ -42,7 +43,9 @@ export const ERROR_MESSAGES = {
         DELETE_FAILED: 'Failed to delete issue. Please try again.',
         ARCHIVE_FAILED: 'Failed to archive issue. Please try again.',
         UNARCHIVE_FAILED: 'Failed to unarchive issue. Please try again.',
+        UPDATE_TYPE_FAILED: 'Failed to update issue type. Please try again.',
     },
+
     ISSUE_TYPE: {
         LOAD_FAILED: 'Failed to load issue types. Please try again.',
         NOT_FOUND: (issueType?: string) => `Issue type "${issueType}" not found.`,
@@ -104,6 +107,7 @@ export const SUCCESS_MESSAGES = {
         DELETED: 'To-do deleted successfully!',
         ARCHIVED: 'To-do archived successfully!',
         UNARCHIVED: 'To-do unarchived successfully!',
+        STATUS_UPDATED: 'To-do status updated successfully!',
     },
     ISSUE: {
         CREATED: 'Issue created successfully!',
@@ -111,6 +115,7 @@ export const SUCCESS_MESSAGES = {
         DELETED: 'Issue deleted successfully!',
         ARCHIVED: 'Issue archived successfully!',
         UNARCHIVED: 'Issue unarchived successfully!',
+        TYPE_UPDATED: 'Issue type updated successfully!',
     },
     HEADLINE: {
         CREATED: 'Headline created successfully!',

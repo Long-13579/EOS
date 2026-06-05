@@ -41,6 +41,10 @@ export type CreateIssue = IssueFormValues & {
 
 export type UpdateIssue = IssueFormValues;
 
+export interface UpdateIssueType {
+    issueTypeId: string | null;
+}
+
 export interface GetIssuesParams extends PaginationParams {
     teamId?: string;
     isArchived?: boolean;
