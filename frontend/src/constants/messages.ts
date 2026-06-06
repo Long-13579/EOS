@@ -16,6 +16,7 @@ export const ERROR_MESSAGES = {
         NOT_FOUND: 'No teams found.',
         CONFLICT: 'Team already exists.',
         VALIDATION: 'Team data is invalid.',
+        DELETE_FAILED: 'Failed to delete team. Please try again.',
     },
 
     USER: {

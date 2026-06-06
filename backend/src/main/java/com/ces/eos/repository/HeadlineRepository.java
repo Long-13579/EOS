@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -40,4 +41,8 @@ public interface HeadlineRepository extends JpaRepository<Headline, UUID> {
   Optional<Headline> findById(@Param("id") UUID id);
 
   boolean existsByIdAndTeam_Users_Id(UUID headlineId, UUID userId);
+
+  @Modifying
+  @Query("DELETE FROM Headline h WHERE h.team.id = :teamId")
+  void deleteAllByTeamId(@Param("teamId") UUID teamId);
 }

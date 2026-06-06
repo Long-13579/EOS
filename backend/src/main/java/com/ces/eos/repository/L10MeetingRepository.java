@@ -10,6 +10,7 @@ import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -67,4 +68,8 @@ public interface L10MeetingRepository extends JpaRepository<L10Meeting, UUID> {
   Optional<L10Meeting> findActiveMeetingByTeamAndDate(
       @Param("teamId") UUID teamId,
       @Param("meetingDate") LocalDate meetingDate);
+
+  @Modifying
+  @Query("DELETE FROM L10Meeting m WHERE m.team.id = :teamId")
+  void deleteAllByTeamId(@Param("teamId") UUID teamId);
 }

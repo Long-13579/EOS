@@ -43,4 +43,8 @@ public interface MetricValueRepository extends JpaRepository<MetricValue, UUID> 
       """)
   List<MetricValue> findByMetricIdsAndWeekIds(
       @Param("metricIds") List<UUID> metricIds, @Param("weekIds") List<UUID> weekIds);
+
+  @Modifying
+  @Query("DELETE FROM MetricValue mv WHERE mv.metric.team.id = :teamId")
+  void deleteAllByTeamId(@Param("teamId") UUID teamId);
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -67,4 +68,8 @@ public interface RockRepository extends JpaRepository<Rock, UUID> {
   Optional<Rock> findById(@Param("id") UUID id);
 
   boolean existsByIdAndTeam_Users_Id(UUID rockId, UUID userId);
+
+  @Modifying
+  @Query("DELETE FROM Rock r WHERE r.team.id = :teamId")
+  void deleteAllByTeamId(@Param("teamId") UUID teamId);
 }

@@ -21,7 +21,14 @@ import com.ces.eos.exception.ResourceAlreadyExistsException;
 import com.ces.eos.exception.ResourceNotFoundException;
 import com.ces.eos.mapper.TeamMapper;
 import com.ces.eos.mapper.UserMapper;
+import com.ces.eos.repository.HeadlineRepository;
+import com.ces.eos.repository.IssueRepository;
+import com.ces.eos.repository.L10MeetingRepository;
+import com.ces.eos.repository.MetricRepository;
+import com.ces.eos.repository.MetricValueRepository;
+import com.ces.eos.repository.RockRepository;
 import com.ces.eos.repository.TeamRepository;
+import com.ces.eos.repository.TodoRepository;
 import com.ces.eos.repository.UserRepository;
 import java.util.List;
 import java.util.Optional;
@@ -41,6 +48,20 @@ class TeamServiceImplTest {
   @Mock private TeamRepository teamRepository;
 
   @Mock private UserRepository userRepository;
+
+  @Mock private TodoRepository todoRepository;
+
+  @Mock private IssueRepository issueRepository;
+
+  @Mock private HeadlineRepository headlineRepository;
+
+  @Mock private MetricRepository metricRepository;
+
+  @Mock private MetricValueRepository metricValueRepository;
+
+  @Mock private RockRepository rockRepository;
+
+  @Mock private L10MeetingRepository l10MeetingRepository;
 
   @Mock private TeamMapper teamMapper;
 
@@ -275,6 +296,45 @@ class TeamServiceImplTest {
               ex ->
                   assertThat(((ResourceNotFoundException) ex).getErrorCode())
                       .isEqualTo(ErrorCode.RESOURCE_NOT_FOUND));
+    }
+  }
+
+  @Nested
+  class DeleteTeam {
+
+    @Test
+    void deleteTeam_existingTeam_deletesChildrenThenTeam() {
+      UUID teamId = UUID.randomUUID();
+      Team team = org.mockito.Mockito.mock(Team.class);
+
+      when(teamRepository.findById(teamId)).thenReturn(Optional.of(team));
+
+      teamService.deleteTeam(teamId);
+
+      verify(metricValueRepository).deleteAllByTeamId(teamId);
+      verify(metricRepository).deleteAllByTeamId(teamId);
+      verify(rockRepository).deleteAllByTeamId(teamId);
+      verify(todoRepository).deleteAllByTeamId(teamId);
+      verify(issueRepository).deleteAllByTeamId(teamId);
+      verify(headlineRepository).deleteAllByTeamId(teamId);
+      verify(l10MeetingRepository).deleteAllByTeamId(teamId);
+      verify(teamRepository).delete(team);
+    }
+
+    @Test
+    void deleteTeam_nonExistentTeam_throwsResourceNotFoundException() {
+      UUID teamId = UUID.randomUUID();
+      when(teamRepository.findById(teamId)).thenReturn(Optional.empty());
+
+      assertThatThrownBy(() -> teamService.deleteTeam(teamId))
+          .isInstanceOf(ResourceNotFoundException.class)
+          .satisfies(
+              ex ->
+                  assertThat(((ResourceNotFoundException) ex).getErrorCode())
+                      .isEqualTo(ErrorCode.RESOURCE_NOT_FOUND));
+
+      verify(metricValueRepository, never()).deleteAllByTeamId(any());
+      verify(teamRepository, never()).delete(any());
     }
   }
 }

@@ -28,4 +28,6 @@ public interface TeamService {
   List<TeamResponse> getTeamsByUserId(UUID userId, UserRole userRole);
 
   Team getTeamById(UUID teamId);
+
+  void deleteTeam(UUID teamId);
 }

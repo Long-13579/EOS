@@ -14,7 +14,14 @@ import com.ces.eos.exception.ResourceAlreadyExistsException;
 import com.ces.eos.exception.ResourceNotFoundException;
 import com.ces.eos.mapper.TeamMapper;
 import com.ces.eos.mapper.UserMapper;
+import com.ces.eos.repository.HeadlineRepository;
+import com.ces.eos.repository.IssueRepository;
+import com.ces.eos.repository.L10MeetingRepository;
+import com.ces.eos.repository.MetricRepository;
+import com.ces.eos.repository.MetricValueRepository;
+import com.ces.eos.repository.RockRepository;
 import com.ces.eos.repository.TeamRepository;
+import com.ces.eos.repository.TodoRepository;
 import com.ces.eos.repository.UserRepository;
 import com.ces.eos.service.TeamService;
 import java.util.*;
@@ -34,6 +41,13 @@ public class TeamServiceImpl implements TeamService {
 
   private final TeamRepository teamRepository;
   private final UserRepository userRepository;
+  private final TodoRepository todoRepository;
+  private final IssueRepository issueRepository;
+  private final HeadlineRepository headlineRepository;
+  private final MetricRepository metricRepository;
+  private final MetricValueRepository metricValueRepository;
+  private final RockRepository rockRepository;
+  private final L10MeetingRepository l10MeetingRepository;
   private final TeamMapper teamMapper;
   private final UserMapper userMapper;
 
@@ -146,6 +160,26 @@ public class TeamServiceImpl implements TeamService {
 
     log.debug("action=getActiveUsersByTeamId.success count={}", users.size());
     return users;
+  }
+
+  @Override
+  @Transactional
+  public void deleteTeam(UUID teamId) {
+    log.info("action=deleteTeam.start teamId={}", teamId);
+    Team team = getTeamById(teamId);
+
+    log.debug("action=deleteTeam.deletingChildren teamId={}", teamId);
+    metricValueRepository.deleteAllByTeamId(teamId);
+    metricRepository.deleteAllByTeamId(teamId);
+    rockRepository.deleteAllByTeamId(teamId);
+    todoRepository.deleteAllByTeamId(teamId);
+    issueRepository.deleteAllByTeamId(teamId);
+    headlineRepository.deleteAllByTeamId(teamId);
+    l10MeetingRepository.deleteAllByTeamId(teamId);
+
+    log.debug("action=deleteTeam.deletingTeam teamId={}", teamId);
+    teamRepository.delete(team);
+    log.info("action=deleteTeam.success teamId={}", teamId);
   }
 
   private void validateTeamName(String name) {

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import type { Team, UpdateTeam } from '@/types/team';
-import { Pencil } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 import type { DataTableProps } from '@/types/table';
 import { TableActions } from '@/components/shared/Table/TableActions';
 import { TeamEditCell } from './TeamEditCell';
@@ -12,20 +12,33 @@ import { Badge } from '@/components/ui/badge';
 export interface TeamsTableProps extends DataTableProps<Team> {
     isPending: boolean;
     isError: boolean;
+    isAdmin: boolean;
     onUpdate: (id: string, data: UpdateTeam) => Promise<void>;
+    onDelete: (team: Team) => void;
 }
 
-const getTeamActions = (team: Team, onStartEdit: (team: Team) => void) => {
-    return [
+const getTeamActions = (team: Team, onStartEdit: (team: Team) => void, onDelete: (team: Team) => void, isAdmin: boolean) => {
+    const actions = [
         {
             label: 'Edit team',
             icon: Pencil,
             onClick: () => onStartEdit(team),
         },
     ];
+
+    if (isAdmin) {
+        actions.push({
+            label: 'Delete team',
+            icon: Trash2,
+            variant: 'destructive' as const,
+            onClick: () => onDelete(team),
+        });
+    }
+
+    return actions;
 };
 
-export function TeamsTable({ data, isPending, isError, onUpdate }: TeamsTableProps) {
+export function TeamsTable({ data, isPending, isError, isAdmin, onUpdate, onDelete }: TeamsTableProps) {
     const [editingTeamId, setEditingTeamId] = useState<string | null>(null);
 
     const handleStartEdit = (team: Team) => {
@@ -78,7 +91,7 @@ export function TeamsTable({ data, isPending, isError, onUpdate }: TeamsTablePro
                                             </TableCell>
 
                                             <TableCell className="text-right pr-4.5">
-                                                <TableActions actions={getTeamActions(team, handleStartEdit)} />
+                                                <TableActions actions={getTeamActions(team, handleStartEdit, onDelete, isAdmin)} />
                                             </TableCell>
                                         </>
                                     )}

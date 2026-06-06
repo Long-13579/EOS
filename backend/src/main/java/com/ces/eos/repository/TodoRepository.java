@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -71,4 +72,8 @@ public interface TodoRepository extends JpaRepository<Todo, UUID> {
           "SELECT t.issue.id, COUNT(t) FROM Todo t "
               + "WHERE t.issue.id IN :issueIds GROUP BY t.issue.id")
   List<Object[]> countTodosByIssueIds(@Param("issueIds") List<UUID> issueIds);
+
+  @Modifying
+  @Query("DELETE FROM Todo t WHERE t.team.id = :teamId")
+  void deleteAllByTeamId(@Param("teamId") UUID teamId);
 }

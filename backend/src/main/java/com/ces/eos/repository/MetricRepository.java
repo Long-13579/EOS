@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -71,4 +72,8 @@ public interface MetricRepository extends JpaRepository<Metric, UUID> {
       ORDER BY m.createdAt ASC, m.id ASC
       """)
   List<Metric> findByOwnerId(@Param("ownerId") UUID ownerId);
+
+  @Modifying
+  @Query("DELETE FROM Metric m WHERE m.team.id = :teamId")
+  void deleteAllByTeamId(@Param("teamId") UUID teamId);
 }

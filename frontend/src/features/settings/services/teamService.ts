@@ -1,4 +1,4 @@
-import { apiGet, apiPut, apiPost } from '@/utils/apiRequest';
+import { apiGet, apiPut, apiPost, apiDelete } from '@/utils/apiRequest';
 import type { PaginatedResponse, PaginationParams } from '@/types/pagination';
 import type { Team, CreateTeam, UpdateTeam } from '@/types/team';
 
@@ -7,3 +7,5 @@ export const getTeams = (params?: PaginationParams): Promise<PaginatedResponse<T
 export const createTeam = (payload: CreateTeam): Promise<Team> => apiPost<Team>('/teams', payload);
 
 export const updateTeam = (id: string, data: UpdateTeam): Promise<Team> => apiPut<Team>(`/teams/${id}`, data);
+
+export const deleteTeam = (id: string): Promise<void> => apiDelete<void>(`/teams/${id}`);

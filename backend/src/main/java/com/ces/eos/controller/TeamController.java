@@ -46,6 +46,13 @@ public class TeamController {
     return ResponseEntity.ok(response);
   }
 
+  @DeleteMapping("/{team-id}")
+  @PreAuthorize("hasRole('ADMIN')")
+  public ResponseEntity<Void> deleteTeam(@PathVariable("team-id") UUID teamId) {
+    teamService.deleteTeam(teamId);
+    return ResponseEntity.noContent().build();
+  }
+
   @GetMapping("/{team-id}/users")
   @PreAuthorize("hasRole('ADMIN') or @teamSecurityService.isCurrentUserMemberOfTeam(#teamId)")
   public ResponseEntity<List<UserBaseResponse>> getUsersByTeamId(

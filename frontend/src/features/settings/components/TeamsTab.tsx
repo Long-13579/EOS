@@ -6,13 +6,22 @@ import { CustomPagination } from '@/components/shared/CustomPagination';
 import { DEFAULT_LIMIT } from '@/types/pagination';
 import { useUpdateTeam } from '../hooks/useUpdateTeam';
 import { useCreateTeam } from '../hooks/useCreateTeam';
+import { useDeleteTeam } from '../hooks/useDeleteTeam';
+import { DeleteTeamDialog } from './DeleteTeamDialog';
 import { toast } from 'sonner';
+import { normalizeApiError } from '@/utils/apiErrorNormalizer';
 import { CreateTeamForm } from './CreateTeamForm';
 import type { CreateTeam, UpdateTeam } from '@/types/team';
 import { SUCCESS_MESSAGES } from '@/constants/messages';
+import type { Team } from '@/types/team';
+import { useUserStore } from '@/stores/useUserStore';
 
 export function TeamsTab() {
     const [page, setPage] = useState<number>(1);
+    const [deleteTeamCandidate, setDeleteTeamCandidate] = useState<Team | null>(null);
+
+    const user = useUserStore((state) => state.user);
+    const isAdmin = user?.role === 'ADMIN';
 
     const {
         data: teamResponse,
@@ -27,6 +36,7 @@ export function TeamsTab() {
 
     const { createTeam, isCreating } = useCreateTeam();
     const { updateTeam } = useUpdateTeam();
+    const { deleteTeam, isDeleting } = useDeleteTeam();
 
     const handleCreate = async (data: CreateTeam) => {
         await createTeam(data);
@@ -42,6 +52,23 @@ export function TeamsTab() {
         toast.success(SUCCESS_MESSAGES.TEAM.UPDATED);
     };
 
+    const handleDeleteClick = (team: Team) => {
+        setDeleteTeamCandidate(team);
+    };
+
+    const handleDeleteConfirm = async () => {
+        if (!deleteTeamCandidate) return;
+
+        try {
+            await deleteTeam(deleteTeamCandidate.id);
+            toast.success(SUCCESS_MESSAGES.TEAM.DELETED);
+            setDeleteTeamCandidate(null);
+        } catch (error) {
+            const normalized = normalizeApiError(error);
+            toast.error(normalized.message);
+        }
+    };
+
     return (
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -54,9 +81,17 @@ export function TeamsTab() {
             </CardHeader>
 
             <CardContent>
-                <TeamsTable isError={isError} isPending={isPending} data={teamResponse?.data ?? []} onUpdate={handleUpdate} />
+                <TeamsTable isError={isError} isPending={isPending} isAdmin={isAdmin} data={teamResponse?.data ?? []} onUpdate={handleUpdate} onDelete={handleDeleteClick} />
                 <CustomPagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
             </CardContent>
+
+            <DeleteTeamDialog
+                isOpen={deleteTeamCandidate !== null}
+                onOpenChange={(open) => { if (!open) setDeleteTeamCandidate(null); }}
+                onConfirm={handleDeleteConfirm}
+                teamName={deleteTeamCandidate?.name ?? ''}
+                isDeleting={isDeleting}
+            />
         </Card>
     );
 }
