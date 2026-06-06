@@ -92,6 +92,7 @@ class MetricValueServiceImplTest {
               null,
               null,
               null,
+              null,
               null);
 
       when(metricRepository.findByIdWithTeam(metricId)).thenReturn(Optional.of(metric));

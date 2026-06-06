@@ -16,6 +16,7 @@ import com.ces.eos.entity.Week;
 import com.ces.eos.enums.MetricOperator;
 import com.ces.eos.enums.MetricUnit;
 import com.ces.eos.exception.BadRequestException;
+import com.ces.eos.exception.ConflictException;
 import com.ces.eos.exception.ResourceNotFoundException;
 import com.ces.eos.mapper.MetricMapper;
 import com.ces.eos.mapper.MetricValueMapper;
@@ -98,10 +99,10 @@ public class MetricServiceImpl implements MetricService {
   }
 
   @Override
-  public List<MetricResponse> listMetricsByTeamAndWeek(UUID teamId, UUID weekId) {
-    log.info("action=listMetricsByTeamAndWeek.start teamId={} weekId={}", teamId, weekId);
-    log.debug("action=listMetricsByTeamAndWeek.repo.findByTeamId teamId={}", teamId);
-    List<Metric> metrics = metricRepository.findByTeamId(teamId);
+  public List<MetricResponse> listMetricsByTeamAndWeek(UUID teamId, UUID weekId, Boolean showArchived) {
+    log.info("action=listMetricsByTeamAndWeek.start teamId={} weekId={} showArchived={}", teamId, weekId, showArchived);
+    log.debug("action=listMetricsByTeamAndWeek.repo.findByTeamIdAndIsArchived teamId={} showArchived={}", teamId, showArchived);
+    List<Metric> metrics = metricRepository.findByTeamIdAndIsArchived(teamId, Boolean.TRUE.equals(showArchived));
     List<MetricResponse> responses = processMetricsForWeek(metrics, weekId, "teamId=" + teamId);
     log.info(
         "action=listMetricsByTeamAndWeek.success teamId={} count={}", teamId, responses.size());
@@ -176,8 +177,8 @@ public class MetricServiceImpl implements MetricService {
   public TrendsTabMetricListResponse listTrendsTabMetricsByTeam(UUID teamId) {
     log.info("action=listTrendsTabMetricsByTeam.start teamId={}", teamId);
 
-    log.debug("action=listTrendsTabMetricsByTeam.repo.findByTeamId teamId={}", teamId);
-    List<Metric> metrics = metricRepository.findByTeamId(teamId);
+    log.debug("action=listTrendsTabMetricsByTeam.repo.findByTeamIdAndIsArchivedFalse teamId={}", teamId);
+    List<Metric> metrics = metricRepository.findByTeamIdAndIsArchivedFalse(teamId);
     if (metrics.isEmpty()) {
       log.debug("action=listTrendsTabMetricsByTeam.branch.noMetrics teamId={}", teamId);
       log.info("action=listTrendsTabMetricsByTeam.success teamId={} count=0", teamId);
@@ -264,6 +265,13 @@ public class MetricServiceImpl implements MetricService {
     log.info("action=updateMetric.start metricId={} updaterId={}", metricId, updaterId);
     Metric metric = getMetricById(metricId);
 
+    if (Boolean.TRUE.equals(metric.getIsArchived())) {
+      log.warn("action=updateMetric.validationFailed reason=archived metricId={}", metricId);
+      throw new ConflictException(
+          Map.of(
+              "metricId", List.of("Cannot update an archived metric. Please unarchive it first.")));
+    }
+
     MetricOperator newOperator =
         request.operator() == null
             ? null
@@ -303,6 +311,35 @@ public class MetricServiceImpl implements MetricService {
 
     log.info("action=updateMetric.success metricId={}", updatedMetric.getId());
 
+    return metricMapper.toMetricResponse(updatedMetric, null, null);
+  }
+
+  @Override
+  @Transactional
+  public MetricResponse updateMetricArchiveStatus(UUID metricId, Boolean isArchived) {
+    log.info("action=updateMetricArchiveStatus.start metricId={} isArchived={}", metricId, isArchived);
+    Metric metric = getMetricById(metricId);
+    if (metric.getIsArchived() == isArchived) {
+      log.debug("action=updateMetricArchiveStatus.branch.noChange metricId={}", metricId);
+      log.info("action=updateMetricArchiveStatus.success metricId={}", metricId);
+      return metricMapper.toMetricResponse(metric, null, null);
+    }
+
+    var beforeSnapshot = objectMapper.valueToTree(metricMapper.toMetricResponse(metric, null, null)).toString();
+
+    metric.setIsArchived(isArchived);
+    log.debug("action=updateMetricArchiveStatus.repo.save metricId={}", metricId);
+    Metric updatedMetric = metricRepository.save(metric);
+
+    log.debug("action=updateMetricArchiveStatus.logChange metricId={}", updatedMetric.getId());
+    l10MeetingChangeLogService.logChange(
+        metric.getTeam().getId(),
+        "METRIC",
+        updatedMetric.getId(),
+        beforeSnapshot,
+        objectMapper.valueToTree(metricMapper.toMetricResponse(updatedMetric, null, null)).toString());
+
+    log.info("action=updateMetricArchiveStatus.success metricId={}", updatedMetric.getId());
     return metricMapper.toMetricResponse(updatedMetric, null, null);
   }
 

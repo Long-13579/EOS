@@ -41,6 +41,7 @@ export interface Metric extends BaseEntity {
     owner: TeamMember;
     unit: MetricUnit;
     isGoalMet?: boolean;
+    isArchived?: boolean;
 }
 
 export interface MetricValue extends BaseEntity {
@@ -60,11 +61,13 @@ export interface MetricResponseItem extends BaseEntity {
     currentValue?: MetricValue;
     lastValue?: string;
     unit: MetricUnit;
+    isArchived?: boolean;
 }
 
 export interface GetMetricsParams {
     teamId: string;
     weekId: string;
+    showArchived?: boolean;
 }
 
 export type GetMyMetricsParams = Pick<GetMetricsParams, 'weekId'>;

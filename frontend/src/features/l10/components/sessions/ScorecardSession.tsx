@@ -2,12 +2,14 @@ import { useMemo, useState } from 'react';
 import { useActiveTeamId } from '@/hooks/useActiveTeamId';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useWeeks } from '@/features/scorecard/hooks/useWeeks';
 import { useMetrics } from '@/features/scorecard/hooks/useMetrics';
 import { useMetricDialog } from '@/features/scorecard/hooks/useMetricDialog';
 import { useDeleteMetric } from '@/features/scorecard/hooks/useDeleteMetric';
+import { useArchiveMetric } from '@/features/scorecard/hooks/useArchiveMetric';
 import { MetricsTable } from '@/features/scorecard/components/MetricsTable';
 import { MetricDialog } from '@/features/scorecard/components/MetricDialog';
 import { WeekSelect } from '@/features/scorecard/components/WeekSelect';
@@ -29,6 +31,10 @@ export function ScorecardSession({ weekStartDate, meetingStatus }: ScorecardSess
 
     const { isDeleteDialogOpen, setDeleteDialogOpen, openDelete, handleConfirmDelete, deletingMetric } = useDeleteMetric();
 
+    const { handleArchiveToggle } = useArchiveMetric();
+
+    const [showArchived, setShowArchived] = useState(false);
+
     const weekId = useMemo(() => {
         if (!weeks.length || !weekStartDate) return undefined;
         const match = weeks.find((w) => w.startDate <= weekStartDate && w.endDate >= weekStartDate);
@@ -44,6 +50,7 @@ export function ScorecardSession({ weekStartDate, meetingStatus }: ScorecardSess
     } = useMetrics({
         teamId: teamId!,
         weekId: effectiveWeekId!,
+        showArchived: showArchived || undefined,
     });
 
     const isEditable = meetingStatus === 'STARTED';
@@ -54,19 +61,10 @@ export function ScorecardSession({ weekStartDate, meetingStatus }: ScorecardSess
                 <CardHeader>
                     <div className="flex items-center justify-between">
                         <CardTitle>Scorecard</CardTitle>
-                        <div className="flex items-center gap-2">
-                            <WeekSelect
-                                weeks={weeks}
-                                value={effectiveWeekId}
-                                onValueChange={setSelectedWeekId}
-                                isPending={isWeeksPending}
-                                isError={isWeeksError}
-                            />
-                            <Button type="button" size="sm" onClick={openCreate}>
-                                <Plus className="mr-1 h-4 w-4" />
-                                Add Metric
-                            </Button>
-                        </div>
+                        <Button type="button" size="sm" onClick={openCreate}>
+                            <Plus className="mr-1 h-4 w-4" />
+                            Add Metric
+                        </Button>
                     </div>
                 </CardHeader>
                 <CardContent>
@@ -76,7 +74,23 @@ export function ScorecardSession({ weekStartDate, meetingStatus }: ScorecardSess
                             <TabsTrigger value="trends">Trends</TabsTrigger>
                         </TabsList>
 
-                        <TabsContent value="metrics" className="m-0">
+                        <TabsContent value="metrics" className="m-0 flex flex-col gap-4">
+                            <div className="flex items-center justify-end gap-4 rounded-lg bg-muted/30 p-4 border">
+                                <WeekSelect
+                                    weeks={weeks}
+                                    value={effectiveWeekId}
+                                    onValueChange={setSelectedWeekId}
+                                    isPending={isWeeksPending}
+                                    isError={isWeeksError}
+                                />
+                                <label className="flex items-center gap-2 text-sm font-medium cursor-pointer">
+                                    <Checkbox
+                                        checked={showArchived}
+                                        onCheckedChange={(checked) => setShowArchived(checked === true)}
+                                    />
+                                    <span>Show archived</span>
+                                </label>
+                            </div>
                             <MetricsTable
                                 data={metrics}
                                 isPending={isPending}
@@ -84,6 +98,7 @@ export function ScorecardSession({ weekStartDate, meetingStatus }: ScorecardSess
                                 emptyMessage="No metrics for this week."
                                 onUpdate={openUpdate}
                                 onDelete={openDelete}
+                                onArchive={(metric) => handleArchiveToggle(metric)}
                                 isDashboardView
                                 isEditable={isEditable}
                             />

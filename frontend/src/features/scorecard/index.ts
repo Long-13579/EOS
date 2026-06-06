@@ -2,6 +2,7 @@ export { useMetrics } from './hooks/useMetrics';
 export { useMyMetrics } from './hooks/useMyMetrics';
 export { useWeeks } from './hooks/useWeeks';
 export { useDeleteMetric } from './hooks/useDeleteMetric';
+export { useArchiveMetric } from './hooks/useArchiveMetric';
 export { useMetricDialog } from './hooks/useMetricDialog';
 export { MetricsTable } from './components/MetricsTable';
 export { MyScorecardsWidget } from './components/MyScorecardsWidget';

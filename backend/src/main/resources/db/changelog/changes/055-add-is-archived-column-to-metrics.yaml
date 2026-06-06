@@ -1,0 +1,18 @@
+databaseChangeLog:
+  - changeSet:
+      id: 055-add-is-archived-column-to-metrics
+      author: eos-team
+      changes:
+        - addColumn:
+            tableName: metrics
+            columns:
+              - column:
+                  name: is_archived
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+      rollback:
+        - dropColumn:
+            tableName: metrics
+            columnName: is_archived

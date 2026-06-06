@@ -1,7 +1,7 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { TableQueryState } from '@/components/shared/Table';
 import { TableActions } from '@/components/shared/Table/TableActions';
-import { Pencil, Trash2, User } from 'lucide-react';
+import { Pencil, Trash2, User, Archive, ArchiveRestore } from 'lucide-react';
 import type { Metric } from '../types/metric';
 import { ERROR_MESSAGES } from '@/constants/messages';
 import { formatMetricValue } from '../utils/metricFormat';
@@ -9,6 +9,7 @@ import { getUserFullName } from '@/utils/user';
 import { useUpdateMetricValue } from '../hooks/useUpdateMetricValue';
 import { MetricValueCell } from './MetricValueCell';
 import { getMetricColor } from '../utils/metricColor';
+import { cn } from '@/lib/utils';
 
 interface MetricsTableProps {
     data?: Metric[];
@@ -17,6 +18,7 @@ interface MetricsTableProps {
     emptyMessage?: string;
     onUpdate?: (metric: Metric) => void;
     onDelete?: (metric: Metric) => void;
+    onArchive?: (metric: Metric) => void;
     isEditable?: boolean;
     isDashboardView?: boolean;
 }
@@ -25,31 +27,45 @@ interface MetricActionsProps {
     metric: Metric;
     onUpdate?: (metric: Metric) => void;
     onDelete?: (metric: Metric) => void;
+    onArchive?: (metric: Metric) => void;
 }
 
-const getActions = ({ metric, onUpdate, onDelete }: MetricActionsProps) => [
-    ...(onUpdate
-        ? [
-              {
-                  label: 'Edit Metric',
-                  icon: Pencil,
-                  onClick: () => onUpdate(metric),
-              },
-          ]
-        : []),
-    ...(onDelete
-        ? [
-              {
-                  label: 'Delete Metric',
-                  icon: Trash2,
-                  variant: 'destructive' as const,
-                  onClick: () => onDelete(metric),
-              },
-          ]
-        : []),
-];
+const getActions = ({ metric, onUpdate, onDelete, onArchive }: MetricActionsProps) => {
+    const isArchived = metric.isArchived;
 
-export function MetricsTable({ data, isPending, isError, emptyMessage, onUpdate, onDelete, isEditable, isDashboardView = false }: MetricsTableProps) {
+    return [
+        ...(onUpdate && !isArchived
+            ? [
+                  {
+                      label: 'Edit Metric',
+                      icon: Pencil,
+                      onClick: () => onUpdate(metric),
+                  },
+              ]
+            : []),
+        ...(onArchive
+            ? [
+                  {
+                      label: isArchived ? 'Unarchive Metric' : 'Archive Metric',
+                      icon: isArchived ? ArchiveRestore : Archive,
+                      onClick: () => onArchive(metric),
+                  },
+              ]
+            : []),
+        ...(onDelete
+            ? [
+                  {
+                      label: 'Delete Metric',
+                      icon: Trash2,
+                      variant: 'destructive' as const,
+                      onClick: () => onDelete(metric),
+                  },
+              ]
+            : []),
+    ];
+};
+
+export function MetricsTable({ data, isPending, isError, emptyMessage, onUpdate, onDelete, onArchive, isEditable, isDashboardView = false }: MetricsTableProps) {
     const { updateMetricValue, isUpdating } = useUpdateMetricValue();
 
     const handleUpdate = (metricId: string, value: string | null) => {
@@ -82,10 +98,15 @@ export function MetricsTable({ data, isPending, isError, emptyMessage, onUpdate,
                             errorMessage={ERROR_MESSAGES.METRIC.LOAD_FAILED}
                         >
                             {data?.map((metric) => {
+                                const isArchived = metric.isArchived;
                                 return (
-                                    <TableRow key={metric.id}>
+                                    <TableRow
+                                        key={metric.id}
+                                        className={cn(isArchived && '[&>td:not(:last-child)]:opacity-60')}
+                                        aria-disabled={isArchived}
+                                    >
                                         <TableCell className="pl-6 font-medium max-w-[240px]">
-                                            {onUpdate ? (
+                                            {onUpdate && !isArchived ? (
                                                 <button
                                                     type="button"
                                                     className="block max-w-full truncate overflow-hidden hover:text-primary hover:underline"
@@ -120,7 +141,7 @@ export function MetricsTable({ data, isPending, isError, emptyMessage, onUpdate,
                                                     metric={metric}
                                                     onUpdate={handleUpdate}
                                                     isUpdating={isUpdating}
-                                                    isEditable={isEditable}
+                                                    isEditable={isEditable && !isArchived}
                                                 />
                                             </span>
                                         </TableCell>
@@ -149,7 +170,7 @@ export function MetricsTable({ data, isPending, isError, emptyMessage, onUpdate,
                                         </TableCell>
 
                                         <TableCell className="text-right pr-8">
-                                            <TableActions actions={getActions({ metric, onUpdate, onDelete })} />
+                                            <TableActions actions={getActions({ metric, onUpdate, onDelete, onArchive })} />
                                         </TableCell>
                                     </TableRow>
                                 );

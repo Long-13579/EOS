@@ -13,4 +13,6 @@ export const metricKeys = {
     detail: (id: string) => [...metricKeys.all, 'detail', id] as const,
 
     deleteMetric: () => [...metricKeys.all, 'delete'] as const,
+
+    archiveMetric: () => [...metricKeys.all, 'archive'] as const,
 };

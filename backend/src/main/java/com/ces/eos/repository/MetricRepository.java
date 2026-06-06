@@ -43,6 +43,30 @@ public interface MetricRepository extends JpaRepository<Metric, UUID> {
       JOIN FETCH m.owner
       LEFT JOIN FETCH m.createdBy
       LEFT JOIN FETCH m.updatedBy
+      WHERE m.team.id = :teamId AND m.isArchived = FALSE
+      ORDER BY m.createdAt ASC, m.id ASC
+      """)
+  List<Metric> findByTeamIdAndIsArchivedFalse(@Param("teamId") UUID teamId);
+
+  @Query(
+      """
+      SELECT m FROM Metric m
+      JOIN FETCH m.team
+      JOIN FETCH m.owner
+      LEFT JOIN FETCH m.createdBy
+      LEFT JOIN FETCH m.updatedBy
+      WHERE m.team.id = :teamId AND m.isArchived = :isArchived
+      ORDER BY m.createdAt ASC, m.id ASC
+      """)
+  List<Metric> findByTeamIdAndIsArchived(@Param("teamId") UUID teamId, @Param("isArchived") Boolean isArchived);
+
+  @Query(
+      """
+      SELECT m FROM Metric m
+      JOIN FETCH m.team
+      JOIN FETCH m.owner
+      LEFT JOIN FETCH m.createdBy
+      LEFT JOIN FETCH m.updatedBy
       WHERE m.owner.id = :ownerId
       ORDER BY m.createdAt ASC, m.id ASC
       """)

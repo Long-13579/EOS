@@ -11,9 +11,11 @@ import java.util.UUID;
 public interface MetricService {
   MetricResponse addMetric(CreateMetricRequest request, UUID creatorId);
 
-  List<MetricResponse> listMetricsByTeamAndWeek(UUID teamId, UUID weekId);
+  List<MetricResponse> listMetricsByTeamAndWeek(UUID teamId, UUID weekId, Boolean showArchived);
 
   MetricResponse updateMetric(UUID metricId, UpdateMetricRequest request, UUID updaterId);
+
+  MetricResponse updateMetricArchiveStatus(UUID metricId, Boolean isArchived);
 
   Metric getMetricById(UUID metricId);
 

@@ -1,6 +1,7 @@
 package com.ces.eos.controller;
 
 import com.ces.eos.dto.request.CreateMetricRequest;
+import com.ces.eos.dto.request.UpdateMetricArchiveRequest;
 import com.ces.eos.dto.request.UpdateMetricRequest;
 import com.ces.eos.dto.response.MetricResponse;
 import com.ces.eos.dto.response.TrendsTabMetricListResponse;
@@ -16,6 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -43,8 +45,19 @@ public class MetricController {
   @GetMapping
   @PreAuthorize("hasRole('ADMIN') or @teamSecurityService.isCurrentUserMemberOfTeam(#teamId)")
   public ResponseEntity<List<MetricResponse>> listMetricsByTeamAndWeek(
-      @RequestParam UUID teamId, @RequestParam UUID weekId) {
-    List<MetricResponse> response = metricService.listMetricsByTeamAndWeek(teamId, weekId);
+      @RequestParam UUID teamId,
+      @RequestParam UUID weekId,
+      @RequestParam(required = false) Boolean showArchived) {
+    List<MetricResponse> response = metricService.listMetricsByTeamAndWeek(teamId, weekId, showArchived);
+    return ResponseEntity.ok(response);
+  }
+
+  @PatchMapping("/{metricId}")
+  @PreAuthorize(
+      "hasRole('ADMIN') or @teamSecurityService.isCurrentUserMemberOfTeamByMetricId(#metricId)")
+  public ResponseEntity<MetricResponse> updateMetricArchiveStatus(
+      @PathVariable UUID metricId, @Valid @RequestBody UpdateMetricArchiveRequest request) {
+    MetricResponse response = metricService.updateMetricArchiveStatus(metricId, request.isArchived());
     return ResponseEntity.ok(response);
   }
 

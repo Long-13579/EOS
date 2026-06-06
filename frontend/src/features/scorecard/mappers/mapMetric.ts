@@ -45,4 +45,5 @@ export const mapMetric = (item: MetricResponseItem): Metric => ({
     owner: item.owner,
     unit: item.unit,
     isGoalMet: item.currentValue?.isGoalMet,
+    isArchived: item.isArchived,
 });

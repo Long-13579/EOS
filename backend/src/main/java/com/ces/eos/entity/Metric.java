@@ -89,4 +89,8 @@ public class Metric {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "updated_by", insertable = false, updatable = false)
   User updatedBy;
+
+  @Builder.Default
+  @Column(name = "is_archived", nullable = false)
+  Boolean isArchived = false;
 }

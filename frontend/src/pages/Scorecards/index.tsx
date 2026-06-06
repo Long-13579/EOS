@@ -11,9 +11,11 @@ import {
     type ScorecardTab,
     useMetricDialog,
     useDeleteMetric,
+    useArchiveMetric,
     MetricDialog,
     WeekSelect,
 } from '@/features/scorecard';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { UI_MESSAGES, ERROR_MESSAGES, CONFIRM_MESSAGES } from '@/constants/messages';
 import { ConfirmationDialog } from '@/components/shared/ConfirmationDialog';
@@ -36,6 +38,9 @@ export function Scorecards() {
 
     const { isDeleteDialogOpen, setDeleteDialogOpen, openDelete, handleConfirmDelete, deletingMetric } = useDeleteMetric();
 
+    const { handleArchiveToggle } = useArchiveMetric();
+    const [showArchived, setShowArchived] = useState(false);
+
     const {
         data: metrics,
         isPending: isMetricsPending,
@@ -43,6 +48,7 @@ export function Scorecards() {
     } = useMetrics({
         teamId: activeTeamId!,
         weekId: selectedWeekValue!,
+        showArchived: showArchived || undefined,
     });
 
     const handleTabChange = (val: string) => {
@@ -83,15 +89,24 @@ export function Scorecards() {
                     </div>
 
                     <TabsContent value={SCORECARD_TAB.METRICS} className="m-0 flex flex-col gap-6">
-                        <div className="flex items-center gap-2 justify-end">
-                            <span className="text-sm font-medium">{UI_MESSAGES.WEEK.LABEL}</span>
-                            <WeekSelect
-                                weeks={weeks}
-                                value={selectedWeekValue}
-                                onValueChange={setSelectedWeek}
-                                isPending={isWeeksPending}
-                                isError={isWeeksError}
-                            />
+                        <div className="flex items-center justify-end gap-4 rounded-lg bg-muted/30 p-4 border">
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm font-medium">{UI_MESSAGES.WEEK.LABEL}</span>
+                                <WeekSelect
+                                    weeks={weeks}
+                                    value={selectedWeekValue}
+                                    onValueChange={setSelectedWeek}
+                                    isPending={isWeeksPending}
+                                    isError={isWeeksError}
+                                />
+                            </div>
+                            <label className="flex items-center gap-2 text-sm font-medium cursor-pointer">
+                                <Checkbox
+                                    checked={showArchived}
+                                    onCheckedChange={(checked) => setShowArchived(checked === true)}
+                                />
+                                <span>Show archived</span>
+                            </label>
                         </div>
 
                         <MetricsTable
@@ -102,6 +117,7 @@ export function Scorecards() {
                             isEditable={isEditingCurrentWeek}
                             onUpdate={openUpdate}
                             onDelete={openDelete}
+                            onArchive={(metric) => handleArchiveToggle(metric)}
                         />
                     </TabsContent>
 

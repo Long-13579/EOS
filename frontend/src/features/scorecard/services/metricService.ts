@@ -1,4 +1,4 @@
-import { apiDelete, apiGet, apiPost, apiPut } from '@/utils/apiRequest';
+import { apiDelete, apiGet, apiPatch, apiPost, apiPut } from '@/utils/apiRequest';
 import type {
     Metric,
     CreateMetric,
@@ -26,3 +26,6 @@ export const getTrendMetrics = (teamId: string): Promise<TrendsTabMetricListResp
     });
 
 export const deleteMetric = (id: string): Promise<void> => apiDelete<void>('/metrics/' + id);
+
+export const archiveMetric = (id: string, isArchived: boolean): Promise<MetricResponseItem> =>
+    apiPatch<MetricResponseItem>(`/metrics/${id}`, { isArchived });

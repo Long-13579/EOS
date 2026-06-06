@@ -80,6 +80,8 @@ export const ERROR_MESSAGES = {
         CREATE_FAILED: 'Failed to create metric. Please try again.',
         UPDATE_FAILED: 'Failed to update metric. Please try again.',
         DELETE_FAILED: 'Failed to delete metric. Please try again.',
+        ARCHIVE_FAILED: 'Failed to archive metric. Please try again.',
+        UNARCHIVE_FAILED: 'Failed to unarchive metric. Please try again.',
         TREND_LOAD_FAILED: 'Failed to load trend metrics. Please try again.',
         TREND_NOT_FOUND: 'No trend metrics found.',
     },
@@ -100,6 +102,8 @@ export const SUCCESS_MESSAGES = {
         CREATED: 'Metric created successfully!',
         UPDATED: 'Metric updated successfully!',
         DELETED: 'Metric deleted successfully!',
+        ARCHIVED: 'Metric archived successfully!',
+        UNARCHIVED: 'Metric unarchived successfully!',
     },
     TODO: {
         CREATED: 'To-do created successfully!',
@@ -141,6 +145,10 @@ export const CONFIRM_MESSAGES = {
     DELETE: {
         CONFIRM_ITEM: (item: string) => `Are you sure you want to delete "${item}"?`,
         GENERIC: 'Are you sure you want to delete this item?',
+    },
+    ARCHIVE: {
+        CONFIRM_ARCHIVE: (item: string) => `Are you sure you want to archive "${item}"?`,
+        CONFIRM_UNARCHIVE: (item: string) => `Are you sure you want to unarchive "${item}"?`,
     },
 } as const;
 

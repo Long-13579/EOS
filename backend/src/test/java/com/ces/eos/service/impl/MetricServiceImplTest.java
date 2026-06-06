@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.ces.eos.dto.request.CreateMetricRequest;
+import com.ces.eos.dto.request.UpdateMetricArchiveRequest;
 import com.ces.eos.dto.request.UpdateMetricRequest;
 import com.ces.eos.dto.response.MetricResponse;
 import com.ces.eos.dto.response.TrendsTabMetricListResponse;
@@ -99,6 +100,7 @@ class MetricServiceImplTest {
               null,
               null,
               null,
+              null,
               null);
 
       when(metricMapper.toEntity(request)).thenReturn(metric);
@@ -154,9 +156,9 @@ class MetricServiceImplTest {
     void listMetricsByTeamAndWeek_noMetrics_returnsEmptyList() {
       UUID teamId = UUID.randomUUID();
       UUID weekId = UUID.randomUUID();
-      when(metricRepository.findByTeamId(teamId)).thenReturn(List.of());
+      when(metricRepository.findByTeamIdAndIsArchivedFalse(teamId)).thenReturn(List.of());
 
-      List<MetricResponse> result = metricService.listMetricsByTeamAndWeek(teamId, weekId);
+      List<MetricResponse> result = metricService.listMetricsByTeamAndWeek(teamId, weekId, null);
 
       assertThat(result).isEmpty();
       verify(weekService, never()).getWeekById(any());
@@ -185,9 +187,10 @@ class MetricServiceImplTest {
               null,
               null,
               null,
+              null,
               null);
 
-      when(metricRepository.findByTeamId(teamId)).thenReturn(List.of(metric));
+      when(metricRepository.findByTeamIdAndIsArchivedFalse(teamId)).thenReturn(List.of(metric));
       when(weekService.getWeekById(weekId)).thenReturn(currentWeek);
       when(currentWeek.getStartDate()).thenReturn(LocalDate.of(2026, 4, 14));
       when(weekService.getPreviousWeek(LocalDate.of(2026, 4, 14))).thenReturn(Optional.empty());
@@ -200,7 +203,7 @@ class MetricServiceImplTest {
           .thenReturn(Map.of(metricId, weekValues));
       when(metricMapper.toMetricResponse(metric, currentValue, null)).thenReturn(response);
 
-      List<MetricResponse> result = metricService.listMetricsByTeamAndWeek(teamId, weekId);
+      List<MetricResponse> result = metricService.listMetricsByTeamAndWeek(teamId, weekId, null);
 
       assertThat(result).containsExactly(response);
     }
@@ -231,9 +234,10 @@ class MetricServiceImplTest {
               null,
               null,
               null,
+              null,
               null);
 
-      when(metricRepository.findByTeamId(teamId)).thenReturn(List.of(metric));
+      when(metricRepository.findByTeamIdAndIsArchivedFalse(teamId)).thenReturn(List.of(metric));
       when(weekService.getWeekById(weekId)).thenReturn(currentWeek);
       when(currentWeek.getStartDate()).thenReturn(LocalDate.of(2026, 4, 14));
       when(weekService.getPreviousWeek(LocalDate.of(2026, 4, 14))).thenReturn(Optional.of(previousWeek));
@@ -249,7 +253,7 @@ class MetricServiceImplTest {
           .thenReturn(Map.of(metricId, weekValues));
       when(metricMapper.toMetricResponse(metric, currentValue, previousValue)).thenReturn(response);
 
-      List<MetricResponse> result = metricService.listMetricsByTeamAndWeek(teamId, weekId);
+      List<MetricResponse> result = metricService.listMetricsByTeamAndWeek(teamId, weekId, null);
 
       assertThat(result).containsExactly(response);
       verify(metricMapper).toMetricResponse(metric, currentValue, previousValue);
@@ -262,7 +266,7 @@ class MetricServiceImplTest {
     @Test
     void listTrendsTabMetricsByTeam_noMetrics_returnsEmptyItems() {
       UUID teamId = UUID.randomUUID();
-      when(metricRepository.findByTeamId(teamId)).thenReturn(List.of());
+      when(metricRepository.findByTeamIdAndIsArchivedFalse(teamId)).thenReturn(List.of());
 
       TrendsTabMetricListResponse result = metricService.listTrendsTabMetricsByTeam(teamId);
 
@@ -274,8 +278,8 @@ class MetricServiceImplTest {
       UUID teamId = UUID.randomUUID();
       Metric metric = org.mockito.Mockito.mock(Metric.class);
 
-      when(metricRepository.findByTeamId(teamId)).thenReturn(List.of(metric));
-      when(weekService.getLast13Weeks()).thenReturn(List.of());
+      when(metricRepository.findByTeamIdAndIsArchivedFalse(teamId)).thenReturn(List.of(metric));
+      lenient().when(weekService.getLast13Weeks()).thenReturn(List.of());
 
       TrendsTabMetricListResponse result = metricService.listTrendsTabMetricsByTeam(teamId);
 
@@ -316,9 +320,11 @@ class MetricServiceImplTest {
               null,
               null,
               null,
-              null);
+              null,
+              false);
 
       when(metricRepository.findByIdWithTeam(metricId)).thenReturn(Optional.of(metric));
+      when(metric.getIsArchived()).thenReturn(false);
       when(metric.getUnit()).thenReturn(MetricUnit.NUMBER);
       when(metric.getTeam()).thenReturn(team);
       when(team.getId()).thenReturn(teamId);
@@ -343,6 +349,7 @@ class MetricServiceImplTest {
       UUID metricId = UUID.randomUUID();
       Metric metric = org.mockito.Mockito.mock(Metric.class);
       when(metricRepository.findByIdWithTeam(metricId)).thenReturn(Optional.of(metric));
+      when(metric.getIsArchived()).thenReturn(false);
 
       UpdateMetricRequest request =
           new UpdateMetricRequest("Revenue", "120", "INVALID", UUID.randomUUID());

@@ -18,4 +18,5 @@ public record MetricResponse(
     Instant createdAt,
     Instant updatedAt,
     UserBaseResponse createdBy,
-    UserBaseResponse updatedBy) {}
+    UserBaseResponse updatedBy,
+    Boolean isArchived) {}
