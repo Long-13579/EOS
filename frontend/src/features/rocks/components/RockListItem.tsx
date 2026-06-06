@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, ClipboardList, Pencil, Archive, ArchiveRestore } from 'lucide-react';
+import { ChevronDown, ChevronUp, ClipboardList, Pencil, Archive, ArchiveRestore, Trash2 } from 'lucide-react';
 import type { Rock, RockStatus } from '../types/rock';
 import { TableActions } from '@/components/shared/Table';
 import { formatDate } from '@/utils/date';
@@ -16,6 +16,7 @@ interface RockListItemProps {
     rock: Rock;
     onUpdate?: (rock: Rock) => void;
     onArchive?: (rock: Rock) => void;
+    onDelete?: (rock: Rock) => void;
     showTeam?: boolean;
     isArchiving?: boolean;
 }
@@ -24,6 +25,7 @@ const getRockActions = (
     rock: Rock,
     onUpdate?: (rock: Rock) => void,
     onArchive?: (rock: Rock) => void,
+    onDelete?: (rock: Rock) => void,
     isDashboard?: boolean,
     isLeadershipTeam: boolean = false,
 ) => {
@@ -49,10 +51,19 @@ const getRockActions = (
         });
     }
 
+    if (canModifyRock) {
+        actions.push({
+            label: 'Delete Rock',
+            icon: Trash2,
+            variant: 'destructive' as const,
+            onClick: () => onDelete?.(rock),
+        });
+    }
+
     return actions;
 };
 
-export function RockListItem({ rock, onUpdate, onArchive, showTeam, isArchiving }: RockListItemProps) {
+export function RockListItem({ rock, onUpdate, onArchive, onDelete, showTeam, isArchiving }: RockListItemProps) {
     const [isExpanded, setIsExpanded] = useState(false);
     const isLeadershipTeam = useIsLeadershipTeam();
 
@@ -142,7 +153,7 @@ export function RockListItem({ rock, onUpdate, onArchive, showTeam, isArchiving 
                         </div>
 
                         <div className="flex items-center gap-2 w-full sm:w-auto">
-                            <TableActions actions={getRockActions(rock, onUpdate, onArchive, showTeam, isLeadershipTeam)} />
+                            <TableActions actions={getRockActions(rock, onUpdate, onArchive, onDelete, showTeam, isLeadershipTeam)} />
                         </div>
                     </div>
                 </div>

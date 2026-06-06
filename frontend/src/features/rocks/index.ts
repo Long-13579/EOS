@@ -12,3 +12,4 @@ export { useMyRocks } from './hooks/useMyRocks';
 export { useRockDialog } from './hooks/useRockDialog';
 export { MyRocksWidget } from './components/MyRocksWidget';
 export { useYearQuarter } from './hooks/useYearQuarter';
+export { useDeleteRock } from './hooks/useDeleteRock';

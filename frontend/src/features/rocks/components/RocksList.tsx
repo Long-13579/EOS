@@ -6,9 +6,10 @@ import { RockListItem } from './RockListItem';
 interface RocksListProps {
     data?: GetRocksResponse;
     onUpdate: (rock: Rock) => void;
+    onDelete?: (rock: Rock) => void;
 }
 
-export function RocksList({ data, onUpdate }: RocksListProps) {
+export function RocksList({ data, onUpdate, onDelete }: RocksListProps) {
     const { handleArchive, isPending: isArchiving } = useArchiveRock();
 
     if (!data) {
@@ -17,7 +18,7 @@ export function RocksList({ data, onUpdate }: RocksListProps) {
     const { companyRocks, departmentRocks, individualRocks } = data;
 
     const renderRock = (rock: Rock) => (
-        <RockListItem key={rock.id} rock={rock} onArchive={handleArchive} onUpdate={onUpdate} isArchiving={isArchiving} />
+        <RockListItem key={rock.id} rock={rock} onArchive={handleArchive} onUpdate={onUpdate} onDelete={onDelete} isArchiving={isArchiving} />
     );
 
     const hasAnyRocks = companyRocks?.length || departmentRocks.length || individualRocks.length;

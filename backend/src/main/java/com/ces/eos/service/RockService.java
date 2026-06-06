@@ -24,4 +24,6 @@ public interface RockService {
   RockResponse updateRock(UUID rockId, UpdateRockRequest request, UUID userId);
 
   UserRockListResponse findActiveRocksByOwnerId(UUID ownerId, UUID yearId, UUID quarterId);
+
+  void deleteRockById(UUID rockId);
 }

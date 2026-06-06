@@ -326,6 +326,15 @@ public class RockServiceImpl implements RockService {
   }
 
   @Override
+  @Transactional
+  public void deleteRockById(UUID rockId) {
+    log.info("action=deleteRockById.start rockId={}", rockId);
+    Rock rock = getRockById(rockId);
+    rockRepository.delete(rock);
+    log.info("action=deleteRockById.success rockId={}", rockId);
+  }
+
+  @Override
   public UserRockListResponse findActiveRocksByOwnerId(UUID ownerId, UUID yearId, UUID quarterId) {
     log.info(
         "action=findActiveRocksByOwnerId.start ownerId={} yearId={} quarterId={}",

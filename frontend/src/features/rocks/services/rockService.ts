@@ -1,4 +1,4 @@
-import { apiGet, apiPatch, apiPost, apiPut } from '@/utils/apiRequest';
+import { apiDelete, apiGet, apiPatch, apiPost, apiPut } from '@/utils/apiRequest';
 import type { Year, Quarter, UpdateRockStatus, Rock, UpdateRock, GetPersonalRocksParams, PersonalRockListResponse } from '../types/rock';
 
 import type { GetRocksParams, GetRocksResponse, CreateRock } from '../types/rock';
@@ -16,6 +16,8 @@ export const updateRockStatus = (id: string, data: UpdateRockStatus) => apiPatch
 export const archiveRock = (id: string, isArchived: boolean): Promise<Rock> => apiPatch<Rock>(`/rocks/${id}`, { isArchived });
 
 export const updateRock = (id: string, payload: UpdateRock): Promise<Rock> => apiPut<Rock>(`/rocks/${id}`, payload);
+
+export const deleteRock = (id: string): Promise<void> => apiDelete<void>(`/rocks/${id}`);
 
 export const getMyRocks = (params: GetPersonalRocksParams): Promise<PersonalRockListResponse> =>
     apiGet<PersonalRockListResponse>('/rocks/me', { params });

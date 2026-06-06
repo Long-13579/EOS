@@ -1,6 +1,26 @@
 parameters:
   - $ref: ../../components/parameters/rock.yaml#/RockIdParam
 
+delete:
+  tags:
+    - Rocks
+  summary: Delete a rock
+  description: Permanently deletes a rock by ID.
+  operationId: deleteRock
+  security:
+    - accessCookieAuth: []
+  responses:
+    "204":
+      description: Rock deleted successfully.
+    "401":
+      $ref: ../../components/responses/unauthorized.yaml#/UnauthorizedResponse
+    "403":
+      $ref: ../../components/responses/forbidden.yaml#/ForbiddenResponse
+    "404":
+      $ref: ../../components/responses/not-found.yaml#/NotFoundResponse
+    "500":
+      $ref: ../../components/responses/internal-server-error.yaml#/InternalServerErrorResponse
+
 put:
   tags:
     - Rocks

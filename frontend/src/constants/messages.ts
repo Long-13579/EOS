@@ -72,6 +72,7 @@ export const ERROR_MESSAGES = {
         UNARCHIVE_FAILED: 'Failed to unarchive rock. Please try again.',
         CREATE_FAILED: 'Failed to create rock. Please try again.',
         UPDATE_FAILED: 'Failed to update rock. Please try again.',
+        DELETE_FAILED: 'Failed to delete rock. Please try again.',
     },
     METRIC: {
         LOAD_FAILED: 'Failed to load metrics. Please try again.',

@@ -4,14 +4,16 @@ import { Plus } from 'lucide-react';
 import { PageHeaderGroup } from '@/components/shared/PageHeaderGroup';
 import { QueryState } from '@/components/shared/QueryState';
 import { EmptyTeamState } from '@/components/shared/EmptyTeamState';
-import { YearQuarterSelector, useRocks, RocksList, RockDialog, useRockDialog, useYearQuarter } from '@/features/rocks';
+import { ConfirmationDialog } from '@/components/shared/ConfirmationDialog';
+import { YearQuarterSelector, useRocks, RocksList, RockDialog, useRockDialog, useYearQuarter, useDeleteRock } from '@/features/rocks';
 import { useActiveTeamId } from '@/hooks/useActiveTeamId';
-import { ERROR_MESSAGES } from '@/constants/messages';
+import { CONFIRM_MESSAGES, ERROR_MESSAGES } from '@/constants/messages';
 import { Checkbox } from '@/components/ui/checkbox';
 
 export function Rocks() {
     const activeTeamId = useActiveTeamId();
     const { isRockDialogOpen, setRockDialogOpen, editingRock, openCreate, openUpdate, handleSubmit } = useRockDialog();
+    const { isDeleteDialogOpen, setDeleteDialogOpen, deletingRock, openDelete, handleConfirmDelete } = useDeleteRock();
 
     const [yearId, setYearId] = useState<string>();
     const [quarterId, setQuarterId] = useState<string>();
@@ -52,6 +54,16 @@ export function Rocks() {
 
             <RockDialog editingRock={editingRock} isOpen={isRockDialogOpen} onOpenChange={setRockDialogOpen} onSubmit={handleSubmit} />
 
+            <ConfirmationDialog
+                isOpen={isDeleteDialogOpen}
+                onOpenChange={setDeleteDialogOpen}
+                title="Delete this rock?"
+                description={deletingRock ? CONFIRM_MESSAGES.DELETE.CONFIRM_ITEM(deletingRock.title) : CONFIRM_MESSAGES.DELETE.GENERIC}
+                confirmLabel="Delete"
+                cancelLabel="Cancel"
+                onConfirm={handleConfirmDelete}
+            />
+
             {!activeTeamId ? (
                 <EmptyTeamState />
             ) : (
@@ -90,7 +102,7 @@ export function Rocks() {
                         errorMessage={ERROR_MESSAGES.ROCK.LOAD_FAILED}
                         emptyMessage={emptyMessage}
                     >
-                        <RocksList data={data} onUpdate={openUpdate} />
+                        <RocksList data={data} onUpdate={openUpdate} onDelete={openDelete} />
                     </QueryState>
                 </>
             )}

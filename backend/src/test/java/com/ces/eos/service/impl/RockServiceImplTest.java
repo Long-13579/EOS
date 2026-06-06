@@ -277,6 +277,38 @@ class RockServiceImplTest {
   }
 
   @Nested
+  class DeleteRockById {
+
+    @Test
+    void deleteRockById_existingRock_deletesSuccessfully() {
+      UUID rockId = UUID.randomUUID();
+      Rock rock = Rock.builder().id(rockId).build();
+
+      when(rockRepository.findById(rockId)).thenReturn(Optional.of(rock));
+
+      rockService.deleteRockById(rockId);
+
+      verify(rockRepository).delete(rock);
+    }
+
+    @Test
+    void deleteRockById_nonExistentRock_throwsResourceNotFoundException() {
+      UUID rockId = UUID.randomUUID();
+
+      when(rockRepository.findById(rockId)).thenReturn(Optional.empty());
+
+      assertThatThrownBy(() -> rockService.deleteRockById(rockId))
+          .isInstanceOf(ResourceNotFoundException.class)
+          .satisfies(
+              ex ->
+                  assertThat(((ResourceNotFoundException) ex).getErrorCode())
+                      .isEqualTo(ErrorCode.RESOURCE_NOT_FOUND));
+
+      verify(rockRepository, never()).delete(any());
+    }
+  }
+
+  @Nested
   class FindActiveRocksByOwner {
 
     @Test
