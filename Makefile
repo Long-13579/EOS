@@ -6,6 +6,9 @@ backend:
 docker-up:
 	cd backend && docker compose up -d
 
+docker-clean:
+	cd backend && docker compose down -v
+
 docker-down:
 	cd backend && docker compose down
 
