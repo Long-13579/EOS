@@ -11,13 +11,16 @@ import com.ces.eos.entity.Team;
 import com.ces.eos.entity.User;
 import com.ces.eos.enums.UserRole;
 import com.ces.eos.exception.AuthException;
+import com.ces.eos.exception.ConflictException;
 import com.ces.eos.exception.ResourceAlreadyExistsException;
 import com.ces.eos.exception.ResourceNotFoundException;
 import com.ces.eos.mapper.UserMapper;
 import com.ces.eos.repository.TeamRepository;
 import com.ces.eos.repository.UserRepository;
 import com.ces.eos.service.RoleService;
+import com.ces.eos.service.TeamMembershipValidationService;
 import com.ces.eos.service.UserService;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +45,7 @@ public class UserServiceImpl implements UserService {
   private final RoleService roleService;
   private final UserRepository userRepository;
   private final TeamRepository teamRepository;
+  private final TeamMembershipValidationService teamMembershipValidationService;
 
   @Override
   public PagedEntityResponse<UserResponse> getUsersWithPagination(GetEntitiesRequest request) {
@@ -158,6 +162,38 @@ public class UserServiceImpl implements UserService {
   }
 
   private void assignUserToTeams(User user, Set<UUID> teamIds) {
+    Set<Team> currentTeams = user.getTeams();
+    Set<UUID> currentTeamIds =
+        currentTeams != null
+            ? currentTeams.stream().map(Team::getId).collect(Collectors.toSet())
+            : new HashSet<>();
+
+    Set<UUID> removedTeamIds = new HashSet<>(currentTeamIds);
+    if (teamIds != null) {
+      removedTeamIds.removeAll(teamIds);
+    }
+
+    if (!removedTeamIds.isEmpty()) {
+      log.debug(
+          "action=assignUserToTeams.validateRemoval count={}", removedTeamIds.size());
+      List<String> allViolations = new ArrayList<>();
+      for (UUID removedTeamId : removedTeamIds) {
+        try {
+          teamMembershipValidationService.validateUserTeamRemoval(user.getId(), removedTeamId);
+        } catch (ConflictException e) {
+          List<String> teamViolations = e.getDetails().get("teamRemoval");
+          if (teamViolations != null) {
+            allViolations.addAll(teamViolations);
+          }
+        }
+      }
+      if (!allViolations.isEmpty()) {
+        throw new ConflictException(
+            "Cannot remove user from team(s). Reassign responsibilities first.",
+            Map.of("teamRemoval", allViolations));
+      }
+    }
+
     if (teamIds == null || teamIds.isEmpty()) {
       log.debug("action=assignUserToTeams.branch.emptyTeamIds");
       user.setTeams(new HashSet<>());
