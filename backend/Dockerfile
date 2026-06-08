@@ -11,4 +11,4 @@ RUN addgroup -S spring && adduser -S spring -G spring
 COPY --from=build /build/target/*.jar app.jar
 EXPOSE 8080
 USER spring:spring
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -Dserver.port=${PORT:-8080} -jar app.jar"]
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -Dspring.profiles.active=prod -Dserver.port=${PORT:-8080} -jar app.jar"]
