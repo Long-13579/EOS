@@ -1,8 +1,7 @@
-import { LayoutDashboard, BookOpen, Calendar, ChartNoAxesCombined, ClipboardList, Newspaper, SquareCheckBig, BadgeAlert } from 'lucide-react';
+import { LayoutDashboard, Calendar, ChartNoAxesCombined, ClipboardList, Newspaper, SquareCheckBig, BadgeAlert } from 'lucide-react';
 
 export const navItems = [
     { title: 'Dashboard', to: '/', icon: LayoutDashboard },
-    { title: 'VTO', to: '/vto', icon: BookOpen },
     { title: 'L10 Meetings', to: '/l10-meetings', icon: Calendar },
     { title: 'Scorecards', to: '/scorecards', icon: ChartNoAxesCombined },
     { title: 'Rocks', to: '/rocks', icon: ClipboardList },

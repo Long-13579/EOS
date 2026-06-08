@@ -3,7 +3,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import type { Team, UpdateTeam } from '@/types/team';
 import { Pencil, Trash2 } from 'lucide-react';
 import type { DataTableProps } from '@/types/table';
-import { TableActions } from '@/components/shared/Table/TableActions';
+import { TableActions, type ActionItem } from '@/components/shared/Table/TableActions';
 import { TeamEditCell } from './TeamEditCell';
 import { TableQueryState } from '@/components/shared/Table';
 import { ERROR_MESSAGES } from '@/constants/messages';
@@ -18,7 +18,7 @@ export interface TeamsTableProps extends DataTableProps<Team> {
 }
 
 const getTeamActions = (team: Team, onStartEdit: (team: Team) => void, onDelete: (team: Team) => void, isAdmin: boolean) => {
-    const actions = [
+    const actions: ActionItem[] = [
         {
             label: 'Edit team',
             icon: Pencil,

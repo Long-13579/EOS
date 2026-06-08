@@ -19,7 +19,7 @@ interface IssuesTableProps extends DataTableProps<Issue> {
     deletingIssueIds?: string[];
     onToggleArchive: (issue: Issue) => void;
     onOpenTodos?: (issue: Issue) => void;
-    onQuickIssueTypeUpdate?: (id: string, issueTypeId: string | null) => void;
+    onQuickIssueTypeUpdate?: (params: { id: string; issueTypeId: string | null }) => void;
 }
 
 const getIssueActions = (issue: Issue, onUpdate: (data: Issue) => void, onDelete: (data: Issue) => void, onToggleArchive: (issue: Issue) => void) => {

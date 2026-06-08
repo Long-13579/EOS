@@ -18,7 +18,7 @@ interface TodosTableProps extends DataTableProps<Todo> {
     onUpdate: (data: Todo) => void;
     onDelete: (data: Todo) => void;
     onToggleArchive: (data: Todo) => void;
-    onQuickStatusUpdate?: (id: string, status: TodoStatus) => void;
+    onQuickStatusUpdate?: (params: { id: string; status: TodoStatus }) => void;
     deletingTodoIds?: string[];
     isArchiving?: boolean;
     isReadOnly?: boolean;

@@ -14,7 +14,6 @@ import { Route as meetingRouteRouteImport } from './routes/(meeting)/route'
 import { Route as appRouteRouteImport } from './routes/(app)/route'
 import { Route as appIndexRouteImport } from './routes/(app)/index'
 import { Route as authLoginRouteImport } from './routes/(auth)/login'
-import { Route as appVtoIndexRouteImport } from './routes/(app)/vto/index'
 import { Route as appTodosIndexRouteImport } from './routes/(app)/todos/index'
 import { Route as appSettingsIndexRouteImport } from './routes/(app)/settings/index'
 import { Route as appScorecardsIndexRouteImport } from './routes/(app)/scorecards/index'
@@ -46,11 +45,6 @@ const authLoginRoute = authLoginRouteImport.update({
   id: '/(auth)/login',
   path: '/login',
   getParentRoute: () => rootRouteImport,
-} as any)
-const appVtoIndexRoute = appVtoIndexRouteImport.update({
-  id: '/vto/',
-  path: '/vto/',
-  getParentRoute: () => appRouteRoute,
 } as any)
 const appTodosIndexRoute = appTodosIndexRouteImport.update({
   id: '/todos/',
@@ -106,7 +100,6 @@ export interface FileRoutesByFullPath {
   '/scorecards/': typeof appScorecardsIndexRoute
   '/settings/': typeof appSettingsIndexRoute
   '/todos/': typeof appTodosIndexRoute
-  '/vto/': typeof appVtoIndexRoute
 }
 export interface FileRoutesByTo {
   '/$': typeof SplatRoute
@@ -120,7 +113,6 @@ export interface FileRoutesByTo {
   '/scorecards': typeof appScorecardsIndexRoute
   '/settings': typeof appSettingsIndexRoute
   '/todos': typeof appTodosIndexRoute
-  '/vto': typeof appVtoIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -137,7 +129,6 @@ export interface FileRoutesById {
   '/(app)/scorecards/': typeof appScorecardsIndexRoute
   '/(app)/settings/': typeof appSettingsIndexRoute
   '/(app)/todos/': typeof appTodosIndexRoute
-  '/(app)/vto/': typeof appVtoIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -153,7 +144,6 @@ export interface FileRouteTypes {
     | '/scorecards/'
     | '/settings/'
     | '/todos/'
-    | '/vto/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/$'
@@ -167,7 +157,6 @@ export interface FileRouteTypes {
     | '/scorecards'
     | '/settings'
     | '/todos'
-    | '/vto'
   id:
     | '__root__'
     | '/(app)'
@@ -183,7 +172,6 @@ export interface FileRouteTypes {
     | '/(app)/scorecards/'
     | '/(app)/settings/'
     | '/(app)/todos/'
-    | '/(app)/vto/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -229,13 +217,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/login'
       preLoaderRoute: typeof authLoginRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/(app)/vto/': {
-      id: '/(app)/vto/'
-      path: '/vto'
-      fullPath: '/vto/'
-      preLoaderRoute: typeof appVtoIndexRouteImport
-      parentRoute: typeof appRouteRoute
     }
     '/(app)/todos/': {
       id: '/(app)/todos/'
@@ -305,7 +286,6 @@ interface appRouteRouteChildren {
   appScorecardsIndexRoute: typeof appScorecardsIndexRoute
   appSettingsIndexRoute: typeof appSettingsIndexRoute
   appTodosIndexRoute: typeof appTodosIndexRoute
-  appVtoIndexRoute: typeof appVtoIndexRoute
 }
 
 const appRouteRouteChildren: appRouteRouteChildren = {
@@ -317,7 +297,6 @@ const appRouteRouteChildren: appRouteRouteChildren = {
   appScorecardsIndexRoute: appScorecardsIndexRoute,
   appSettingsIndexRoute: appSettingsIndexRoute,
   appTodosIndexRoute: appTodosIndexRoute,
-  appVtoIndexRoute: appVtoIndexRoute,
 }
 
 const appRouteRouteWithChildren = appRouteRoute._addFileChildren(

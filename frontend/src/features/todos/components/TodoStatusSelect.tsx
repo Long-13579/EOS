@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { CheckCircle2, Clock, CircleDashed } from 'lucide-react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import type { TodoStatus } from '@/features/todos/types/todo';
 
 const statusOptions: { value: TodoStatus; label: string; icon: React.ComponentType<{ className?: string }>; className: string }[] = [
