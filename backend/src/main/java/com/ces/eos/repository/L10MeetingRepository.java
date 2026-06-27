@@ -69,6 +69,24 @@ public interface L10MeetingRepository extends JpaRepository<L10Meeting, UUID> {
       @Param("teamId") UUID teamId,
       @Param("meetingDate") LocalDate meetingDate);
 
+  @Query(
+      """
+      SELECT CONCAT(m.meetingDate, ' ', m.meetingTime)
+      FROM L10Meeting m
+      WHERE m.facilitator.id = :userId AND m.status IN :statuses
+      """)
+  List<String> findUpcomingDatesByFacilitatorId(
+      @Param("userId") UUID userId, @Param("statuses") Collection<L10MeetingStatus> statuses);
+
+  @Query(
+      """
+      SELECT CONCAT(m.meetingDate, ' ', m.meetingTime)
+      FROM L10Meeting m
+      WHERE m.scribe.id = :userId AND m.status IN :statuses
+      """)
+  List<String> findUpcomingDatesByScribeId(
+      @Param("userId") UUID userId, @Param("statuses") Collection<L10MeetingStatus> statuses);
+
   @Modifying
   @Query("DELETE FROM L10Meeting m WHERE m.team.id = :teamId")
   void deleteAllByTeamId(@Param("teamId") UUID teamId);

@@ -24,6 +24,8 @@ export const ERROR_MESSAGES = {
         NOT_FOUND: 'No users found.',
         CONFLICT: 'User already exists.',
         VALIDATION: 'User data is invalid.',
+        DEACTIVATE_FAILED: 'Failed to deactivate user. Please try again.',
+        ACTIVATE_FAILED: 'Failed to activate user. Please try again.',
     },
     TODO: {
         LOAD_FAILED: 'Failed to load To-dos. Please try again.',
@@ -99,6 +101,8 @@ export const SUCCESS_MESSAGES = {
         CREATED: 'User created successfully!',
         UPDATED: 'User updated successfully!',
         DELETED: 'User deleted successfully!',
+        ACTIVATED: 'User activated successfully!',
+        DEACTIVATED: 'User deactivated successfully!',
     },
     METRIC: {
         CREATED: 'Metric created successfully!',
@@ -151,6 +155,9 @@ export const CONFIRM_MESSAGES = {
     ARCHIVE: {
         CONFIRM_ARCHIVE: (item: string) => `Are you sure you want to archive "${item}"?`,
         CONFIRM_UNARCHIVE: (item: string) => `Are you sure you want to unarchive "${item}"?`,
+    },
+    DEACTIVATE: {
+        CONFIRM: (name: string) => `Are you sure you want to deactivate "${name}"? The user will lose access immediately.`,
     },
 } as const;
 

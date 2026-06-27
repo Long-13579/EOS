@@ -21,4 +21,9 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, UUID
   @Modifying
   @Query("DELETE FROM RefreshToken rt WHERE rt.jti = :jti")
   int deleteByJti(@Param("jti") String jti);
+
+  @Transactional
+  @Modifying
+  @Query("DELETE FROM RefreshToken rt WHERE rt.user.id = :userId")
+  int deleteByUserId(@Param("userId") UUID userId);
 }

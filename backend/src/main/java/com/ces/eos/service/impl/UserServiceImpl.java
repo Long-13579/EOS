@@ -15,10 +15,12 @@ import com.ces.eos.exception.ConflictException;
 import com.ces.eos.exception.ResourceAlreadyExistsException;
 import com.ces.eos.exception.ResourceNotFoundException;
 import com.ces.eos.mapper.UserMapper;
+import com.ces.eos.repository.RefreshTokenRepository;
 import com.ces.eos.repository.TeamRepository;
 import com.ces.eos.repository.UserRepository;
 import com.ces.eos.service.RoleService;
 import com.ces.eos.service.TeamMembershipValidationService;
+import com.ces.eos.service.UserDeactivationValidator;
 import com.ces.eos.service.UserService;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -46,6 +48,8 @@ public class UserServiceImpl implements UserService {
   private final UserRepository userRepository;
   private final TeamRepository teamRepository;
   private final TeamMembershipValidationService teamMembershipValidationService;
+  private final UserDeactivationValidator userDeactivationValidator;
+  private final RefreshTokenRepository refreshTokenRepository;
 
   @Override
   public PagedEntityResponse<UserResponse> getUsersWithPagination(GetEntitiesRequest request) {
@@ -133,6 +137,53 @@ public class UserServiceImpl implements UserService {
                 });
     log.debug("action=getUserById.success userId={}", user.getId());
     return user;
+  }
+
+  @Override
+  @Transactional
+  public UserResponse deactivateUser(UUID currentUserId, UUID userId) {
+    log.info("action=deactivateUser.start userId={} actorId={}", userId, currentUserId);
+
+    if (currentUserId.equals(userId)) {
+      log.warn("action=deactivateUser.selfDeactivationBlocked userId={}", userId);
+      throw AuthException.forbidden("Admins cannot deactivate themselves.");
+    }
+
+    User user = getUserById(userId);
+
+    if (!user.getIsActive()) {
+      log.warn("action=deactivateUser.alreadyInactive userId={}", userId);
+      throw new ConflictException(Map.of("userId", List.of("User is already inactive.")));
+    }
+
+    userDeactivationValidator.validate(userId);
+
+    user.setIsActive(false);
+    userRepository.save(user);
+
+    refreshTokenRepository.deleteByUserId(userId);
+
+    log.info("action=deactivateUser.success userId={}", userId);
+    return userMapper.toUserResponse(user);
+  }
+
+  @Override
+  @Transactional
+  public UserResponse activateUser(UUID currentUserId, UUID userId) {
+    log.info("action=activateUser.start userId={} actorId={}", userId, currentUserId);
+
+    User user = getUserById(userId);
+
+    if (user.getIsActive()) {
+      log.warn("action=activateUser.alreadyActive userId={}", userId);
+      throw new ConflictException(Map.of("userId", List.of("User is already active.")));
+    }
+
+    user.setIsActive(true);
+    userRepository.save(user);
+
+    log.info("action=activateUser.success userId={}", userId);
+    return userMapper.toUserResponse(user);
   }
 
   @Override

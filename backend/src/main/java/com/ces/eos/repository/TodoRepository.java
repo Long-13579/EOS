@@ -81,6 +81,13 @@ public interface TodoRepository extends JpaRepository<Todo, UUID> {
   List<String> findActiveTitlesByAssigneeIdAndTeamId(
       @Param("userId") UUID userId, @Param("teamId") UUID teamId);
 
+  @Query(
+      """
+      SELECT t.title FROM Todo t JOIN t.assignees a
+      WHERE a.id = :userId AND t.isArchived = false
+      """)
+  List<String> findActiveTitlesByAssigneeId(@Param("userId") UUID userId);
+
   @Modifying
   @Query("DELETE FROM Todo t WHERE t.team.id = :teamId")
   void deleteAllByTeamId(@Param("teamId") UUID teamId);

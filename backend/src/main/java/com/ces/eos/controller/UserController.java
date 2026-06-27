@@ -22,6 +22,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -67,6 +68,24 @@ public class UserController {
       @AuthenticationPrincipal CustomUserDetails currentUser) {
     UserRole userRole = EnumParserUtil.parseEnum(UserRole.class, currentUser.getRole(), "role");
     List<TeamResponse> response = teamService.getTeamsByUserId(currentUser.getId(), userRole);
+    return ResponseEntity.ok(response);
+  }
+
+  @PatchMapping("/{userId}/deactivate")
+  @PreAuthorize("hasRole('ADMIN')")
+  public ResponseEntity<UserResponse> deactivateUser(
+      @AuthenticationPrincipal CustomUserDetails currentUser,
+      @PathVariable UUID userId) {
+    UserResponse response = userService.deactivateUser(currentUser.getId(), userId);
+    return ResponseEntity.ok(response);
+  }
+
+  @PatchMapping("/{userId}/activate")
+  @PreAuthorize("hasRole('ADMIN')")
+  public ResponseEntity<UserResponse> activateUser(
+      @AuthenticationPrincipal CustomUserDetails currentUser,
+      @PathVariable UUID userId) {
+    UserResponse response = userService.activateUser(currentUser.getId(), userId);
     return ResponseEntity.ok(response);
   }
 

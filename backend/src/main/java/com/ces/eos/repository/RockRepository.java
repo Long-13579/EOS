@@ -77,6 +77,13 @@ public interface RockRepository extends JpaRepository<Rock, UUID> {
   List<String> findActiveTitlesByOwnerIdAndTeamId(
       @Param("userId") UUID userId, @Param("teamId") UUID teamId);
 
+  @Query(
+      """
+      SELECT r.title FROM Rock r
+      WHERE r.owner.id = :userId AND r.isArchived = false
+      """)
+  List<String> findActiveTitlesByOwnerId(@Param("userId") UUID userId);
+
   @Modifying
   @Query("DELETE FROM Rock r WHERE r.team.id = :teamId")
   void deleteAllByTeamId(@Param("teamId") UUID teamId);

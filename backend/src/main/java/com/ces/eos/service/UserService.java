@@ -18,4 +18,8 @@ public interface UserService {
   UserResponse updateUser(UUID currentUserId, UUID userId, UpdateUserRequest user);
 
   User getUserByIdAndTeamId(UUID userId, UUID teamId);
+
+  UserResponse deactivateUser(UUID currentUserId, UUID userId);
+
+  UserResponse activateUser(UUID currentUserId, UUID userId);
 }

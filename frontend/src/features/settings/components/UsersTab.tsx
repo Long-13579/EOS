@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 
 import { useUsers } from '@/features/settings/hooks/useUsers';
+import { useToggleUserStatus } from '@/features/settings/hooks/useToggleUserStatus';
 import { UsersTable } from '@/features/settings/components/UsersTable';
 import { CustomPagination } from '@/components/shared/CustomPagination';
 import { DEFAULT_LIMIT } from '@/types/pagination';
@@ -25,6 +26,8 @@ export function UsersTab() {
         limit: DEFAULT_LIMIT,
         // TODO: Implement search
     });
+
+    const { handleToggleStatus } = useToggleUserStatus();
 
     const totalPages = userResponse?.pagination.totalPages ?? 0;
 
@@ -73,7 +76,7 @@ export function UsersTab() {
                     </div>
                 </div> */}
 
-                <UsersTable isError={isError} isPending={isPending} data={userResponse?.data || []} onUpdate={handleUpdateUser} />
+                <UsersTable isError={isError} isPending={isPending} data={userResponse?.data || []} onUpdate={handleUpdateUser} onToggleStatus={handleToggleStatus} />
                 <CustomPagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
             </CardContent>
 

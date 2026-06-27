@@ -81,6 +81,13 @@ public interface MetricRepository extends JpaRepository<Metric, UUID> {
   List<String> findActiveNamesByOwnerIdAndTeamId(
       @Param("userId") UUID userId, @Param("teamId") UUID teamId);
 
+  @Query(
+      """
+      SELECT m.name FROM Metric m
+      WHERE m.owner.id = :userId AND m.isArchived = false
+      """)
+  List<String> findActiveNamesByOwnerId(@Param("userId") UUID userId);
+
   @Modifying
   @Query("DELETE FROM Metric m WHERE m.team.id = :teamId")
   void deleteAllByTeamId(@Param("teamId") UUID teamId);
